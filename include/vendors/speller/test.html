@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Проверка правописания</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<script type="text/javascript" src="spell.js"></script>
+<script type="text/javascript">
+var speller = new Speller({ url: ".", lang: "ru", options: Speller.IGNORE_URLS });
+
+function spellCheck() {
+    speller.check([ document.forms[0].edit ]);
+}
+</script>
+</head>
+<body>
+  <h3>Проверка правописания</h3>
+  <form action="">
+  <p><textarea name="edit" rows="10" cols="60"></textarea></p>
+  <button name="cmdSpell" type="button" onclick="spellCheck()">Проверить</button>&#160;
+  <button name="cmdOptions" type="button" onclick="speller.optionsDialog()">Параметры...</button>
+  </form>
+</body>
+</html>

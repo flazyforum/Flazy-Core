@@ -1,0 +1,429 @@
+/*
+1 - НАСТРОЙКА
+**************************************************************/
+/* 1.1 Текст
+-------------------------------------------------------------*/
+body {
+	font-size: 100%;
+}
+.brd-page {
+	font: 75%/1.4em Verdana, Helvetica, Arial, sans-serif;
+}
+.brd h1, .brd h2, .brd h3, .brd h4, .brd h5, .brd h6 {
+	font-size: 1em;
+	font-weight: 400;
+}
+.brd samp, .brd code, .brd pre, .brd option, .brd optgroup, .brd input, .brd select, .brd textarea, .brd td, .brd th {
+	font: normal normal 1em Verdana, Helvetica, Arial, sans-serif;
+}
+/*************************************************************
+2 - Главные
+**************************************************************/
+/* 2.1 Общее расположение
+-------------------------------------------------------------*/
+.brd {
+	padding: 1.3em 2em;
+}
+.brd .main-content, .brd .gen-content {
+	border-style: solid;
+	border-width: 1px;
+}
+/* 2.2 Заголовки
+-------------------------------------------------------------*/
+.brd th {
+	font-size: 1.084em;
+}
+.brd .main-head .hn, .brd .main-foot .hn {
+	font-size: 1.084em;
+}
+.brd .column-title {
+	border-style: solid;
+	border-width: 1px;
+}
+.brd h2.main-subhead {
+	border-style: solid;
+	border-width: 1px;
+	font-size: 1.084em;
+}
+.brd .main-subhead .hn {
+	font-size: 1.084em;
+}
+.brd #brd-announcement h1, .brd .main-extensions .ct-legend, .brd .main-hotfixes .ct-legend {
+	font-size: 1.1em;
+	font-weight: 700;
+}
+/*
+3 - ОБЩИЕ ТИПЫ (МНОГОКРАТНОГО ИСПОЛЬЗОВАНИЯ)
+**************************************************************/
+/* 3.1 Контейнеры
+-------------------------------------------------------------*/
+.brd .ct-box, .brd .ct-set, .brd .ct-group {
+	border-style: solid;
+	border-width: 1px;
+}
+.brd .ct-set .ct-legend {
+	text-align: left;
+	font-weight: 400;
+}
+/* 3.2 Участники
+-------------------------------------------------------------*/
+.brd .user-ident .username a, .brd .user-ident .username strong {
+	font-size: 1.167em;
+	font-weight: 700;
+}
+.brd .user-ident .username a, .brd .user-ident .username a:link, .brd .user-ident .username a:visited {
+	text-decoration: none;
+}
+.brd .user-ident .username a:hover, .brd .user-ident .username a:active, .brd .user-ident .username a:focus {
+	text-decoration: underline;
+}
+.brd .user-ident .usertitle {
+	font-weight: 700;
+}
+/* 3.3 Секция меню (профиль и админка)
+-------------------------------------------------------------*/
+.brd .main-menu li, .brd .admin-menu li {
+	font-size: 1.084em;
+}
+.brd .main-menu li.active a, .brd .admin-menu li.active a {
+	font-weight: 700;
+}
+/*
+4 - ОБЩИЕ ЭЛЕМЕНТЫ ИНТЕРФЕЙСА
+**************************************************************/
+/* 4.1 Лого и подзаголовок
+-------------------------------------------------------------*/
+#brd-head {
+	padding-bottom: 2.75em;
+	padding-top: 1em;
+}
+#brd-title a, #brd-title strong {
+	font-size: 1.5em;
+	text-decoration: none;
+	font-weight: 400;
+	padding-left: 120px;
+}
+#brd-desc {
+	font-size: 1.084em;
+	padding-left: 120px;
+}
+/* 4.2 Основная навигация
+-------------------------------------------------------------*/
+#brd-navlinks li a {
+	font-size: 1.167em;
+	text-decoration: none;
+	font-weight: 700;
+}
+#brd-navlinks a {
+	border-bottom-style: dotted;
+	border-bottom-width: 1px;
+}
+#brd-navlinks a:hover {
+	border-bottom-style: solid;
+	border-bottom-style: 1px;
+}
+/* 4.3 Пейджинг и собщения
+-------------------------------------------------------------*/
+.brd .posting .newpost {
+	font-size: 1.084em;
+	font-weight: 700;
+}
+.brd a.toggle {
+	width: 17px;
+	height: 17px;
+}
+.brd a.hide {
+	background-position: 0 17px;
+}
+.brd .count-poll {
+	height: 8px;
+}
+/* 4.4 Breadcrumbs
+-------------------------------------------------------------*/
+.brd .crumbs .crumblast {
+	font-weight: 700;
+}
+.brd .crumbs .crumblast span {
+	font-weight: 400;
+}
+.brd .crumbs {
+	font-size: 1.084em;
+}
+/* 4.5 Статистика
+-------------------------------------------------------------*/
+#brd-stats li strong {
+	font-weight: 700;
+}
+.brd .index-stat {
+	border-top: 0;
+}
+#brd-statlist p {
+	text-align: center;
+}
+/* 4.6 Низ
+-------------------------------------------------------------*/
+#querytime {
+	text-align: center;
+	font-size: .9em;
+}
+/* Основное содержание и функции
+-------------------------------------------------------------*/
+.brd #brd-announcement {
+	margin-top: 1em;
+	padding: .5em 1.5em;
+}
+.brd #brd-announcement br {
+	display: inline;
+}
+.brd .main-options {
+	border-top: none;
+}
+.brd .main-options .options {
+	text-align: center;
+	float: none;
+}
+/*
+5 - ГЛАВНАЯ, ФОРУМЫ, ПОИСК, МОДЕРИРОВАНИЕ
+**************************************************************/
+/* 5.1 Содержание
+-------------------------------------------------------------*/
+.brd .main-content .item-status {
+	font-weight: 400;
+}
+.brd .main-content .item-status em {
+	font-style: normal;
+}
+.brd .main-content .item-status em.sticky {
+	font-weight: 700;
+}
+.brd .main-content .item-status em.closed {
+	font-weight: 700;
+}
+.brd .main-content .item-status em.poll {
+	font-weight: 700;
+}
+.brd .main-content .item-status em.moved, .brd .main-content .item-status em.poll {
+	font-weight: 700;
+}
+.brd .main-content .item-subject h3 {
+	font-size: 1.084em;
+	font-weight: 400;
+}
+.brd .main-content cite, .brd .main-content em {
+	font-style: normal;
+}
+.brd .main-content .item-subject h3 {
+	font-size: 1.084em;
+	font-weight: 400;
+}
+.brd .main-content cite, .brd .main-content em {
+	font-style: normal;
+}
+.brd .main-content .info-lastpost cite, .brd .main-content .info-lastpost span, .brd .main-content .info-forum a {
+	font-style: normal;
+	font-weight: 400;
+}
+.brd .main-content .icon {
+	width: 28px;
+	height: 28px;
+}
+td div.tclcon {
+	margin-left: 35px;
+}
+#tooltip {
+	font-size: .7em;
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+}
+#tooltip h3, #tooltip div {
+	font-size: 1.074em;
+	font-weight: 700;
+}
+/*
+6 - ОСНОВНОЕ СОДЕРЖАНИЕ - ФОРМЫ
+**************************************************************/
+/* 6.1 В целом
+-------------------------------------------------------------*/
+.brd .frm-group, .brd .sf-box, .brd .mf-box, .brd .txt-box, .brd .sf-set, .brd .mf-set, .brd .txt-set {
+	border-style: solid;
+	border-width: 1px;
+}
+.brd .text input, .brd .select select, .brd span.submit input, .brd span.cancel input {
+	font-size: 1.084em;
+}
+/* 6.2 Поля (текст, селекс, чекбокс)
+-------------------------------------------------------------*/
+.brd .sf-set .text label small, .brd .sf-set .select label small {
+	text-align: left;
+	font-size: .917em;
+}
+.brd .sf-set .sf-short label small {
+	font-size: 1em;
+}
+/* 6.3 Мульти-поля (радио, группа чекбоксов)
+-------------------------------------------------------------*/
+.brd .mf-set legend span em {
+	font-style: normal;
+	font-size: .917em;
+}
+.brd .mf-set .mf-field {
+	border-left: 1px solid #ccc;
+}
+.brd .mf-set .mf-field1 {
+	border-left: 0;
+}
+/* 6.4 Блок мулти-чекбокс
+-------------------------------------------------------------*/
+.brd .checklist legend, .brd .checklist legend span {
+	font-weight: 700;
+}
+/* 6.5 Текстовые поля
+-------------------------------------------------------------*/
+.brd .txt-set label small {
+	font-size: .917em;
+}
+/* 6.6 Обработка ошибок
+-------------------------------------------------------------*/
+.brd #req-msg p em, .brd .required label span em {
+	font-style: normal;
+	font-weight: 400;
+}
+.brd .required label span em {
+	font-size: .917em;
+}
+.brd .required label span  {
+	font-weight: 700;
+}
+/*
+7 - ОСНОВНОЕ СОДЕРЖАНИЕ - ТЕМЫ И РАЗОБРАННОЕ СОДЕРЖАНИЕ
+**************************************************************/
+/* 7.1 Структура
+-------------------------------------------------------------*/
+.brd .post {
+	border-style: solid;
+	border-width: 1px;
+}
+.brd .post .posthead .post-byline a, .brd .post .posthead .post-byline strong {
+	font-size: 1.167em;
+	font-weight: 700;
+	text-decoration: none;
+	font-style: normal;
+}
+.brd .posthead {
+	border-style: none none none solid;
+	border-width: 1px;
+}
+.brd .posthead .hn {
+	border-style: none none dashed;
+	border-width: 1px;
+}
+.brd .posthead .post-num {
+	font-weight: 700;
+}
+.brd .posthead .post-title a {
+	font-size: 1em;
+	text-decoration: none;
+	font-weight: 700;
+}
+.brd .posthead .post-title small, .brd .posthead .post-title small a {
+	font-size: 1em;
+	font-weight: 400;
+}
+.brd .postbody {
+	border-left-style: solid;
+	border-left-width: 1px;
+}
+.brd .postfoot {
+	border-top-style: dashed;
+	border-top-width: 1px;
+}
+.brd .postfoot .post-options {
+	border-left-style: solid;
+	border-left-width: 1px;
+}
+.brd .postbody .author-ident .usertitle {
+	font-weight: 700;
+}
+.brd .postbody .author-ident .userstatus span {
+	font-size: .917em;
+}
+.brd .postbody .author-info li span strong {
+	font-weight: 400;
+}
+.brd .online .author-ident .userstatus span {
+	font-weight: 700;
+}
+/* 7.2 Содержание
+-------------------------------------------------------------*/
+.brd .entry-content {
+	font-size: 1.084em;
+}
+.brd .entry-content h5, .brd .entry-content h5 * {
+	font-weight: 700;
+	font-size: 1.084em;
+}
+.brd .entry-content .codebox code {
+	font-family: monospace;
+}
+.brd .entry-content .quotebox cite {
+	font-style: normal;
+	font-weight: 700;
+}
+.brd .entry-content .hide-head {
+	border-style: solid;
+	border-width: 1px;
+}
+.brd .entry-content span.bbu {
+	text-decoration: underline;
+}
+.brd span.sig-line {
+	border-top-style: solid;
+	border-top-width: 1px;
+}
+/* 7.3 Личные сообщения
+-------------------------------------------------------------*/
+.brd .pm-list tr.pm-new td, .brd .pm-list tr.pm-new td span {
+	font-weight: 700;
+}
+/*
+8 - Таблицы
+**************************************************************/
+/* 8.1 Ячейки таблицы
+-------------------------------------------------------------*/
+.brd table td {
+	border-width: 1px;
+	border-style: solid none none solid;
+}
+.brd table td.tc0 {
+	border-left-style: none;
+	border-left-width: 0
+}
+.brd .main-content th {
+	font-size: 1.084em;
+	font-weight: 400;
+}
+/*
+9 - СОДЕРЖАНИЕ - Остатки
+**************************************************************/
+/* 9.1 Жалобы
+-------------------------------------------------------------*/
+.brd .report h3 span {
+	font-style: normal;
+}
+.brd .report h3 cite {
+	font-style: normal;
+	font-size: 1.084em;
+	font-weight: 700;
+}
+.brd .report h3 strong {
+	text-align: right;
+	font-size: 1.167em;
+}
+.brd .report p strong {
+	font-weight: 400;
+}
+/* 9.2 Помощь
+-------------------------------------------------------------*/
+.brd .help-box code {
+	font-family: courier;
+	font-size: 1.084em;
+}

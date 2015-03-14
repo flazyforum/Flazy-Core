@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+  <title>Правописание</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="spell.css"/>
+  <script type="text/javascript" src="http://speller.yandex.net/speller/1.0/lib.js"></script>
+  <script type="text/javascript" src="http://speller.yandex.net/speller/1.0/spellopt.js"></script>
+</head>
+<body onload="new SpellOptDialog().init()">
+  <form id="form" action="">
+    <div>Параметры:
+      <ul style="list-style-type:none;padding-left:15px;margin:0px;">
+        <li><input type="checkbox" id="ignoreUppercase"/> <label for="ignoreUppercase">Пропускать слова из ПРОПИСНЫХ букв</label></li>
+        <li><input type="checkbox" id="ignoreDigits"/> <label for="ignoreDigits">Пропускать слова с цифрами</label></li>
+        <li><input type="checkbox" id="ignoreUrls"/> <label for="ignoreUrls">Пропускать URL'и и имена файлов</label></li>
+        <li><input type="checkbox" id="findRepeat"/> <label for="findRepeat">Подсвечивать повторяющиеся слова</label></li>
+      </ul>
+    </div>
+    <div style="position:relative;margin:7px 0px;">&#160;
+      <span style="position:absolute;right:165px;">Язык словаря:</span>
+      <select name="langList" style="width:160px;position:absolute;right:0px">
+        <option value="en">Английский</option>
+        <option value="ru">Русский</option>
+        <option value="uk">Украинский</option>
+      </select>
+    </div>
+    <div style="position:relative;margin:7px 0px;">&#160;
+      <span style="position:absolute;right:165px;">Словарь пользователя:</span>
+      <button type="button" name="userDic" style="width:120px;position:absolute;right:40px;">Редактировать...</button>
+    </div>
+    <div id="groupLatin" style="margin-bottom:5px;">Слова, написанные латиницей:
+      <ul style="list-style-type:none;padding-left:15px;margin:0px;">
+        <li><input type="radio" id="ignoreLatin" name="latin" value="ignore"/> <label for="ignoreLatin">Пропускать</label></li>
+        <li><input type="radio" id="flagLatin"   name="latin" value="flag"/> <label for="flagLatin">Подсвечивать</label></li>
+        <li>
+          <div style="position:relative;">
+          <input type="radio" id="checkLatin"  name="latin" value="check"/> <label for="checkLatin">Проверять</label>
+          <select name="latinLang" style="width:160px;position:absolute;right:0px;">
+            <option value="en" selected="selected">Английский</option>
+          </select>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div style="position:relative;">
+      <span>
+        <input type="checkbox" id="recheck"/>
+        <label for="recheck" id="labelRecheck">Проверить с начала</label>
+      </span>
+      <span style="position:absolute;right:0px;">
+        <input type="button" name="ok" class="button" value="OK"/>
+        <input type="button" name="cancel" class="button" value="Отмена"/>
+      </span>
+    </div>
+  </form>
+</body>
+</html>

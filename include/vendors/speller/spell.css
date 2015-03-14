@@ -1,0 +1,27 @@
+* {
+   font-family: Tahoma, Verdana, Arial;
+   font-size: 11px;
+}
+body {
+   background: threedface;
+   border-style: none;
+   padding: 0px;
+   margin: 10px;
+   overflow: hidden;
+}
+.lbutton {
+   width: 100%;
+   padding-left: 0px;
+   padding-right: 0px;
+}
+.button {
+   width: 90px;
+}
+.fragment {
+   height: 46px;
+   background-color: #ffffe1;
+   border: 1px solid gray;
+   margin: 2px 0px 0px 0px;
+   overflow: hidden;
+   padding: 0px 2px;
+}

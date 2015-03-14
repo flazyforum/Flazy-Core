@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Правописание:</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="spell.css"/>
+  <script type="text/javascript" src="http://speller.yandex.net/speller/1.0/lib.js"></script>
+  <script type="text/javascript" src="http://speller.yandex.net/speller/1.0/speller.js"></script>
+  <script type="text/javascript" src="http://speller.yandex.net/speller/1.0/spelldlg.js"></script>
+  <script type="text/javascript" src="http://speller.yandex.net/speller/1.0/spelldic.js"></script>
+</head>
+<body onload="new SpellDialog().init()">
+  <div style="display:none">
+    <p id="checkComplete">Проверка правописания завершена.</p>
+    <p id="wordNotFound">Слово &quot;{0}&quot; не найдено в словаре. Вы хотите его использовать?</p>
+    <p id="timeoutError">Не удалось выполнить запрос. Время ожидания истекло.</p>
+    <p id="changeError">Не удалось заменить слово.</p>
+    <p id="spellErrors">Ошибка:Нет в словаре:Повтор слова:Ошибка капитализации</p>
+  </div>
+  <form id="form" action="">
+    <table cellspacing="2" align="center">
+      <tr>
+        <td><span id="reason"></span></td>
+        <td style="width:105px">&#160;</td>
+      </tr>
+      <tr>
+        <td valign="top">
+        <input name="word" type="text" maxlength="100" style="width:300px;padding:1px;"/>
+        <div id="fragment" class="fragment" style="width:300px"></div></td>
+        <td valign="top">
+        <button type="button" name="ignoreOnce" class="lbutton" style="margin-bottom: 3px">Пропустить</button>
+        <button type="button" name="ignoreAll" class="lbutton" style="margin-bottom: 3px">Пропустить все</button>
+        <button type="button" name="addToDic" class="lbutton" style="visibility:hidden">Добавить</button>
+        </td>
+      </tr>
+      <tr>
+        <td><span>Варианты:</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><select name="suggest" size="5" style="width:306px"><option>(варианты отсутствуют)</option></select></td>
+        <td valign="top">
+        <button type="button" name="change" class="lbutton" style="margin-bottom: 3px">Заменить</button>
+        <button type="button" name="changeAll" class="lbutton" style="margin-bottom: 3px">Заменить все</button>
+        </td>
+      </tr>
+      <tr>
+        <td align="right">
+        Язык словаря:
+        <select name="langList" style="width:160px">
+            <option value="en">Английский</option>
+            <option value="ru">Русский</option>
+            <option value="uk">Украинский</option>
+        </select>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td valign="top" align="right">
+        <div style="position:relative">
+          <img src="yandex.png" width="52" height="22" style="position:absolute;right:254px;bottom:0;" alt="Яндекс"/>
+          <button type="button" name="options" class="button">Параметры...</button>&#160;
+          <button type="button" name="undo" class="button">Вернуть</button>
+        </div>
+        </td>
+        <td valign="top">
+        <button type="button" name="cancel" class="lbutton">Закрыть</button>
+        </td>
+      </tr>
+    </table>
+  </form>
+</body>
+</html>
