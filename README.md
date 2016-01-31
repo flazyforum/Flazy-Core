@@ -66,7 +66,8 @@ Upgrading
 * **Make a backup (That measn a backup of your files and your database.)** 
 * **Do not remove the previous version** (or else your settings will maybe get lost)
 * Download the new version
-* Install the new version over the previous version
+* Open your forum
+* Update the database if it needs it
 * Done
 
 Frequently asked questions
