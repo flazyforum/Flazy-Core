@@ -3,8 +3,8 @@
  * Загружает сохраненные последовательности используемые для преобразования проблемных строк в URL.
  * Они подбираются в отношении всей строки после всех других преобразований.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */

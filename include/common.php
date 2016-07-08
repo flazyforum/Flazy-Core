@@ -2,8 +2,8 @@
 /**
  * Общие данные, выполение различных функций, необходимых для правильной работы форума.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008-2015 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.Us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -12,7 +12,7 @@
 if (!defined('FORUM_ROOT'))
 {
 	header('Content-type: text/html; charset=utf-8');
-	die('Константа FORUM_ROOT должны быть определена и ссылаться на действующий корневой каталог Flazy.');
+	die('Constant FORUM_ROOT need to be пределена и ссылаться на действующий корневой каталог Flazy.');
 }
 if (!defined('FORUM_ESSENTIALS_LOADED'))
 	require FORUM_ROOT.'include/essentials.php';
@@ -82,7 +82,7 @@ else
 
 // Verify that we are running the proper database schema revision
 if ((!isset($forum_config['o_database_revision']) || $forum_config['o_database_revision'] < FORUM_DB_REVISION || version_compare($forum_config['o_cur_version'], FORUM_VERSION, '<')) && $forum_user['g_id'] == FORUM_ADMIN)
-	error('Ваша база данных Flazy устарела и должна быть обновлена. Пожалуйста запустите <a href="'.$base_url.'/admin/db_update.php">db_update.php</a> чтобы закончить процесс обновления.');
+	error('New update is avalible. Click here  <a href="'.$base_url.'/admin/db_update.php">to upgrade</a> .');
 
 // Check if we are to display a maintenance message
 if ($forum_config['o_maintenance'] && $forum_user['g_id'] > FORUM_ADMIN && !defined('FORUM_TURN_OFF_MAINT'))

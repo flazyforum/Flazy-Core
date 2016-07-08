@@ -1,10 +1,9 @@
 <?php
 /**
- * Общие функции используемые на форуме.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
- * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
+ * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
 
@@ -337,7 +336,7 @@ function flazy_format_time($timestamp, $type = FORUM_FT_BACK, $date_only = false
 			return $hours.' '.declination($hours, array($lang_common['Hour'], $lang_common['Hours'], $lang_common['Hours2'])).' '.$way;
 		//Минуты > 60
 		else if ($hours == 1)
-			return '1 час, '.$minutes.' '.declination($minutes, array($lang_common['Minute'], $lang_common['Minutes'], $lang_common['Minutes2'])).' '.$way;
+			return '1 hour, '.$minutes.' '.declination($minutes, array($lang_common['Minute'], $lang_common['Minutes'], $lang_common['Minutes2'])).' '.$way;
 		// Минут
 		else if ($minutes > 0 && $minutes != 1)
 			return $minutes.' '.declination($minutes, array($lang_common['Minute'], $lang_common['Minutes'], $lang_common['Minutes2'])).' '.$way;
@@ -417,6 +416,81 @@ function declination($number, $words)
  * Создаёт "Меню", которое отображается в верхней части каждой страницы.
  * @return string Список ссылок.
  */
+function generate_navlinks_admins()
+{
+	global $forum_config, $lang_common, $forum_url, $forum_url_admin, $forum_user;
+	$return = ($hook = get_hook('fn_generate_navlinks_start')) ? eval($hook) : null;
+	if ($return != null)
+		return $return;
+	if ($forum_user['is_guest'])
+	{
+		if ($forum_user['g_read_board'] && $forum_user['g_search'])
+		$links['register'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['register']).'" accesskey="x" role="menuitem"><i class="fa fa-user-plus"></i> '.$lang_common['Register'].'</a></li>';
+		$links['login'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['login']).'" accesskey="x" role="menuitem"><i class="fa fa-sign-in"></i> '.$lang_common['Login'].'</a></li>';
+	}
+	else
+	{
+		if (!$forum_user['is_admmod'])
+		{
+			if ($forum_user['g_read_board'] && $forum_user['g_search'])
+			$links['profil'] = '<li id="navprofile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><span>'.$lang_common['Profile'].'</span></a></li>';
+			$links['logout'] = '<li id="navlogout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><span>'.$lang_common['Logout'].'</span></a></li>';
+		}
+		else
+		{
+			$links['towebsite'] = '<li id="nav_website" class="nav"><a href="'.forum_link($forum_url['index']).'"><i class="fa fa-globe"></i> '.$lang_common['To website'].'</a></li>';
+			$links['profil'] = '<li id="nav_profile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><i class="fa fa-power-off"></i> '.$lang_common['Profile'].'</a></li>';
+			$links['logout'] = '<li id="nav_logout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><i class="fa fa-sign-out"></i> '.$lang_common['Logout'].'</a></li>';
+		}
+	}
+	($hook = get_hook('fn_generate_navlinks_end')) ? eval($hook) : null;
+	return implode("\n\t\t", $links);
+	}
+
+ function generate_topnavlinks()
+{
+	global $forum_config, $lang_common, $forum_url, $forum_url_admin, $forum_user;
+
+	$return = ($hook = get_hook('fn_generate_navlinks_start')) ? eval($hook) : null;
+	if ($return != null)
+		return $return;
+
+if ($forum_user['is_guest'])
+	{
+		if ($forum_user['g_read_board'] && $forum_user['g_search'])
+		$links['register'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['register']).'"><i class="fa fa-user-plus"></i> '.$lang_common['Register'].'</a></li>';
+		$links['login'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['login']).'"><i class="fa fa-sign-in"></i> '.$lang_common['Login'].'</a></li>';
+	}
+	else
+
+		if (!$forum_user['is_admmod'])
+		{
+			if ($forum_user['g_read_board'] && $forum_user['g_search'])
+			$links['logout'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><i class="fa fa-sign-out"></i> '.$lang_common['Logout'].'</a></li>';	
+			$links['profile'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><i class="fa fa-power-off"></i> '.$lang_common['Profile'].'</a></li>';
+			$pm_full = ($forum_user['pm_inbox'] < $forum_config['o_pm_inbox_size']) ? false : true;
+			if ($forum_user['pm_new'] && $forum_config['o_pm_show_new_count'] || $pm_full)
+				$links['pm_new']  = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><i class="fa fa-envelope-o"></i> '.$lang_common['Private messages'].'</a></li>';
+
+		}
+		else
+		{
+			$links['logout'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'" ><i class="fa fa-sign-out"></i> '.$lang_common['Logout'].'</a></li>';
+			$links['profile'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><i class="fa fa-user"></i> '.$lang_common['Profile'].'</a></li>';
+			$pm_full = ($forum_user['pm_inbox'] < $forum_config['o_pm_inbox_size']) ? false : true;
+				if ($forum_user['pm_new'] && $forum_config['o_pm_show_new_count'] || $pm_full)
+				$links['pm_new']  = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><i class="fa fa-envelope-o"></i> '.$lang_common['PM new'].'(' .$forum_user['pm_new'].')'.'</a></li>';
+				
+			$links['admin'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link('admin/index.php').'" ><i class="fa fa-lock"></i> '.$lang_common['Admin'].'</a></li>';		
+}
+
+
+		($hook = get_hook('fn_generate_navlinks_end')) ? eval($hook) : null;
+
+	return implode("\n\t\t", $links);
+}
+
+
 function generate_navlinks()
 {
 	global $forum_config, $lang_common, $forum_url, $forum_url_admin, $forum_user;
@@ -426,49 +500,16 @@ function generate_navlinks()
 		return $return;
 
 	// Index should always be displayed
-	$links['index'] = '<li id="navindex" class="nav'.((FORUM_PAGE == 'index') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['index']).'"><span>'.$lang_common['Index'].'</span></a></li>';
+	$links['index'] = '<li data-skip-responsive="true" class="site-menu font-icon"><a href="'.forum_link($forum_url['index']).'"><i class="fa fa-comments"></i>'.$lang_common['Index'].'</a></li>';
 
 	if ($forum_user['g_read_board'] && $forum_user['g_view_users'])
-		$links['userlist'] = '<li id="navuserlist" class="nav'.((FORUM_PAGE == 'userlist') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['users']).'"><span>'.$lang_common['User list'].'</span></a></li>';
+		$links['userlist'] = '<li data-skip-responsive="true" class="site-menu font-icon"><a href="'.forum_link($forum_url['users']).'"><i class="fa fa-users"></i>'.$lang_common['User list'].'</a></li>';
+			$links['search'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['search']).'"> <i class="fa fa-search"></i>'.$lang_common['Search'].'</a></li>';
 
 	if ($forum_config['o_rules'] && (!$forum_user['is_guest'] || $forum_user['g_read_board'] || $forum_config['o_regs_allow']))
-		$links['rules'] = '<li id="navrules" class="nav'.((FORUM_PAGE == 'rules') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['rules']).'"><span>'.$lang_common['Rules'].'</span></a></li>';
+		$links['rules'] = '<li data-skip-responsive="true" class="site-menu font-icon"><a href="'.forum_link($forum_url['rules']).'"><i class="fa fa-book"></i>'.$lang_common['Rules'].'</a></li>';
 
-	if ($forum_user['is_guest'])
-	{
-		if ($forum_user['g_read_board'] && $forum_user['g_search'])
-			$links['search'] = '<li id="navsearch" class="nav'.((FORUM_PAGE == 'search') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['search']).'"><span>'.$lang_common['Search'].'</span></a></li>';
 
-		$links['register'] = '<li id="navregister" class="nav'.((FORUM_PAGE == 'register') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['register']).'"><span>'.$lang_common['Register'].'</span></a></li>';
-		$links['login'] = '<li id="navlogin" class="nav'.((FORUM_PAGE == 'login') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['login']).'"><span>'.$lang_common['Login'].'</span></a></li>';
-	}
-	else
-	{
-		if (!$forum_user['is_admmod'])
-		{
-			if ($forum_user['g_read_board'] && $forum_user['g_search'])
-				$links['search'] = '<li id="navsearch" class="nav'.((FORUM_PAGE == 'search') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['search']).'"><span>'.$lang_common['Search'].'</span></a></li>';
-
-			$links['profile'] = '<li id="navprofile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><span>'.$lang_common['Profile'].'</span></a></li>';
-
-			if ($forum_config['o_pm_show_global_link'])
-				$links['pm'] = '<li id="navpm" class="nav'.((FORUM_PAGE == 'profile-pm') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><span>'.$lang_common['Private messages'].'</span></a></li>';
-
-			$links['logout'] = '<li id="navlogout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><span>'.$lang_common['Logout'].'</span></a></li>';
-		}
-		else
-		{
-			$links['search'] = '<li id="navsearch" class="nav'.((FORUM_PAGE == 'search') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['search']).'"><span>'.$lang_common['Search'].'</span></a></li>';
-
-			$links['profile'] = '<li id="navprofile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><span>'.$lang_common['Profile'].'</span></a></li>';
-
-			if ($forum_config['o_pm_show_global_link'])
-				$links['pm'] = '<li id="navpm" class="nav'.((FORUM_PAGE == 'profile-pm') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><span>'.$lang_common['Private messages'].'</span></a></li>';
-
-			$links['logout'] = '<li id="navlogout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><span>'.$lang_common['Logout'].'</span></a></li>';
-			$links['admin'] = '<li id="navadmin" class="nav'.((substr(FORUM_PAGE, 0, 5) == 'admin') ? ' isactive' : '').'"><a href="'.forum_link('admin/admin.php').'"><span>'.$lang_common['Admin'].'</span></a></li>';
-		}
-	}
 
 	// Are there any additional navlinks we should insert into the array before imploding it?
 	if ($forum_config['o_additional_navlinks'] != '' && preg_match_all('#([0-9]+)\s*=\s*(.*?)\n#s', $forum_config['o_additional_navlinks']."\n", $extra_links))
@@ -476,14 +517,13 @@ function generate_navlinks()
 		// Insert any additional links into the $links array (at the correct index)
 		$num_links = count($extra_links[1]);
 		for ($i = 0; $i < $num_links; ++$i)
-			array_insert($links, (int)$extra_links[1][$i], '<li id="navextra'.($i + 1).'">'.$extra_links[2][$i].'</li>');
+			array_insert($links, (int)$extra_links[1][$i], '<li data-skip-responsive="true" class="site-menu font-icon '.($i + 1).'">'.$extra_links[2][$i].'</li>');
 	}
 
 	($hook = get_hook('fn_generate_navlinks_end')) ? eval($hook) : null;
 
 	return implode("\n\t\t", $links);
 }
-
 
 // Generate a string with page and item information for multipage headings
 function generate_items_info($label, $first, $total)
@@ -530,11 +570,11 @@ function paginate($num_pages, $cur_page, $link, $separator, $args = null)
 	{
 		// Add a previous page link
 		if ($num_pages > 1 && $cur_page > 1)
-			$pages[] = '<span class="pevious"></span><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], ($cur_page - 1), $args).'">'.$lang_common['Previous'].'</a>';
+			$pages[] = '<li class="previous"><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], ($cur_page - 1), $args).'" rel="prev" role="button"><i class="fa fa-chevron-left"></i></a></li>';
 
 		if ($cur_page > 3)
 		{
-			$pages[] = '<a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], 1, $args).'">1</a>';
+			$pages[] = '<li><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], 1, $args).'" role="button"">1</a></li>';
 
 			if ($cur_page > 5)
 				$pages[] = '<span>'.$lang_common['Spacer'].'</span>';
@@ -545,21 +585,21 @@ function paginate($num_pages, $cur_page, $link, $separator, $args = null)
 			if ($current < 1 || $current > $num_pages)
 				continue;
 			else if ($current != $cur_page || $link_to_all)
-				$pages[] = '<a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $current, $args).'">'.forum_number_format($current).'</a>';
+				$pages[] = '<li><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $current, $args).'" role="button">'.forum_number_format($current).'</a></li>';
 			else
-				$pages[] = '<strong'.(empty($pages) ? ' class="first-item"' : '').'>'.forum_number_format($current).'</strong>';
+				$pages[] = '<li class="active"><span>'.forum_number_format($current).'</span></li>';
 
 		if ($cur_page <= ($num_pages-3))
 		{
 			if ($cur_page != ($num_pages-3) && $cur_page != ($num_pages-4))
 				$pages[] = '<span>'.$lang_common['Spacer'].'</span>';
 
-			$pages[] = '<a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $num_pages, $args).'">'.forum_number_format($num_pages).'</a>';
+			$pages[] = '<li><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $num_pages, $args).'">'.forum_number_format($num_pages).'</a></li>';
 		}
 
 		// Add a next page link
 		if ($num_pages > 1 && !$link_to_all && $cur_page < $num_pages)
-			$pages[] = '<a class="next" href="'.forum_sublink($link, $forum_url['page'], ($cur_page + 1), $args).'">'.$lang_common['Next'].'</a>';
+			$pages[] = '<li class="next"><a  href="'.forum_sublink($link, $forum_url['page'], ($cur_page + 1), $args).'" rel="next" role="button"><i class="fa fa-chevron-right"></i></a></li>';
 	}
 
 	($hook = get_hook('fn_paginate_end')) ? eval($hook) : null;
@@ -939,7 +979,7 @@ function get_current_url($max_length = 0)
 	if ($return != null)
 		return $return;
 
-	$protocol = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off') ? 'http://' : 'https://';
+	 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 	$port = (isset($_SERVER['SERVER_PORT']) && (($_SERVER['SERVER_PORT'] != '80' && $protocol == 'http://') || ($_SERVER['SERVER_PORT'] != '443' && $protocol == 'https://')) && strpos($_SERVER['HTTP_HOST'], ':') === false) ? ':'.$_SERVER['SERVER_PORT'] : '';
 
 	$url = urldecode($protocol.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI']);
@@ -1001,7 +1041,7 @@ function validate_search_word($word)
 {
 	global $forum_user;
 	static $stopwords;
-	
+
 	$return = ($hook = get_hook('fn_validate_search_word_start')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
@@ -1180,8 +1220,8 @@ function cookie_login(&$forum_user)
 	global $forum_db, $db_type, $forum_config, $cookie_name, $cookie_path, $cookie_domain, $cookie_secure, $forum_time_formats, $forum_date_formats;
 
 	$now = time();
-	$expire = $now + 1209600; // The cookie expires after 14 days
-
+	$expire = $now + 2678400; // The cookie expires after 31 days
+	
 	// We assume it's a guest
 	$cookie = array('user_id' => 1, 'password_hash' => 'Guest', 'expiration_time' => 0, 'expire_hash' => 'Guest');
 
@@ -1212,7 +1252,7 @@ function cookie_login(&$forum_user)
 		$security = false;
 		if ($forum_user['security_ip'] && substr(get_remote_address(), 0, strlen($forum_user['security_ip'])) != $forum_user['security_ip'])
 			$security = true;
-		
+
 		// We now validate the cookie hash
 		if ($cookie['expire_hash'] !== sha1($forum_user['salt'].$forum_user['password'].forum_hash(intval($cookie['expiration_time']), $forum_user['salt'])) || $user_agent || $security)
 			set_default_user();
@@ -1380,13 +1420,13 @@ function set_default_user()
 				'VALUES'	=> '1, \''.$forum_db->escape($remote_addr).'\', '.$forum_user['logged'].', \''.$forum_user['csrf_token'].'\'',
 				'UNIQUE'	=> 'user_id=1 AND ident=\''.$forum_db->escape($remote_addr).'\''
 			);
-	
+
 			if ($forum_user['prev_url'] != null)
 			{
 				$query['REPLACE'] .= ', prev_url';
 				$query['VALUES'] .= ', \''.$forum_db->escape($forum_user['prev_url']).'\'';
 			}
-	
+
 			($hook = get_hook('fn_set_default_user_qr_add_online_guest_user')) ? eval($hook) : null;
 			$forum_db->query_build($query) or error(__FILE__, __LINE__);
 		}
@@ -1397,11 +1437,11 @@ function set_default_user()
 				'SET'		=> 'logged='.time(),
 				'WHERE'		=> 'ident=\''.$forum_db->escape($remote_addr).'\''
 			);
-	
+
 			$current_url = get_current_url(255);
 			if ($current_url != null)
 				$query['SET'] .= ', prev_url=\''.$forum_db->escape($current_url).'\'';
-	
+
 			($hook = get_hook('fn_set_default_user_qr_update_online_guest_user')) ? eval($hook) : null;
 			$forum_db->query_build($query) or error(__FILE__, __LINE__);
 		}
@@ -1651,7 +1691,7 @@ function forum_online()
 	if ($cur_page == 'viewforum.php' || $cur_page == 'viewtopic.php' || $cur_page == 'profile.php' || $cur_page == 'post.php' || $cur_page == 'edit.php' || $cur_page == 'reputation.php')
 	{
 		if (isset($_GET['id']))
-			$cur_page_id = intval($_GET['id']); 
+			$cur_page_id = intval($_GET['id']);
 		else if (isset($_GET['pid']))
 		{
 			$query = array(
@@ -1799,17 +1839,13 @@ function get_tracked_topics()
 function generate_crumbs($reverse)
 {
 	global $lang_common, $forum_url, $forum_config, $forum_page;
-
 	$return = ($hook = get_hook('fn_generate_crumbs_start')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
-
 	if (empty($forum_page['crumbs']))
 		$forum_page['crumbs'][0] = forum_htmlencode($forum_config['o_board_title']).$lang_common['Title separator'].forum_htmlencode($forum_config['o_board_desc']);
-
 	$crumbs = '';
 	$num_crumbs = count($forum_page['crumbs']);
-
 	if ($reverse)
 	{
 		for ($i = ($num_crumbs - 1); $i >= 0; --$i)
@@ -1819,9 +1855,38 @@ function generate_crumbs($reverse)
 		for ($i = 0; $i < $num_crumbs; ++$i)
 		{
 			if ($i < ($num_crumbs - 1))
-				$crumbs .= '<span class="crumb'.(($i == 0) ? ' crumbfirst' : '').'">'.(($i >= 1) ? '<span>'.$lang_common['Crumb separator'].'</span>' : '').(is_array($forum_page['crumbs'][$i]) ? '<a href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i])).'</span> ';
+				$crumbs .= '<span class="crumb">'.(($i >= 1) ? '' : '').(is_array($forum_page['crumbs'][$i]) ? '<a itemtype="http://data-vocabulary.org/Breadcrumb" itemscope="" href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i])).'</span> ';
 			else
-				$crumbs .= '<span class="crumb crumblast'.(($i == 0) ? ' crumbfirst' : '').'">'.(($i >= 1) ? '<span>'.$lang_common['Crumb separator'].'</span>' : '').(is_array($forum_page['crumbs'][$i]) ? '<a href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i])).'</span> ';
+				$crumbs .= '<span class="crumb">'.(($i >= 1) ? '' : '').(is_array($forum_page['crumbs'][$i]) ? '<a itemtype="http://data-vocabulary.org/Breadcrumb" itemscope="" href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i])).'</span> ';
+		}
+
+	($hook = get_hook('fn_generate_crumbs_end')) ? eval($hook) : null;
+
+	return $crumbs;
+}
+// Generate breadcrumb navigation
+function generate_crumbs_admin($reverse)
+{
+	global $lang_common, $forum_url, $forum_config, $forum_page;
+	$return = ($hook = get_hook('fn_generate_crumbs_start')) ? eval($hook) : null;
+	if ($return != null)
+		return $return;
+	if (empty($forum_page['crumbs']))
+		$forum_page['crumbs'][0] = forum_htmlencode($forum_config['o_board_title']).$lang_common['Title separator'].forum_htmlencode($forum_config['o_board_desc']);
+	$crumbs = '';
+	$num_crumbs = count($forum_page['crumbs']);
+	if ($reverse)
+	{
+		for ($i = ($num_crumbs - 1); $i >= 0; --$i)
+			$crumbs .= (is_array($forum_page['crumbs'][$i]) ? forum_htmlencode($forum_page['crumbs'][$i][0]) : forum_htmlencode($forum_page['crumbs'][$i])).((isset($forum_page['page']) && $i == ($num_crumbs - 1)) ? ' ('.$lang_common['Page'].' '.forum_number_format($forum_page['page']).')' : '').($i > 0 ? $lang_common['Title separator'] : '');
+	}
+	else
+		for ($i = 0; $i < $num_crumbs; ++$i)
+		{
+			if ($i < ($num_crumbs - 1))
+				$crumbs .= '<li>'.(($i >= 1) ? '' : '').(is_array($forum_page['crumbs'][$i]) ? '<a temtype="http://data-vocabulary.org/Breadcrumb" itemscope="" href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a></li>' : forum_htmlencode($forum_page['crumbs'][$i])).' ';
+			else
+				$crumbs .= '<li class="active">'.(($i >= 1) ? '' : '').(is_array($forum_page['crumbs'][$i]) ? '<a temtype="http://data-vocabulary.org/Breadcrumb" itemscope="" href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a></li>' : forum_htmlencode($forum_page['crumbs'][$i])).' ';
 		}
 
 	($hook = get_hook('fn_generate_crumbs_end')) ? eval($hook) : null;
@@ -1874,7 +1939,33 @@ function delete_orphans()
 	($hook = get_hook('fn_delete_orphans_end')) ? eval($hook) : null;
 }
 
-
+function ucp_preg_replace($pattern, $replace, $subject, $callback = false)
+{
+	if($callback) 
+		$replaced = preg_replace_callback($pattern, create_function('$matches', 'return'.$replace.';'), $subject);
+	else
+		$replaced = preg_replace($pattern, $replace, $subject);
+	// If preg_replace() returns false, this probably means unicode support is not built-in, so we need to modify the pattern a little
+	if ($replaced === false)
+	{
+		if (is_array($pattern))
+		{
+			foreach ($pattern as $cur_key => $cur_pattern)
+				$pattern[$cur_key] = str_replace('\p{L}\p{N}', '\w', $cur_pattern);
+			$replaced = preg_replace($pattern, $replace, $subject);
+		}
+		else
+			$replaced = preg_replace(str_replace('\p{L}\p{N}', '\w', $pattern), $replace, $subject);
+	}
+	return $replaced;
+}
+//
+// A wrapper for ucp_preg_replace
+//
+function ucp_preg_replace_callback($pattern, $replace, $subject)
+{
+	return ucp_preg_replace($pattern, $replace, $subject, true);
+}
 // Display a form that the user can use to confirm that they want to undertake an action.
 // Used when the CSRF token from the request does not match the token stored in the database.
 function csrf_confirm_form()
@@ -1942,26 +2033,24 @@ function csrf_confirm_form()
 	($hook = get_hook('fn_csrf_confirm_form_pre_header_load')) ? eval($hook) : null;
 
 ?>
-<div id="brd-main" class="main">
-
-	<div class="main-subhead">
-		<h2 class="hn"><?php echo $lang_common['Confirm action head'] ?></h2>
-	</div>
-	<div class="main-content main-frm">
-		<div class="ct-box error-box">
-			<h2 class="warn hn"><?php echo $lang_common['CSRF token mismatch'] ?></h2>
+<div class="chunk">
+	<div class="panel" id="message">
+		<div class="inner">
+			<h2 class="message-title"><?php echo $lang_common['Confirm action head'] ?></h2>
+			<p><?php echo $lang_common['CSRF token mismatch'] ?></p>
 		</div>
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>">
+				<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>">
 			<div class="hidden">
 				<?php echo implode("\n\t\t\t\t", $forum_page['hidden_fields'])."\n" ?>
 			</div>
 			<div class="frm-buttons">
-				<span class="submit"><input type="submit" value="<?php echo $lang_common['Confirm'] ?>" /></span>
-				<span class="cancel"><input type="submit" name="confirm_cancel" value="<?php echo $lang_common['Cancel'] ?>" /></span>
+				<input type="submit" class="button1" value="<?php echo $lang_common['Confirm'] ?>" />
+				<input type="submit" class="button2" name="confirm_cancel" value="<?php echo $lang_common['Cancel'] ?>" />
 			</div>
 		</form>
 	</div>
 </div>
+
 <?php
 
 	($hook = get_hook('fn_csrf_confirm_form_end')) ? eval($hook) : null;
@@ -2012,9 +2101,12 @@ function message($message, $link = '', $heading = '')
 	($hook = get_hook('fn_message_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content main-message">
+<div class="panel" id="message">
+	<div class="inner">
+			<h2 class="message-title">Information</h2>
 		<p><?php echo $message.($link ? ' <span>'.$link.'</span>' : '') ?></p>
 	</div>
+</div>
 <?php
 
 	($hook = get_hook('fn_message_output_end')) ? eval($hook) : null;
@@ -2077,7 +2169,7 @@ function redirect($destination_url, $message)
 	ob_start();
 
 	// Include stylesheets
-	echo '<link rel="stylesheet" type="text/css" href="'.$base_url.'/style/base.css" />';
+	echo '<link rel="stylesheet" type="text/css" href="'.$base_url.'/style/'.$forum_user['style'].'/css/base.css" />';
 	require FORUM_ROOT.'style/'.$forum_user['style'].'/'.$forum_user['style'].'.php';
 
 	$head_temp = forum_trim(ob_get_contents());
@@ -2098,15 +2190,18 @@ function redirect($destination_url, $message)
 	ob_start();
 
 ?>
-<div id="brd-main" class="main basic">
-
-	<div class="main-head">
-		<h1 class="hn"><span><?php echo $message ?></span></h1>
+<div class="chunk">
+	<div class="action-bar top">
 	</div>
-	<div class="main-content main-message">
-		<p><?php printf($lang_common['Forwarding info'], $forum_config['o_redirect_delay'], intval($forum_config['o_redirect_delay']) == 1 ? $lang_common['second'] : $lang_common['seconds']) ?><span> <a href="<?php echo $destination_url ?>"><?php echo $lang_common['Click redirect'] ?></a></span></p>
+	<div class="panel" id="message">
+		<div class="inner">
+			<h2 class="message-title"><?php echo $message ?></h2>
+		</div>
+			<p>
+				<?php printf($lang_common['Forwarding info'], $forum_config['o_redirect_delay'], intval($forum_config['o_redirect_delay']) == 1 ? $lang_common['second'] : $lang_common['seconds']) ?>
+				<span> <a href="<?php echo $destination_url ?>"><?php echo $lang_common['Click redirect'] ?></a></span>
+			</p>
 	</div>
-
 </div>
 <?php
 
@@ -2209,7 +2304,7 @@ function error()
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru" dir="ltr">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Ошибка - <?php echo forum_htmlencode($forum_config['o_board_title']) ?></title>
+<title>Error - <?php echo forum_htmlencode($forum_config['o_board_title']) ?></title>
 <link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_url ?>/favicon.ico" />
 <style>
 body {
@@ -2230,7 +2325,7 @@ a {
 </style>
 </head>
 <body>
-<h1>Съобщение от Българска поддръжка @ Flazy - страницата не е намерена.</h1>
+<h1></h1>
 <?php
 
 	if (isset($message))
@@ -2241,9 +2336,9 @@ a {
 		if (defined('FORUM_DEBUG'))
 		{
 			if (isset($file) && isset($line))
-				echo '<p><strong>flazy:~$</strong><span> &#8594; Информация:</span> Ошибка в строке  '.$line.' в файле <em>'.$file.'</em></p>'."\n";
+				echo '<p><strong>flazy:~$</strong><span> &#8594; Info:</span> Error on line  '.$line.' in <em>'.$file.'</em></p>'."\n";
 
-			$db_error = isset($GLOBALS['forum_db']) ?  $GLOBALS['forum_db']->error() : array(); 
+			$db_error = isset($GLOBALS['forum_db']) ?  $GLOBALS['forum_db']->error() : array();
 			if (!empty($db_error['error_msg']))
 			{
 				echo '<p><strong>flazy:~$</strong><span> &#8594; База данных сообщила:</span> '.forum_htmlencode($db_error['error_msg']).(($db_error['error_no']) ? ' (Errno: '.$db_error['error_no'].')' : '').'.</p>'."\n";

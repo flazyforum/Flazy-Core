@@ -1,13 +1,11 @@
 <?php
 /**
- * Просмотр репутации участников.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -33,7 +31,7 @@ $method = isset($_GET['method']) ? $_GET['method'] : null;
 $section = isset($_GET['section']) ? $_GET['section'] : null;
 
 if (isset($_GET['section']) && $section != 'reputation' && $section != 'positive')
-	message($lang_common['Bad request']);
+	message($lang_common['Bad request'], false, '404 Not Found');
 
 $errors = array();
 
@@ -48,12 +46,12 @@ if (isset($_POST['form_sent']))
 		confirm_current_url(forum_link($forum_url['reputation'], array($id, $section)));
 
 		if (!$forum_user['is_admmod'])
-			message($lang_common['No permission']);
+			message($lang_common['No permission'], false, '403 Forbidden');
 
 		($hook = get_hook('rp_fl_form_delete')) ? eval($hook) : null;
 
 		if ($id < 2)
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		// Delete reputation
 		$query = array(
@@ -110,12 +108,12 @@ if (isset($_POST['form_sent']))
 	else
 	{
 		if ($forum_user['is_guest'])
-			message($lang_common['No permission']);
+			message($lang_common['No permission'], false, '403 Forbidden');
 
 		$poster_id = intval($_POST['poster_id']);
 
 		if ($poster_id < 1 && $pid < 1 && ($method != 'positive' && $method != 'negative'))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		confirm_current_url(forum_link($forum_url['reputation_change'], array($poster_id, $pid, $method)));
 
@@ -150,7 +148,7 @@ if (isset($_POST['form_sent']))
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$cur_rep = $forum_db->fetch_assoc($result);
 
@@ -234,7 +232,7 @@ if (isset($_POST['form_sent']))
 if ($section)
 {
 	if ($id < 2)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	$query = array(
 		'SELECT'	=> 'u.username, '.$section.'_plus, '.$section.'_minus',
@@ -246,7 +244,7 @@ if ($section)
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$user_rep = $forum_db->fetch_assoc($result);
 
@@ -495,7 +493,7 @@ if ($section)
 else if ($method)
 {
 	if ($forum_user['is_guest'])
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	if ($forum_user['id'] == $id)
 		message($lang_reputation['Silly user']);
 
@@ -519,7 +517,7 @@ else if ($method)
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$cur_rep = $forum_db->fetch_assoc($result);
 

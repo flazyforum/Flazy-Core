@@ -2,8 +2,8 @@
 /**
  * SEF URL-адреса с местом расположения скриптов.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -47,7 +47,7 @@ $forum_url = array(
 'pm_delete_section'		=>	'pm/delete/',
 'pm_post'				=>	'pm/write/$1',
 'post'					=>	'post/$1/#p$1',
-'profile'				=>	'user/$1/$2/',
+'profile'				=>	'profile/$1/$2/',
 'print'					=>	'print/$1/$2/',
 'quote'					=>	'new/reply/$1/quote/$2/',
 'register'				=>	'register/',
@@ -72,7 +72,7 @@ $forum_url = array(
 'topic_new_posts'		=>	'topic/$1/$2/new/posts/',
 'topic_last_post'		=>	'topic/$1/last/post/',
 'unsubscribe'			=>	'unsubscribe/$1/$2/',
-'user'					=>	'user/$1/',
+'user'					=>	'profile/$1/',
 'users'					=>	'users/',
 'users_browse'			=>	'users/$4/$1/$2/$3/',
 'page'					=>	'page/$1/',

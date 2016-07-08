@@ -3,7 +3,7 @@
  * SEF URL-адреса с местом расположения скриптов.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -85,6 +85,5 @@ $forum_url = array(
 'moderate_topic'		=>	'moderate$1-$2.html',
 'reputation'			=>	'user$1-$2.html',
 'reputation_change'		=>	'user$1-post$2-$3.html',
-);
 
-?>
+);

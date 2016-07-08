@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -9,7 +9,7 @@
 
 // Make sure we have built in support for MySQL
 if (!function_exists('mysqli_connect'))
-	die('Эта PHP среда не имеет встроенной поддержки Improved MySQL (mysqli). Она необходима, если вы хотите использовать базу данных MySQL 4.1 (или более позднюю версию) для работы этого форума. Изучите PHP документацию для получения дополнительной информации.');
+	die('This PHP environment does not have built-in support Improved MySQL (mysqli). It is necessary if you want to use a database MySQL 4.1 (or later) for this forum. Learn PHP documentation for more information.');
 
 /**
  * Прослойка для работы PHP с базой данных MySQLi InnoDB.
@@ -76,7 +76,7 @@ class DBLayer
 	function query($sql, $unbuffered = false)
 	{
 		if (strlen($sql) > 140000)
-			die('Безумно большой запрос. Прервано.');
+			die('Insanely great request. Interrupted.');
 
 		if (defined('FORUM_SHOW_QUERIES'))
 			$q_start = get_microtime();
@@ -279,7 +279,7 @@ class DBLayer
 		$result = $this->query('SELECT VERSION()');
 
 		return array(
-			'name'		=> 'MySQL Улучшенная (InnoDB)',
+			'name'		=> 'MySQL Improved (InnoDB)',
 			'version'	=> preg_replace('/^([^-]+).*$/', '\\1', $this->result($result))
 		);
 	}

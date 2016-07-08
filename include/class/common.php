@@ -2,18 +2,30 @@
 /**
  * Общие классы используемые на форуме.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
- * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
+ * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
-
+($hook = get_hook('cls_fl_js_helper_start')) ? eval($hook) : null;
 $js = array(
-	'jquery'		=> 'http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js',
-	'tooltip'		=> $base_url.'/js/jquery.tooltip.js',
-	'pstrength'		=> $base_url.'/js/jquery.pstrength.js',
-	'cookies'		=> $base_url.'/js/jquery.cookie.js',
+	/* Forum JS*/
+	'jquery'		  => '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js',
+	'mainjs'		  => ''.$base_url.'/style/default/js/main.js',
+	'chosen'		  => ''.$base_url.'/style/default/js/chosen.jquery.min.js',
+	'ui'			  => '//code.jquery.com/ui/1.11.4/jquery-ui.js'
+	/* Admin JS*/
+	
+	//Dashboard
+	
+	//Settings
+	
+	//Users
+	
+	//Management
+	
+	//Extensions
+	
 );
 
 ($hook = get_hook('cls_fl_pre_class_js_helper')) ? eval($hook) : null;
@@ -22,8 +34,10 @@ $js = array(
 /**
  * Добавление java-script файлов в <head> форума.
  * @author Copyright (C) 2009 hcs
- * @modified Copyright (C) 2015 Flazy.Us
+ * @modified Copyright (C) 2008-2015 Flazy.us
  */
+
+
 class forum_js
 {
 	var $file = array();

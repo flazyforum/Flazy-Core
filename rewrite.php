@@ -1,13 +1,11 @@
 <?php
 /**
- * Замема SEF URL на реальные адреса.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 define('FORUM_ROOT', './');
 require FORUM_ROOT.'include/essentials.php';

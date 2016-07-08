@@ -1,13 +1,11 @@
 <?php
 /**
- * Различные функции форума для пользователей (например: отображение правил, отправление электронных сообщений через форум и т.д.).
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 if (isset($_GET['action']))
 	define('FORUM_QUIET_VISIT', 1);
@@ -28,7 +26,7 @@ $errors = array();
 if ($action == 'rules')
 {
 	if (!$forum_config['o_rules'] || ($forum_user['is_guest'] && !$forum_user['g_read_board'] && !$forum_config['o_regs_allow']))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['rules']));
@@ -72,7 +70,7 @@ if ($action == 'rules')
 else if ($action == 'markread')
 {
 	if ($forum_user['is_guest'])
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['mark_read'], isset($_GET['csrf_token']) ? $_GET['csrf_token'] : ''));
@@ -106,11 +104,11 @@ else if ($action == 'markread')
 else if ($action == 'markforumread')
 {
 	if ($forum_user['is_guest'])
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	
 	$fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
 	if ($fid < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['mark_forum_read'], array($fid, isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '')));
@@ -138,7 +136,7 @@ else if ($action == 'markforumread')
 	($hook = get_hook('mi_markforumread_qr_get_forum_info')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$forum_name = $forum_db->result($result);
 
@@ -168,7 +166,7 @@ else if ($action == 'smilies')
 
 	($hook = get_hook('mi_smilies_pre_header_load')) ? eval($hook) : null;
 
-	$forum_js->file($base_url.'/js/bb.smilies.js');
+	$forum_js->file($base_url.'/resources/old_editor/js/bb.smilies.js');
 
 	define('FORUM_PAGE', 'smilies');
 	require FORUM_ROOT.'header.php';
@@ -221,11 +219,11 @@ else if ($action == 'smilies')
 else if (isset($_GET['email']))
 {
 	if ($forum_user['is_guest'] || !$forum_user['g_send_email'])
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	
 	$recipient_id = intval($_GET['email']);
 	if ($recipient_id < 2)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['email'], $recipient_id));
@@ -245,7 +243,7 @@ else if (isset($_GET['email']))
 	($hook = get_hook('mi_email_qr_get_form_email_data')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	list($recipient, $recipient_email, $email_setting) = $forum_db->fetch_row($result);
 
@@ -415,13 +413,13 @@ else if (isset($_GET['email']))
 else if (isset($_GET['report']))
 {
 	if ($forum_user['is_guest'])
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	if (!$forum_config['o_report_enabled'])
 		message($lang_misc['Report off']);
 
 	$post_id = intval($_GET['report']);
 	if ($post_id < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['report'], array($post_id, $action)));
@@ -459,7 +457,7 @@ else if (isset($_GET['report']))
 			($hook = get_hook('mi_fl_report_qr_get_pm_data')) ? eval($hook) : null;
 			$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 			if (!$forum_db->num_rows($result))
-				message($lang_common['Bad request']);
+				message($lang_common['Bad request'], false, '404 Not Found');
 
 			list($poster_id, $message) = $forum_db->fetch_row($result);
 		}
@@ -481,7 +479,7 @@ else if (isset($_GET['report']))
 			($hook = get_hook('mi_report_qr_get_topic_data')) ? eval($hook) : null;
 			$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 			if (!$forum_db->num_rows($result))
-				message($lang_common['Bad request']);
+				message($lang_common['Bad request'], false, '404 Not Found');
 
 			list($topic_id, $subject, $forum_id, $poster_id, $message) = $forum_db->fetch_row($result);
 
@@ -629,11 +627,11 @@ else if (isset($_GET['report']))
 else if (isset($_GET['subscribe']))
 {
 	if ($forum_user['is_guest'] || $forum_config['o_subscriptions'] != '1')
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	
 	$topic_id = intval($_GET['subscribe']);
 	if ($topic_id < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['subscribe'], array($topic_id, isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '')));
@@ -660,7 +658,7 @@ else if (isset($_GET['subscribe']))
 	($hook = get_hook('mi_subscribe_qr_topic_exists')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$subject = $forum_db->result($result);
 
@@ -694,11 +692,11 @@ else if (isset($_GET['subscribe']))
 else if (isset($_GET['unsubscribe']))
 {
 	if ($forum_user['is_guest'] || $forum_config['o_subscriptions'] != '1')
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 	
 	$topic_id = intval($_GET['unsubscribe']);
 	if ($topic_id < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['unsubscribe'], array($topic_id, isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '')));
@@ -747,7 +745,7 @@ else if (isset($_GET['unsubscribe']))
 else if (isset($_GET['admin_action']) && $_GET['admin_action'] == 'change_engine')
 {
 	if ($forum_user['g_id'] != FORUM_ADMIN)
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 
 	$from = $forum_config['o_database_engine'];
 	if ($db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
@@ -784,7 +782,7 @@ else if (isset($_GET['admin_action']) && $_GET['admin_action'] == 'change_engine
 
 		generate_config_cache();
 
-		redirect(forum_link('admin/admin.php'), sprintf($lang_misc['Conversion successful'], $from, $to));
+		redirect(forum_link('admin/index.php'), sprintf($lang_misc['Conversion successful'], $from, $to));
 	}
 
 	// Setup form
@@ -837,4 +835,4 @@ else if (isset($_GET['admin_action']) && $_GET['admin_action'] == 'change_engine
 
 ($hook = get_hook('mi_new_action')) ? eval($hook) : null;
 
-message($lang_common['Bad request']);
+message($lang_common['Bad request'], false, '404 Not Found');

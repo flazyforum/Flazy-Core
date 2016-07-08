@@ -1,13 +1,11 @@
 <?php
 /**
- * Скрипт перенаправления внешних ссылок.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
- * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
+ * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');

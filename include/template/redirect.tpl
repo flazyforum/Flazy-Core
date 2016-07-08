@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <forum_head>
 </head>
-<body>
+<body id="flazy" class="notouch section-index ltr hasjs ">
 
-<div id="brd-wrap" class="brd-page">
-<div id="brd-redirect" class="brd">
+<div id="overall-wrap">
+<div id="wrap-body">
 
 <forum_redir_main>
 

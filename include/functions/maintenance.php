@@ -1,11 +1,11 @@
 <?php
 /**
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
+ 
 if (!defined('FORUM'))
 	die;
 
@@ -51,9 +51,10 @@ function maintenance_message()
 
 ?>
 <title><?php echo $lang_common['Maintenance mode'].$lang_common['Title separator'].forum_htmlencode($forum_config['o_board_title']) ?></title>
-<link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_url ?>'/favicon.ico" />
-<?php
+<link rel="stylesheet" type="text/css" href="<?php echo $base_url.'/style/'.$forum_user['style'].'/css/base.css'; ?>" />
 
+<?php
+	
 	require FORUM_ROOT.'style/'.$forum_user['style'].'/'.$forum_user['style'].'.php';
 
 	$tpl_temp = forum_trim(ob_get_contents());
@@ -73,17 +74,13 @@ function maintenance_message()
 	ob_start();
 
 ?>
-<div id="brd-main" class="main basic">
-
-	<div class="main-head">
-		<h1 class="hn"><span><?php echo $lang_common['Maintenance mode'] ?></span></h1>
+<div class="panel" id="message">
+	<div class="inner">
+		<a class="site-logo" href="" style="text-align:center"></a>
+		<br><br>
+		<h2 class="message-title" style="text-align:center"><?php echo $lang_common['Maintenance mode'] ?></h2>
+		<p><?php echo $message."\n" ?></p>
 	</div>
-	<div class="main-content main-message">
-		<div class="ct-box user-box">
-			<?php echo $message."\n" ?>
-		</div>
-	</div>
-
 </div>
 <?php
 

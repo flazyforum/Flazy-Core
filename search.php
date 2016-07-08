@@ -1,13 +1,11 @@
 <?php
 /**
- * Позволяет участникам искать на форуме сообщения, темы, на основе различных критерий.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -33,7 +31,7 @@ if (isset($_GET['search_id']))
 {
 	$search_id = intval($_GET['search_id']);
 	if ($search_id < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	// Generate the query to grab the cached results
 	$query = generate_cached_search_query($search_id, $show_as, $keywords);
@@ -47,7 +45,7 @@ else if (isset($_GET['action']))
 
 	// Validate action
 	if (!validate_search_action($action))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	// If it's a regular search (keywords and/or author)
 	if ($action == 'search')
@@ -81,7 +79,7 @@ else if (isset($_GET['action']))
 		{
 			$value = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 			if ($value < 2)
-				message($lang_common['Bad request']);
+				message($lang_common['Bad request'], false, '404 Not Found');
 		}
 		else if ($action == 'show_recent')
 			$value = (isset($_GET['value'])) ? intval($_GET['value']) : 86400;
@@ -131,7 +129,7 @@ if (isset($query))
 	generate_search_crumbs($action);
 
 	// Generate paging links
-	$forum_page['page_post']['paging'] = '<p class="paging"><span class="pages">'.$lang_common['Pages'].'</span> '.paginate($forum_page['num_pages'], $forum_page['page'], $url_type, $lang_common['Paging separator'], $search_id).'</p>';
+	$forum_page['page_post']['paging'] = '<div class="pagination">'. $forum_page['items_info'].' • <span class="pages">'.$lang_common['Pages'].' </span> '.paginate($forum_page['num_pages'], $forum_page['page'], $url_type, $lang_common['Paging separator'], $search_id).'</div>';
 
 	// Get topic/forum tracking data
 	if (!$forum_user['is_guest'])
@@ -189,31 +187,25 @@ if (isset($query))
 		require FORUM_ROOT.'lang/'.$forum_user['language'].'/forum.php';
 
 		$forum_page['item_header'] = array();
-		$forum_page['item_header']['title'] = '<th class="item-subject" scope="col">'.$lang_forum['Topics'].'</th>';
-		$forum_page['item_header']['forum'] = '<th class="info-forum" scope="col">'.$lang_forum['Forum'].'</th>';
-		$forum_page['item_header']['replies'] = '<th class="info-replies" scope="col">'.$lang_forum['Replies'].'</th>';
-		$forum_page['item_header']['lastpost'] = '<th class="info-lastpost" scope="col">'.$lang_forum['Last post'].'</th>';
+		$forum_page['item_header']['title'] = '<dt><div class="list-inner">'.$lang_forum['Topics'].'</div></dt>';
+		$forum_page['item_header']['forum'] = '<dd class="posts" scope="col">'.$lang_forum['Forum'].'</dd>';
+		$forum_page['item_header']['replies'] = '<dd class="views" scope="col">'.$lang_forum['Replies'].'</dd>';
+		$forum_page['item_header']['lastpost'] = '<dd class="lastpost" scope="col">'.$lang_forum['Last post'].'</dd>';
 
 		($hook = get_hook('se_results_topics_pre_item_header_output')) ? eval($hook) : null;
 
 ?>
-	<div class="main-head">
-<?php
-
-	if (!empty($forum_page['main_head_options']))
-		echo "\t\t".'<p class="options">'.implode(' ', $forum_page['main_head_options']).'</p>'."\n";
-
-?>
-		<h2 class="hn"><span><?php echo $forum_page['items_info'] ?></span></h2>
-	</div>
-	<div class="main-content main-forum">
-		<table cellspacing="0">
-		<thead>
-			<tr>
-				<?php echo implode("\n\t\t\t\t", $forum_page['item_header'])."\n" ?>
-			</tr>
-		</thead>
-		<tbody>
+<div id="forumlist">
+	<div id="forumlist-inner">
+		<div class="forabg">
+			<div class="inner">
+				<ul class="topiclist">
+					<li class="header">
+						<dl class="icon">
+								<?php echo implode("\n\t\t\t\t", $forum_page['item_header'])."\n" ?>
+						</dl>
+					</li>
+				</ul>
 <?php
 
 	}
@@ -324,7 +316,7 @@ if (isset($query))
 		<div class="postbody">
 			<div class="post-entry">
 				<div class="entry-content">
-					<?php echo $forum_page['message'] ?>
+					dasda<?php echo $forum_page['message'] ?>
 				</div>
 <?php ($hook = get_hook('se_results_posts_row_new_post_entry_data')) ? eval($hook) : null; ?>
 			</div>
@@ -378,11 +370,11 @@ if (isset($query))
 			if ($cur_set['question'] != '')
 				$topic_desc['question'] = $lang_common['Title separator'].forum_htmlencode(forum_htmlencode($cur_set['question']));
 
-			$forum_page['item_title']['link'] = '<strong><a href="'.forum_link($forum_url['topic'], array($cur_set['tid'], sef_friendly($cur_set['subject']))).'"'.(!empty($topic_desc) ? ' title="'.$lang_forum['Description'].implode('', $topic_desc).'"' : '').'>'.forum_htmlencode($cur_set['subject']).'</a></strong>';
+			$forum_page['item_title']['link'] = '<a class="forumtitle" href="'.forum_link($forum_url['topic'], array($cur_set['tid'], sef_friendly($cur_set['subject']))).'"'.(!empty($topic_desc) ? ' title="'.$lang_forum['Description'].implode('', $topic_desc).'"' : '').'>'.forum_htmlencode($cur_set['subject']).'</a><br>';
 
 			($hook = get_hook('se_results_topic_loop_normal_topic_pre_item_title_merge')) ? eval($hook) : null;
 
-			$forum_page['item_body']['subject']['title'] = '<h3>'.implode(' ', $forum_page['item_title']).'</h3>';
+			$forum_page['item_body']['subject']['title'] = implode(' ', $forum_page['item_title']);
 
 			// Assemble the Topic subject
 			$forum_page['item_subject']['starter'] = '<span class="item-starter">'.sprintf($lang_forum['Topic starter'], '<cite><a href="'.forum_link($forum_url['user'], $cur_set['poster_id']).'">'.forum_htmlencode($cur_set['poster']).'</a></cite>').'</span>';
@@ -411,17 +403,17 @@ if (isset($query))
 			if (!empty($forum_page['item_nav']))
 				$forum_page['item_title']['nav'] = '<span class="item-nav">'.sprintf($lang_forum['Topic navigation'], implode('&#160;&#160;', $forum_page['item_nav'])).'</span>';
 
-			$forum_page['item_body']['subject']['title'] = '<h3>'.implode(' ', $forum_page['item_title']).'</h3>';
+			$forum_page['item_body']['subject']['title'] = implode(' ', $forum_page['item_title']);
 
 			$forum_page['item_body']['subject']['desc'] = implode(' ', $forum_page['item_subject']);
 
 			($hook = get_hook('se_topic_loop_normal_topic_pre_item_subject_merge')) ? eval($hook) : null;
 
-			$forum_page['item_body']['info']['forum'] = '<td class="info-forum"><a href="'.forum_link($forum_url['forum'], array($cur_set['forum_id'], sef_friendly($cur_set['forum_name']))).'">'.$cur_set['forum_name'].'</a></td>';
+			$forum_page['item_body']['info']['forum'] = '<dd class="info-forum"><a href="'.forum_link($forum_url['forum'], array($cur_set['forum_id'], sef_friendly($cur_set['forum_name']))).'">'.$cur_set['forum_name'].'</a></td>';
 
-			$forum_page['item_body']['info']['replies'] = '<td class="info-replies"><span class="'.item_size($cur_set['num_replies']).'">'.forum_number_format($cur_set['num_replies']).'</span></td>';
+			$forum_page['item_body']['info']['replies'] = '<dd class="info-replies"><span class="'.item_size($cur_set['num_replies']).'">'.forum_number_format($cur_set['num_replies']).'</span></td>';
 
-			$forum_page['item_body']['info']['lastpost'] = '<td class="info-lastpost"><span><a href="'.forum_link($forum_url['post'], $cur_set['last_post_id']).'">'.format_time($cur_set['last_post']).'</a></span> <cite>'.sprintf($lang_forum['by poster'], '<a href="'.forum_link($forum_url['user'],$cur_set['last_poster_id']).'">'.forum_htmlencode($cur_set['last_poster']).'</a>').'</cite></td>';
+			$forum_page['item_body']['info']['lastpost'] = '<dd class="info-lastpost"><span><a href="'.forum_link($forum_url['post'], $cur_set['last_post_id']).'">'.format_time($cur_set['last_post']).'</a></span> <cite>'.sprintf($lang_forum['by poster'], '<a href="'.forum_link($forum_url['user'],$cur_set['last_poster_id']).'">'.forum_htmlencode($cur_set['last_poster']).'</a>').'</cite></td>';
 
 			($hook = get_hook('se_results_topics_row_pre_display')) ? eval($hook) : null;
 
@@ -430,25 +422,30 @@ if (isset($query))
 			($hook = get_hook('se_row_pre_display')) ? eval($hook) : null;
 
 ?>
-			<tr class="<?php echo implode(' ', $forum_page['item_status']) ?> <?php echo ($forum_page['item_count'] % 2 != 0) ? 'odd' : 'even' ?><?php echo ($forum_page['item_count'] == 1) ? ' row1' : '' ?>">
-				<td class="item-subject">
-					<div class="icon"><!-- --></div>
-					<div class="tclcon">
-						<?php echo implode("\n\t\t\t\t", $forum_page['item_body']['subject'])."\n" ?>
-					</div>
-				</td>
-				<?php echo implode("\n\t\t\t\t", $forum_page['item_body']['info'])."\n" ?>
-			</tr>
+		<ul class="topiclist forums">
+
+										<li class="row">
+											<dl class="icon <?php echo implode($forum_page['item_status']) ?> <?php echo ($forum_page['item_count'] % 2 != 0) ? 'forum_read' : 'forum_read' ?><?php echo ($forum_page['item_count'] == 1) ? '' : '' ?>">
+												<dt>
+													<div class="list-inner">
+
+														<?php echo implode("\n\t\t\t\t", $forum_page['item_body']['subject'])."\n" ?>
+													</div>
+												</dt>
+												<?php echo implode("\n\t\t\t\t", $forum_page['item_body']['info'])."\n" ?>
+											</dl>
+										</li>
+									</ul>
 <?php
 
 		}
 	}
 
 ?>
-		</tbody>
-		</table>
+			</div>
+		</div>
 	</div>
-
+</div>
 	<div class="main-foot">
 <?php
 
@@ -476,19 +473,19 @@ if (isset($query))
 
 // Setup form information
 $forum_page['frm-info'] = array(
-	'search'	=> '<li><span>'.$lang_search['Search info'].'</span></li>',
-	'keywords'	=> '<li><span>'.$lang_search['Keywords info'].'</span></li>',
-	'refine'	=> '<li><span>'.$lang_search['Refine info'].'</span></li>',
-	'wildcard'	=> '<li><span>'.$lang_search['Wildcard info'].'</span></li>'
+	'search'	=> '<span>'.$lang_search['Search info'].'</span><br>',
+	'keywords'	=> '<span>'.$lang_search['Keywords info'].'</span><br>',
+	'refine'	=> '<span>'.$lang_search['Refine info'].'</span><br>',
+	'wildcard'	=> '<span>'.$lang_search['Wildcard info'].'</span><br>'
 );
 
 if ($forum_config['o_search_all_forums'] || $forum_user['is_admmod'])
-	$forum_page['frm-info']['forums'] = '<li><span>'.$lang_search['Forum default info'].'</span></li>';
+	$forum_page['frm-info']['forums'] = '<span>'.$lang_search['Forum default info'].'</span>';
 else
-	$forum_page['frm-info']['forums'] = '<li><span>'.$lang_search['Forum require info'].'</span></li>';
+	$forum_page['frm-info']['forums'] = '<span>'.$lang_search['Forum require info'].'</span>';
 
 // Setup sort by options
-$forum_page['frm-sort'] = array(
+$forum_page['frm-sorts'] = array(
 	'post_time'		=> '<option value="0">'.$lang_search['Sort by post time'].'</option>',
 	'author'		=> '<option value="1">'.$lang_search['Sort by author'].'</option>',
 	'subject'		=> '<option value="2">'.$lang_search['Sort by subject'].'</option>',
@@ -498,7 +495,7 @@ $forum_page['frm-sort'] = array(
 // Setup breadcrumbs
 $forum_page['crumbs'] = array(
 	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-	array($lang_common['Search'], forum_link($forum_url['search'])) 
+	array($lang_common['Search'], forum_link($forum_url['search']))
 );
 
 // Setup form
@@ -516,49 +513,69 @@ ob_start();
 
 ?>
 	<div class="main-content main-frm">
-		<div class="ct-box info-box">
-			<ul class="info-list">
-				<?php echo implode("\n\t\t\t\t", $forum_page['frm-info'])."\n" ?>
-			</ul>
+		<div class="stat-block online-list">
+			<p><?php echo implode("\n\t\t\t\t", $forum_page['frm-info'])."\n" ?></p>
 		</div>
 		<form id="afocus" class="frm-form" method="get" accept-charset="utf-8" action="<?php echo forum_link($forum_url['search']) ?>">
 			<div class="hidden">
 				<input type="hidden" name="action" value="search" />
 			</div>
 <?php ($hook = get_hook('se_pre_criteria_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_search['Search legend'] ?></strong></legend>
-<?php ($hook = get_hook('se_pre_keywords')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_search['Keyword search'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="keywords" size="40" maxlength="100" /></span>
-					</div>
-				</div>
-<?php ($hook = get_hook('se_pre_author')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_search['Author search'] ?></span></label><br />
-						<span class="fld-input"><input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="author" size="25" maxlength="25" /></span>
-					</div>
-				</div>
-<?php ($hook = get_hook('se_pre_search_in')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_search['Search in'] ?></span></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="search_in">
-							<option value="all"><?php echo $lang_search['Message and subject'] ?></option>
-							<option value="message"><?php echo $lang_search['Message only'] ?></option>
-							<option value="topic"><?php echo $lang_search['Topic only'] ?></option>
-						</select></span>
-					</div>
-				</div>
+			<div class="panel bg<?php echo ++$forum_page['group_count'] ?>">
+				<div class="inner">
+				<h3><?php echo $lang_search['Search legend'] ?></h3>
 <?php ($hook = get_hook('se_pre_forum_fieldset')) ? eval($hook) : null; ?>
-				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_search['Forum search'] ?> <em><?php echo ($forum_config['o_search_all_forums'] || $forum_user['is_admmod']) ? $lang_search['Forum search default'] : $lang_search['Forum search require'] ?></em></span></legend>
+				<fieldset>
+<?php ($hook = get_hook('se_pre_keywords')) ? eval($hook) : null; ?>
+			<dl>
+				<dt>
+					<label for="keywords"><?php echo $lang_search['Keyword search'] ?></label>
+				</dt>
+				<dd>
+					<input type="search" class="inputbox" id="fld<?php echo $forum_page['fld_count'] ?>" title="<?php echo $lang_search['Keyword search'] ?>" name="keywords" size="40" maxlength="100" />
+				</dd>
+<?php ($hook = get_hook('se_pre_search_in')) ? eval($hook) : null; ?>
+				<div name="search_in">
+					<dd>
+						<label for="terms1">
+							<input type="radio" name="terms" id="fld<?php echo $forum_page['fld_count'] ?>" value="all" checked="checked">
+							<?php echo $lang_search['Message and subject'] ?></label>
+					</dd>
+					<dd>
+						<label for="terms2">
+							<input type="radio" name="terms" id="fld<?php echo $forum_page['fld_count'] ?>" value="message">
+							<?php echo $lang_search['Message only'] ?></label>
+					</dd>
+					<dd>
+						<label for="terms2">
+							<input type="radio" name="terms" id="fld<?php echo $forum_page['fld_count'] ?>" value="topic">
+							<?php echo $lang_search['Topic only'] ?></label>
+					</dd>
+				</div>
+			</dl>
+
+<?php ($hook = get_hook('se_pre_author')) ? eval($hook) : null; ?>
+			<dl>
+				<dt>
+					<label for="author"><?php echo $lang_search['Author search'] ?></label>
+				</dt>
+				<dd>
+					<input  id="fld<?php echo $forum_page['fld_count'] ?>" type="search" class="inputbox" name="author" size="25" maxlength="25" title="<?php echo $lang_search['Author search'] ?>">
+				</dd>
+			</dl>
+
+
+				<dl>
+					<dt>
+						<label for="search_forum"><?php echo $lang_search['Forum search'] ?></label>
+						<br>
+							<span><?php echo ($forum_config['o_search_all_forums'] || $forum_user['is_admmod']) ? $lang_search['Forum search default'] : $lang_search['Forum search require'] ?></span>
+					</dt>
 <?php ($hook = get_hook('se_pre_forum_checklist')) ? eval($hook) : null; ?>
-					<div class="mf-box">
-						<div class="checklist">
+			<dd>
+				<select name="fid[]" id="search_forum" multiple="multiple" size="8" title="Search in forums">
+
+
 <?php
 
 // Get the list of categories and forums
@@ -590,76 +607,86 @@ while ($cur_forum = $forum_db->fetch_assoc($result))
 	if ($cur_forum['cid'] != $cur_category) // A new category since last iteration?
 	{
 		if ($cur_category)
-			echo "\t\t\t\t\t\t\t".'</fieldset>'."\n";
+			echo "\t\t\t\t\t\t\t".'</option>'."\n";
 
-		echo "\t\t\t\t\t\t\t".'<fieldset>'."\n\t\t\t\t\t\t\t\t".'<legend><span>'.forum_htmlencode($cur_forum['cat_name']).':</span></legend>'."\n";
+		echo "\t\t\t\t\t\t\t".''."\n\t\t\t\t\t\t\t\t".'<option>'.forum_htmlencode($cur_forum['cat_name']).':'."\n";
 		$cur_category = $cur_forum['cid'];
 	}
 
-	echo "\t\t\t\t\t\t\t\t".'<div class="checklist-item"><span class="fld-input"><input type="checkbox" id="fld'.(++$forum_page['fld_count']).'"  name="forum[]" value="'.$cur_forum['fid'].'" /></span> <label for="fld'.$forum_page['fld_count'].'">'.forum_htmlencode($cur_forum['forum_name']).'</label></div>'."\n";
+	echo "\t\t\t\t\t\t\t\t".'<option id="fld'.(++$forum_page['fld_count']).'"  name="forum[]" value="'.$cur_forum['fid'].'" >&nbsp<label for="fld'.$forum_page['fld_count'].'">'.forum_htmlencode($cur_forum['forum_name']).'</label></option>'."\n";
 }
 
 ?>
-							</fieldset>
-						</div>
-					</div>
-<?php ($hook = get_hook('se_pre_forum_fieldset_end')) ? eval($hook) : null; ?>
+			</select>
+		</dd>
+
+				</dl>
 				</fieldset>
+<?php ($hook = get_hook('se_pre_forum_fieldset_end')) ? eval($hook) : null; ?>
+				</div>
+			</div>
 <?php ($hook = get_hook('se_forum_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('se_criteria_fieldset_end')) ? eval($hook) : null; ?>
 <?php $forum_page['item_count'] = 0; ?>
 <?php ($hook = get_hook('se_pre_results_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_search['Results legend'] ?></strong></legend>
-<?php ($hook = get_hook('se_pre_sort_by')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_search['Sort by'] ?></span></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="sort_by">
-						<?php echo implode("\n\t\t\t\t\t\t", $forum_page['frm-sort'])."\n" ?>
-						</select></span>
-					</div>
-				</div>
-<?php ($hook = get_hook('se_pre_sort_order_fieldset')) ? eval($hook) : null; ?>
-				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_search['Sort order'] ?></span></legend>
-<?php ($hook = get_hook('se_pre_sort_order')) ? eval($hook) : null; ?>
-					<div class="mf-box mf-yesno">
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="sort_dir" value="ASC" /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_search['Ascending'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="sort_dir" value="DESC" checked="checked" /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_search['Descending'] ?></label>
-						</div>
-					</div>
-<?php ($hook = get_hook('se_pre_sort_order_fieldset_end')) ? eval($hook) : null; ?>
-				</fieldset>
-<?php ($hook = get_hook('se_pre_display_choices_fieldset')) ? eval($hook) : null; ?>
-				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_search['Display results'] ?></span></legend>
+		<div class="panel bg<?php echo ++$forum_page['group_count'] ?>">
+			<div class="inner">
+				<h3><?php echo $lang_search['Results legend'] ?></h3>
+			<fieldset>
+				<?php ($hook = get_hook('se_pre_display_choices_fieldset')) ? eval($hook) : null; ?>
+<dl>
+					<dt><label for="show_results1"><?php echo $lang_search['Display results'] ?></label></dt>
 <?php ($hook = get_hook('se_pre_display_choices')) ? eval($hook) : null; ?>
-					<div class="mf-box mf-yesno">
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="show_as" value="topics" /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_search['Show as topics'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="show_as" value="posts" checked="checked" /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_search['Show as posts'] ?></label>
-						</div>
+				<dd>
+						<label for="show_results1">
+
+							<input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="show_as" value="topics" checked="checked"/>
+							<?php echo $lang_search['Show as topics'] ?>
+						</label>
+						<label for="show_results2">
+							<input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="show_as" value="posts" />
+							<?php echo $lang_search['Show as posts'] ?>
+						</label>
 <?php ($hook = get_hook('se_new_display_choices')) ? eval($hook) : null; ?>
-					</div>
+				</dd>
 <?php ($hook = get_hook('se_pre_display_choices_fieldset_end')) ? eval($hook) : null; ?>
-				</fieldset>
+</dl>
 <?php ($hook = get_hook('se_pre_results_fieldset_end')) ? eval($hook) : null; ?>
+<?php ($hook = get_hook('se_pre_sort_by')) ? eval($hook) : null; ?>
+<dl class="dl<?php echo ++$forum_page['item_count'] ?>">
+	<dt><label for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_search['Sort by'] ?></label></dt>
+	<dd>
+		<div class="chosen-container chosen-container-single chosen-container-single-nosearch" style="width: auto;" title="" id="sk_chosen">
+			<select id="fld<?php echo $forum_page['fld_count'] ?>" name="sort_by" class="chosen-single">
+				<?php echo implode("\n\t\t\t\t\t\t", $forum_page['frm-sorts'])."\n" ?>
+			</select>
+		</div>
+		<?php ($hook = get_hook('se_pre_sort_order_fieldset')) ? eval($hook) : null; ?>
+		<?php ($hook = get_hook('se_pre_sort_order')) ? eval($hook) : null; ?>
+		&nbsp; <label for="sa">
+			<input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="sort_dir" value="ASC" checked="checked">
+			<?php echo $lang_search['Ascending'] ?></label>
+		<label for="sd">
+			<input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="sort_dir" value="DESC" >
+			<?php echo $lang_search['Descending'] ?></label>
+		<?php ($hook = get_hook('se_pre_sort_order_fieldset_end')) ? eval($hook) : null; ?>
+
+	</dd>
+</dl>
+
 			</fieldset>
+		</div>
+	</div>
 <?php ($hook = get_hook('se_results_fieldset_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="search" value="<?php echo $lang_search['Submit search'] ?>" /></span>
-			</div>
+<div class="panel bg3">
+	<div class="inner">
+		<fieldset class="submit-buttons">
+			<input type="submit" name="submit" value="<?php echo $lang_search['Submit search'] ?>" class="button1">
+		</fieldset>
+	</div>
+</div>
+
 		</form>
 	</div>
 <?php

@@ -1,15 +1,12 @@
 <?php
 /**
- * Скрипт для внешнего обьединения данных с форума.
  *
- * Позволяет экспортировать содержание форума в формата (пр: RSS, Atom, XML, HTML).
- *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
+ 
 /***********************************************************************
 
   ИНСТРУКЦИЯ

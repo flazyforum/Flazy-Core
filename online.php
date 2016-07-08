@@ -1,13 +1,11 @@
 <?php
 /**
- * Подробно показывает всех кто есть на форуме.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
- * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
+ * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -40,21 +38,24 @@ require FORUM_ROOT.'header.php';
 ob_start();
 
 $forum_page['table_header'] = array();
-$forum_page['table_header']['username'] = '<th class="tc'.count($forum_page['table_header']).'" style="width:25%" scope="col">'.$lang_common['Username'].'</th>';
-$forum_page['table_header']['action'] = '<th class="tc'.count($forum_page['table_header']).'" style="width:50%" scope="col">'.$lang_online['Last action'].'</th>';
-$forum_page['table_header']['time'] = '<th class="tc'.count($forum_page['table_header']).'" style="width:25%" scope="col">'.$lang_online['Time'].'</th>';
+$forum_page['table_header']['username'] = '<th class="name'.count($forum_page['table_header']).'"  scope="col">'.$lang_common['Username'].'</th>';
+$forum_page['table_header']['action'] = '<th class="group'.count($forum_page['table_header']).'"  scope="col">'.$lang_online['Last action'].'</th>';
+$forum_page['table_header']['time'] = '<th class="last_visit'.count($forum_page['table_header']).'"  scope="col">'.$lang_online['Time'].'</th>';
 
 ($hook = get_hook('on_fl_results_pre_header_output')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content main-frm">
-		<table cellspacing="0">
-		<thead>
-			<tr>
-				<?php echo implode("\n\t\t\t\t", $forum_page['table_header'])."\n" ?>
-			</tr>
-		</thead>
-		<tbody>
+<div id="wrap-body">
+	<div class="chunk">	
+		<div class="forumbg forumbg-table">
+			<div class="inner">
+				<table class="table1 show-header responsive" id="memberlist" summary="List of users filtered and sorted according to the criteria (if any) you have chosen.">
+					<thead>
+						<tr>
+							<?php echo implode("\n\t\t\t\t", $forum_page['table_header'])."\n" ?>
+						</tr>
+					</thead>
+					<tbody>
 <?php
 
 // Получим список участников
@@ -129,16 +130,17 @@ if ($forum_db->num_rows($result))
 			$page_name = '';
 
 		$forum_page['table_row'] = array();
-		$forum_page['table_row']['user'] = '<td class="tc'.count($forum_page['table_row']).'">'.$page_user.'</td>';
-		$forum_page['table_row']['page'] = '<td class="tc'.count($forum_page['table_row']).'">'.$lang_online[$cur_page].$page_name.'</td>';
-		$forum_page['table_row']['time'] = '<td class="tc'.count($forum_page['table_row']).'">'.format_time($cur_online['logged']).'</td>';
+		$forum_page['table_row']['user'] = '<td class="tc'.count($forum_page['table_row']).'"><dfn style="display: none;">Username</dfn>'.$page_user.'</td>';
+		$forum_page['table_row']['page'] = '<td class="tc'.count($forum_page['table_row']).'"><dfn style="display: none;">Page</dfn>'.$lang_online[$cur_page].$page_name.'</td>';
+		$forum_page['table_row']['time'] = '<td class="tc'.count($forum_page['table_row']).'"><dfn style="display: none;">Last login</dfn>'.format_time($cur_online['logged']).'</td>';
 
 		($hook = get_hook('on_fl_results_row_pre_data_output')) ? eval($hook) : null;
 
 		++$forum_page['item_count'];
 
 ?>
-			<tr class="<?php echo ($forum_page['item_count'] % 2 != 0) ? 'odd' : 'even' ?><?php echo ($forum_page['item_count'] == 1) ? ' row1' : '' ?>">
+
+			<tr class="<?php echo ($forum_page['item_count'] % 2 != 0) ? 'bg1' : 'bg1' ?><?php echo ($forum_page['item_count'] == 1) ? ' bg2' : '' ?>">
 				<?php echo implode("\n\t\t\t\t", $forum_page['table_row'])."\n" ?>
 			</tr>
 <?php
@@ -158,9 +160,12 @@ else
 }
 
 ?>
-		</tbody>
-		</table>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
+</div>
 <?php
 
 ($hook = get_hook('on_fl_end')) ? eval($hook) : null;

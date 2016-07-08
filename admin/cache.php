@@ -3,7 +3,7 @@
  * Скрипт для пересоздания кеш файлов и синхронизацией с базой данных.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -272,7 +272,7 @@ $hook = get_hook('acs_qr_db_data') ? eval($hook) : null;
 // Setup breadcrumbs
 $forum_page['crumbs'] = array(
 	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-	array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),	
+	array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),	
 	array($lang_admin_common['Management'], forum_link('admin/reports.php')),
 	array($lang_admin_common['Cache'], forum_link('admin/cache.php'))
 );
@@ -290,22 +290,26 @@ ob_start();
 ($hook = get_hook('acs_cache_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content main-frm">
-		<div class="main-subhead">
-			<h2 class="hn"><span><?php echo $lang_admin_cache['About cache'] ?></span></h2>
-		</div>
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('/admin/cache.php') ?>">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('/admin/cache.php')) ?>" />
-				<input type="hidden" name="form_sent" value="1" />
-			</div>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_cache['About cache'] ?></strong></legend>
+<div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title"><?php echo $lang_admin_cache['About cache'] ?></h3>
+              <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('/admin/cache.php') ?>">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('/admin/cache.php')) ?>" />
+		<input type="hidden" name="form_sent" value="1" />
+	</div>
+	<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
 <?php ($hook = get_hook('acs_pre_select_cache')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_cache['Regenerate cache'] ?></span><small><?php echo $lang_admin_cache['Select cache'] ?></small></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="cache">
+		<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+			<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_cache['Regenerate cache'] ?></span></label>
+			<div class="col-md-4">
+				<select id="fld<?php echo $forum_page['fld_count'] ?>" name="cache" class="form-control">
 							<option value="" selected="selected"><?php echo $lang_admin_cache['Select'] ?></option>
 							<option value="all"><?php echo $lang_admin_cache['All сache'] ?></option>
 							<option value="bans"><?php echo $lang_admin_cache['Bans cache'] ?></option>
@@ -317,14 +321,15 @@ ob_start();
 							<option value="quickjum"><?php echo $lang_admin_cache['Quickjump cache'] ?></option>
 							<option value="stats"><?php echo $lang_admin_cache['Stats cache'] ?></option>
 <?php ($hook = get_hook('acs_cache_end_select')) ? eval($hook) : null; ?>
-						</select></span>
-					</div>
-				</div>
+						</select>
+				 <span class="help-block"><?php echo $lang_admin_cache['Select cache'] ?></span>
+			</div>
+		</div>
 <?php ($hook = get_hook('acs_pre_select_sync')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_cache['Syns'] ?></span><small><?php echo $lang_admin_cache['Select syns'] ?></small></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="sync">
+		<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+			<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_cache['Syns'] ?></span></label>
+			<div class="col-md-4">
+				<select id="fld<?php echo $forum_page['fld_count'] ?>" name="sync" class="form-control">
 							<option value="" selected="selected"><?php echo $lang_admin_cache['Select'] ?></option>
 							<option value="forum_post"><?php echo $lang_admin_cache['Forum post sync'] ?></option>
 							<option value="forum_last_post"><?php echo $lang_admin_cache['Forum last post'] ?></option>
@@ -332,17 +337,23 @@ ob_start();
 							<option value="topic_last_post"><?php echo $lang_admin_cache['Topic last post'] ?></option>
 							<option value="user_post"><?php echo $lang_admin_cache['User post sync'] ?></option>
 <?php ($hook = get_hook('acs_sync_end_select')) ? eval($hook) : null; ?>
-						</select></span>
-					</div>
-				</div>
+						</select>
+					<span class="help-block"><?php echo $lang_admin_cache['Select syns'] ?></span>
+			</div>
+		</div>
 <?php ($hook = get_hook('acs_sync_pre_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('acs_sync_fieldset_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_cache['Syns bottom'] ?>" /></span>
-			</div>
-		</form>
-	</div>
+
+
+            </div><!-- /.box-body -->
+            <div class="box-footer">
+				<div class="col-md-4">
+					<input type="submit" class="btn btn-primary" name="save" value="<?php echo $lang_admin_cache['Syns bottom'] ?>" />
+				</div>
+            </div><!-- /.box-footer-->
+            </form>
+          </div>
 <?php
 
 $tpl_temp = trim(ob_get_contents());
@@ -350,4 +361,4 @@ $tpl_main = str_replace('<forum_main>', $tpl_temp, $tpl_main);
 ob_end_clean();
 // END SUBST - <forum_main>
 
-require FORUM_ROOT.'footer.php';
+require FORUM_ROOT.'admin/footer_adm.php';

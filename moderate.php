@@ -1,13 +1,11 @@
 <?php
 /**
- * Скрипт выполнящий модерацию.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
-
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -24,7 +22,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/misc.php';
 if (isset($_GET['get_host']))
 {
 	if (!$forum_user['is_admmod'])
-		message($lang_common['No permission']);
+		message($lang_common['No permission'], false, '403 Forbidden');
 
 	($hook = get_hook('mr_view_ip_selected')) ? eval($hook) : null;
 
@@ -38,7 +36,7 @@ if (isset($_GET['get_host']))
 	{
 		$get_host = intval($_GET['get_host']);
 		if ($get_host < 1)
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$query = array(
 			'SELECT'	=> 'p.poster_ip',
@@ -49,7 +47,7 @@ if (isset($_GET['get_host']))
 		($hook = get_hook('mr_view_ip_qr_get_poster_ip')) ? eval($hook) : null;
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$ip = $forum_db->result($result);
 	}
@@ -63,7 +61,7 @@ if (isset($_GET['get_host']))
 // All other functions require moderator/admin access
 $fid = isset($_GET['fid']) ? intval($_GET['fid']) : 0;
 if ($fid < 1)
-	message($lang_common['Bad request']);
+	message($lang_common['Bad request'], false, '404 Not Found');
 
 // Get some info about the forum we're moderating
 $query = array(
@@ -81,13 +79,13 @@ $query = array(
 ($hook = get_hook('mr_qr_get_forum_data')) ? eval($hook) : null;
 $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 if (!$forum_db->num_rows($result))
-	message($lang_common['Bad request']);
+	message($lang_common['Bad request'], false, '404 Not Found');
 
 $cur_forum = $forum_db->fetch_assoc($result);
 
 // Make sure we're not trying to moderate a redirect forum
 if ($cur_forum['redirect_url'] != '')
-	message($lang_common['Bad request']);
+	message($lang_common['Bad request'], false, '404 Not Found');
 
 // Setup the array of moderators
 $mods_array = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderators']) : array();
@@ -95,7 +93,7 @@ $mods_array = ($cur_forum['moderators'] != '') ? unserialize($cur_forum['moderat
 ($hook = get_hook('mr_pre_permission_check')) ? eval($hook) : null;
 
 if ($forum_user['g_id'] != FORUM_ADMIN && ($forum_user['g_moderator'] != '1' || !array_key_exists($forum_user['username'], $mods_array)))
-	message($lang_common['No permission']);
+	message($lang_common['No permission'], false, '403 Forbidden');
 
 // Get topic/forum tracking data
 if (!$forum_user['is_guest'])
@@ -114,7 +112,7 @@ if (isset($_GET['tid']))
 
 	$tid = intval($_GET['tid']);
 	if ($tid < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$forum_page['page'] = (!isset($_GET['p']) || !is_numeric($_GET['p']) || $_GET['p'] <= 1) ? 1 : intval($_GET['p']);
 	
@@ -131,7 +129,7 @@ if (isset($_GET['tid']))
 	($hook = get_hook('mr_post_actions_qr_get_topic_info')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$cur_topic = $forum_db->fetch_assoc($result);
 
@@ -167,7 +165,7 @@ if (isset($_GET['tid']))
 			($hook = get_hook('mr_confirm_delete_posts_qr_verify_post_ids')) ? eval($hook) : null;
 			$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 			if ($forum_db->result($result) != count($posts))
-				message($lang_common['Bad request']);
+				message($lang_common['Bad request'], false, '404 Not Found');
 
 			// Delete the posts
 			$query = array(
@@ -289,7 +287,7 @@ if (isset($_GET['tid']))
 			($hook = get_hook('mr_confirm_split_posts_qr_verify_post_ids')) ? eval($hook) : null;
 			$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 			if ($forum_db->result($result) != count($posts))
-				message($lang_common['Bad request']);
+				message($lang_common['Bad request'], false, '404 Not Found');
 
 			$new_subject = isset($_POST['new_subject']) ? forum_trim($_POST['new_subject']) : '';
 
@@ -673,7 +671,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 
 		$move_to_forum = isset($_POST['move_to_forum']) ? intval($_POST['move_to_forum']) : 0;
 		if (empty($topics) || $move_to_forum < 1)
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		// Fetch the forum name for the forum we're moving to
 		$query = array(
@@ -685,7 +683,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 		($hook = get_hook('mr_confirm_move_topics_qr_get_move_to_forum_name')) ? eval($hook) : null;
 
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$move_to_forum_name = $forum_db->result($result);
 
@@ -699,7 +697,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 		($hook = get_hook('mr_confirm_move_topics_qr_verify_topic_ids')) ? eval($hook) : null;
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		if ($forum_db->result($result) != count($topics))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		// Delete any redirect topics if there are any (only if we moved/copied the topic back to where it where it was once moved from)
 		$query = array(
@@ -785,7 +783,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 	{
 		$topics = intval($_GET['move_topics']);
 		if ($topics < 1)
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$action = 'single';
 		// Check for use of incorrect URLs
@@ -814,7 +812,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to']))
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$subject = $forum_db->result($result);
 	}
@@ -988,7 +986,7 @@ else if (isset($_POST['merge_topics']) || isset($_POST['merge_topics_comply']))
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		list($num_topics, $merge_to_tid) = $forum_db->fetch_row($result);
 		if ($num_topics != count($topics))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		// Make any redirect topics point to our new, merged topic
 		$query = array(
@@ -1168,7 +1166,7 @@ else if (isset($_REQUEST['delete_topics']) || isset($_POST['delete_topics_comply
 		($hook = get_hook('mr_confirm_delete_topics_qr_verify_topic_ids')) ? eval($hook) : null;
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		if ($forum_db->result($result) != count($topics))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		// Create an array of forum IDs that need to be synced
 		$forum_ids = array($fid);
@@ -1372,7 +1370,7 @@ else if (isset($_REQUEST['open']) || isset($_REQUEST['close']))
 	{
 		$topic_id = ($action) ? intval($_GET['close']) : intval($_GET['open']);
 		if ($topic_id < 1)
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 		
 		// Check for use of incorrect URLs
 		confirm_current_url(forum_link($forum_url['mod'], array(($action ? 'close' : 'open'), $fid, $topic_id, isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '')));
@@ -1393,7 +1391,7 @@ else if (isset($_REQUEST['open']) || isset($_REQUEST['close']))
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request']);
+			message($lang_common['Bad request'], false, '404 Not Found');
 
 		$subject = $forum_db->result($result);
 
@@ -1420,7 +1418,7 @@ else if (isset($_GET['stick']))
 {
 	$stick = intval($_GET['stick']);
 	if ($stick < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['mod'], array('stick', $fid, $stick, isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '')));
@@ -1443,7 +1441,7 @@ else if (isset($_GET['stick']))
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$subject = $forum_db->result($result);
 
@@ -1467,7 +1465,7 @@ else if (isset($_GET['unstick']))
 {
 	$unstick = intval($_GET['unstick']);
 	if ($unstick < 1)
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 	
 	// Check for use of incorrect URLs
 	confirm_current_url(forum_link($forum_url['mod'], array('unstick', $fid, $unstick, isset($_GET['csrf_token']) ? $_GET['csrf_token'] : '')));
@@ -1490,7 +1488,7 @@ else if (isset($_GET['unstick']))
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request']);
+		message($lang_common['Bad request'], false, '404 Not Found');
 
 	$subject = $forum_db->result($result);
 
@@ -1515,7 +1513,7 @@ else if (isset($_GET['unstick']))
 
 // If forum is empty
 if ($cur_forum['num_topics'] == 0)
-	message($lang_common['Bad request']);
+	message($lang_common['Bad request'], false, '404 Not Found');
 
 // Load the viewforum.php language file
 require FORUM_ROOT.'lang/'.$forum_user['language'].'/forum.php';

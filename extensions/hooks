@@ -1,4 +1,4 @@
-### ФАЙЛ: ./click.php
+﻿### ФАЙЛ: ./click.php
  cl_fl_start
  cl_preg
  cl_fl_die
@@ -449,8 +449,11 @@
  ps_parse_signature_end
 ### ФАЙЛ: ./include/class/common.php
  cls_fl_js_helper_start
+ cls_fl_css_helper_start
  cls_fl_pre_class_js_helper
+ cls_fl_pre_class_css_helper
  cls_fl_js_helper_end
+ cls_fl_css_helper_end
 ### ФАЙЛ: ./include/cache/quickjump.php
  ch_fn_generate_quickjump_cache_start
  ch_fn_generate_quickjump_cache_qr_get_groups
@@ -1512,6 +1515,7 @@
  aop_setup_pre_personal_fieldset
  aop_setup_pre_board_title
  aop_setup_pre_board_descrip
+ aop_setup_pre_board_keywords
  aop_setup_pre_default_style
  aop_fl_setup_pre_forced_style
  aop_setup_pre_user_style
