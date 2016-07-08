@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+
+<!--
+/**
+ *  
+ * Developer helper. Add route function, autoloading classes, 
+ * static references to global vars and more.
+ * 
+ *
+ */
+-->
+
+<extension engine="1.0">
+	<id>developer_helper</id>
+	<title>Developer helper</title>
+	<version>1.0.0</version>
+	<description>Adds an more API function for developers to Flazy</description>
+	<author> Flazy Development Team</author>
+	<minversion>0.0.1</minversion>
+	<maxtestedon>0.0.1</maxtestedon>
+
+	<hooks>
+
+		<hook id="aex_add_repository_for_developer_helper"><![CDATA[
+$inst_exts['developer_helper']['repo_url'] = $repository_url_by_extension[] = 'https://flazy.us/'; 
+		]]></hook>	
+
+		<hook id="es_essentials"><![CDATA[
+require $ext_info['path'].DIRECTORY_SEPARATOR.'helper.php';
+		]]></hook>
+
+		<hook id="mi_new_action"><![CDATA[
+$forum_page['crumbs'] = array(
+	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
+);
+App::route();
+		]]></hook>
+
+		<hook id="aop_new_section"><![CDATA[
+App::$admin_section = true;
+$forum_page['crumbs'] = array(
+	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
+	array($lang_admin_common['Forum administration'], forum_link($forum_url['admin_index']))
+);		
+
+App::route();
+		]]></hook>
+
+
+		<hook id="pf_change_details_new_section"><![CDATA[
+App::$profile_section = true;
+$forum_page['crumbs'] = array(
+	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
+	array(sprintf($lang_profile['Users profile'], $forum_user['username']), forum_link($forum_url['user'], $forum_user['id']))
+);
+App::route();
+		]]></hook>
+
+		<hook id="fn_message_start"><![CDATA[
+if (App::$is_ajax)
+{
+	App::send_json(array('code' => -1, 'message' => $message, 'sender' => 'developer_helper'));
+}
+		]]></hook>
+
+		<hook id="fn_redirect_start"><![CDATA[
+if (App::$is_ajax)
+{
+	App::send_json(array('code' => -2, 'redirect' => $message, 'destination_url' => $destination_url, 'sender' => 'developer_helper'));
+}
+		]]></hook>
+
+		<hook id="fn_get_current_url_start"><![CDATA[
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' AND !isset($_POST['csrf_token']))
+{
+	return $GLOBALS['forum_user']['prev_url'];
+}
+		]]></hook>
+		
+		
+		<hook id="fn_cookie_login_qr_update_online_user"><![CDATA[
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')
+{
+	$query['SET'] = str_replace(', prev_url=\''.$forum_db->escape($current_url).'\'', '', $query['SET']);
+}		
+		]]></hook>		
+
+		<hook id="fn_csrf_confirm_form_start"><![CDATA[
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' AND !defined('DEVELOPER_HELPER_CSRF_CONFIRM'))
+{		
+	foreach ($_POST as $submitted_key => $submitted_val)
+		if ($submitted_key != 'csrf_token' && $submitted_key != 'prev_url')
+		{
+			$hidden_fields = _csrf_confirm_form($submitted_key, $submitted_val);
+			foreach ($hidden_fields as $field_key => $field_val)
+				$forum_page['hidden_fields'][$field_key] = forum_htmlencode($field_val);
+		}
+
+	$send_data = array(
+		'code'		=>	-3, 
+		'message'	=>	$lang_common['CSRF token mismatch'],
+		'sender'	=>	'developer_helper',
+		'csrf_token'=>	generate_form_token(get_current_url()),	
+		'prev_url'	=>	forum_htmlencode($forum_user['prev_url']),
+		
+	);
+	if (isset($forum_page['hidden_fields']))
+		$send_data['post_data'] = $forum_page['hidden_fields'];
+	
+	App::send_json($send_data);		
+	return 1;
+}		
+		]]></hook>
+		
+				
+	</hooks>
+</extension>

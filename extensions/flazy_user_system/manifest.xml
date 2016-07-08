@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE extension SYSTEM "ext-1.0.dtd">
+
+<!--
+/**
+ * flazy_user_system extension main file
+ *
+ * @copyright Copyright (C) 2015 Flazy.us
+ * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
+ * @package flazy_user_system
+ */
+-->
+
+<extension engine="1.0">
+	<flazy>yes</flazy>
+	<id>flazy_user_system</id>
+	<title>User System</title>
+	<version>1.0.1</version>
+	<description>Adds information about the operation system and web browser of the user</description>
+	<author>Flazy Development Team</author>
+	<minversion>0.0.1</minversion>
+	<maxtestedon>0.0.1</maxtestedon>
+
+	<hooks>
+		<hook id="pf_change_details_about_pre_header_load"><![CDATA[
+if (file_exists($ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php'))
+	require $ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php';
+else
+	require $ext_info['path'].'/lang/Russian/'.$ext_info['id'].'.php';
+
+require $ext_info['path'].'/functions.php';
+
+if ($user['user_agent'])
+	$forum_page['user_private']['useragent']= '<li><span class="prof" style="background-image: url('.$base_url.'/'.$ext_info['path'].'/img/browser.png);">'.$lang_user_system['OS'].' \ '.$lang_user_system['Browser'].': '.user_system($user['user_agent']).'</span></li>';
+		]]></hook>
+
+		<hook id="vt_start"><![CDATA[
+if (file_exists($ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php'))
+	require $ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info['id'].'.php';
+else
+	require $ext_info['path'].'/lang/Russian/'.$ext_info['id'].'.php';
+
+require $ext_info['path'].'/functions.php';
+		]]></hook>
+
+		<hook id="vt_row_pre_post_ident_merge"><![CDATA[
+if (isset($user_data_cache[$cur_post['poster_id']]['author_ident']))
+	$forum_page['author_ident'] = $user_data_cache[$cur_post['poster_id']]['author_ident'];
+else
+{
+	if ($cur_post['poster_id'] > 1 && $cur_post['user_agent'])
+		$forum_page['picture']['user_system'] = user_system($cur_post['user_agent']);
+}
+		]]></hook>
+	</hooks>
+</extension>

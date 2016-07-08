@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension engine="1.0">
+	<id>sitemap</id>
+	<title>Sitemap Generator</title>
+	<version>0.0.1</version>
+	<description>Allows the forum to generate a standard-complying sitemap.</description>
+	<author>Garciat edit by Flazy Developer Team</author>
+	<minversion>0.0.1</minversion>
+	<maxtestedon>0.0.2</maxtestedon>
+	
+	<install>
+		<![CDATA[
+if (!$handle = @fopen(FORUM_ROOT.'sitemap.xml', 'w'))
+	die("Could not create <strong>sitemap.xml</strong> on forum root.");
+fclose($handle);
+
+include $ext_info['path'].'/common.php';
+
+createSitemap();
+		]]>
+	</install>
+	
+	<uninstall>
+		<![CDATA[
+if(!@unlink(FORUM_ROOT.'sitemap.xml'))
+	die("Could not delete <strong>sitemap.xml</strong> on forum root.");
+		]]>
+	</uninstall>
+	
+	<hooks>
+		<hook id="po_pre_redirect, ed_pre_redirect, dl_topic_deleted_pre_redirect, acg_del_cat_pre_redirect, afo_add_forum_pre_redirect, afo_del_forum_pre_redirect, afo_update_positions_pre_redirect, afo_save_forum_pre_redirect, afo_revert_perms_pre_redirect">
+			<![CDATA[
+include $ext_info['path'].'/common.php';
+
+createSitemap();
+			]]>
+		</hook>
+	</hooks>
+</extension>
