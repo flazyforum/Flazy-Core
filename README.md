@@ -1,7 +1,6 @@
 ## Flazy  
 ======
-NO MORE UPDATES FOR THIS VERSION!
-WE ARE STARTING THE PROJECT IN LARAVEL
+We are starting the project again. New design and everything. Just stay in touch.
 
 Index
 -----
