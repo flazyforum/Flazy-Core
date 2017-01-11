@@ -2,8 +2,8 @@
 /**
  * Загрузка данных (например: функции, база данных, конфигурационные данные, и т.д.), необходимые для работы форума.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008-2015 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.Us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -16,8 +16,8 @@ if (!defined('FORUM_ROOT'))
 }
 
 // Define the version and database revision that this code was written for
-define('FORUM_VERSION', '0.0.2');
-define('FORUM_DB_REVISION', '1.4.3');
+define('FORUM_VERSION', '0.7');
+define('FORUM_DB_REVISION', '13');
 
 // If we have the 1.2 constant defined, define the proper 1.3 constant so we don't get
 // an incorrect "need to install" message
@@ -27,7 +27,7 @@ if (defined('FORUM'))
 // Загрузить скрипт с функциями
 require FORUM_ROOT.'include/functions/common.php';
 
-// Load UTF-8 function
+// Загрузить функции UTF-8
 require FORUM_ROOT.'include/utf8/utf8.php';
 
 // Обратный эффект register_globals
@@ -50,9 +50,9 @@ if (file_exists($config))
 if (!defined('FORUM'))
 	error('Файл \'config.php\' не существует или поврежден. Пожалуйста, запустите <a href="'.FORUM_ROOT.'admin/install.php">install.php</a>, чтобы установить Flazy.');
 
-// Loading js and css script
+// Загрузить скрипт с классами
 require FORUM_ROOT.'include/class/common.php';
-require FORUM_ROOT.'include/class/css_get.php';
+
 // Block prefetch requests
 if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 {
@@ -71,15 +71,14 @@ $forum_start = get_microtime();
 
 // Make sure PHP reports all errors except E_NOTICE. Forum supports E_ALL, but a lot of scripts it may interact with, do not.
 if (defined('FORUM_DEBUG'))
-	error_reporting(-1);
+	error_reporting(E_ALL);
 else
-	error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+	error_reporting(E_ALL ^ E_NOTICE);
 
 // Устанавливаем локаль для функций преобразования строк
 setlocale(LC_CTYPE, 'C');
 
-if(function_exists('date_default_timezone_set'))
-	date_default_timezone_set('UTC');
+date_default_timezone_set('UTC');
 
 // Construct REQUEST_URI if it isn't set (or if it's set improperly)
 if (!isset($_SERVER['REQUEST_URI']) || (!empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['REQUEST_URI'], '?') === false))
@@ -131,7 +130,7 @@ if (!defined('FORUM_HOOKS_LOADED'))
 }
 
 if (!defined('FORUM_AVATAR_DIR'))
-	define('FORUM_AVATAR_DIR', 'resources/avatars');
+	define('FORUM_AVATAR_DIR', 'img/avatars/');
 
 // If the request_uri is invalid try fix it
 if (!defined('FORUM_IGNORE_REQUEST_URI'))
@@ -146,10 +145,6 @@ if (!isset($base_url))
 
 	$base_url = $base_url_guess;
 }
-
-// For sqlite "show dot" options always disabled
-if ($db_type == 'sqlite')
-	$forum_config['o_show_dot'] = '0';
 
 // Define a few commonly used constants
 define('FORUM_UNVERIFIED', 0);

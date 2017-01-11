@@ -11,7 +11,7 @@
 
 // Make sure we have built in support for MySQL
 if (!function_exists('mysql_connect'))
-	die('This PHP environment does not have built-in support for MySQL. It is necessary if you want to use a MySQL database for this forum. Explore the PHP documentation for more information.');
+	die('Эта PHP среда не имеет встроенной поддержки MySQL. Она необходима, если вы хотите использовать базу данных MySQL для работы этого форума. Изучите PHP документацию для получения дополнительной информации.');
 
 /**
  *  Абстрактная прослойка для работы PHP с базой данных MySQL InnoDB.
@@ -43,10 +43,10 @@ class DBLayer
 		if ($this->link_id)
 		{
 			if (!@mysql_select_db($db_name, $this->link_id))
-				error('Unable to select database. MySQL say: '.mysql_error(), __FILE__, __LINE__);
+				error('Невозможно выбрать базу данных. MySQL сообщила: '.mysql_error(), __FILE__, __LINE__);
 		}
 		else
-			error('Unable to connect to MySQL server. MySQL say:'.mysql_error(), __FILE__, __LINE__);
+			error('Не удается установить соединение с MySQL сервером. MySQL сообщила: '.mysql_error(), __FILE__, __LINE__);
 
 		// Setup the client-server character set (UTF-8)
 		if (!defined('FORUM_NO_SET_NAMES'))
@@ -77,7 +77,7 @@ class DBLayer
 	function query($sql, $unbuffered = false)
 	{
 		if (strlen($sql) > 140000)
-			die('Insanely great request. Interrupted.');
+			die('Безумно большой запрос. Прервано.');
 
 		if (defined('FORUM_SHOW_QUERIES'))
 			$q_start = get_microtime();
@@ -277,7 +277,7 @@ class DBLayer
 		$result = $this->query('SELECT VERSION()');
 
 		return array(
-			'name'		=> 'MySQL Standart (InnoDB)',
+			'name'		=> 'MySQL Стандартная (InnoDB)',
 			'version'	=> preg_replace('/^([^-]+).*$/', '\\1', $this->result($result))
 		);
 	}

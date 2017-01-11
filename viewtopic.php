@@ -1,11 +1,13 @@
 <?php
 /**
+ * Просмотр сообщений в тем.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
+
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -24,7 +26,7 @@ $action = isset($_GET['action']) ? $_GET['action'] : null;
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $pid = isset($_GET['pid']) ? intval($_GET['pid']) : 0;
 if ($id < 1 && $pid < 1)
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 
 // If a post ID is specified we determine topic ID and page number so we can redirect to the correct message
@@ -42,7 +44,7 @@ if ($pid)
 	($hook = get_hook('vt_qr_get_post_info')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request'], false, '404 Not Found');
+		message($lang_common['Bad request']);
 
 	list($id, $posted) = $forum_db->fetch_row($result);
 
@@ -146,7 +148,7 @@ if (!$forum_user['is_guest'] && $forum_config['o_subscriptions'])
 ($hook = get_hook('vt_qr_get_topic_info')) ? eval($hook) : null;
 $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 if (!$forum_db->num_rows($result))
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 $cur_topic = $forum_db->fetch_assoc($result);
 
@@ -188,7 +190,7 @@ if (!$forum_user['is_guest'] && $cur_topic['question'] != '')
 
 		$answer_id = isset($_POST['answer']) ? intval($_POST['answer']) : 0;
 		if ($answer_id < 1)
-			message($lang_common['Bad request'], false, '404 Not Found');
+			message($lang_common['Bad request']);
 
 		// Отвечал ли уже
 		$query = array(
@@ -200,7 +202,7 @@ if (!$forum_user['is_guest'] && $cur_topic['question'] != '')
 		($hook = get_hook('vt_fl_qr_get_answers_with_this_id')) ? eval($hook) : null;
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 		if ($forum_db->num_rows($result) < 1)
-			message($lang_common['Bad request'], false, '404 Not Found');
+			message($lang_common['Bad request']);
 
 		//Have user voted?
 		$query = array(
@@ -245,7 +247,7 @@ if (!$forum_user['is_guest'] && $cur_topic['question'] != '')
 			$query = array(
 				'INSERT'	=> 'topic_id, user_id, answer_id, voted',
 				'INTO'		=> 'voting',
-				'VALUES'	=> $id.', '.$forum_user['id'].', '.$answer_id.', '.$now
+				'VALUES'	=> $id.', '.$forum_user['id'].', '.$answer_id.', '.$now	
 			);
 
 			($hook = get_hook('vt_fl_qr_get_insert_voting')) ? eval($hook) : null;
@@ -257,7 +259,7 @@ if (!$forum_user['is_guest'] && $cur_topic['question'] != '')
 		}
 		$is_voted_user = true;
 	}
-	else
+	else	
 	{
 		//Determine user have voted or not
 		$query = array(
@@ -317,8 +319,8 @@ if (!$pid)
 // Navigation links for header and page numbering for title/meta description
 if ($forum_page['page'] < $forum_page['num_pages'])
 {
-	$forum_page['nav']['last'] = '<link rel="next" href="'.forum_sublink($forum_url['topic'], $forum_url['page'], $forum_page['num_pages'], array($id, sef_friendly($cur_topic['subject']))).'" title="'.$lang_common['Page'].' '.$forum_page['num_pages'].'" />';
-	$forum_page['nav']['next'] = '<link rel="prev" href="'.forum_sublink($forum_url['topic'], $forum_url['page'], ($forum_page['page'] + 1), array($id, sef_friendly($cur_topic['subject']))).'" title="'.$lang_common['Page'].' '.($forum_page['page'] + 1).'" />';
+	$forum_page['nav']['last'] = '<link rel="last" href="'.forum_sublink($forum_url['topic'], $forum_url['page'], $forum_page['num_pages'], array($id, sef_friendly($cur_topic['subject']))).'" title="'.$lang_common['Page'].' '.$forum_page['num_pages'].'" />';
+	$forum_page['nav']['next'] = '<link rel="next" href="'.forum_sublink($forum_url['topic'], $forum_url['page'], ($forum_page['page'] + 1), array($id, sef_friendly($cur_topic['subject']))).'" title="'.$lang_common['Page'].' '.($forum_page['page'] + 1).'" />';
 }
 if ($forum_page['page'] > 1)
 {
@@ -336,18 +338,16 @@ if (!empty($cur_topic['description']))
 	$cur_topic['subject'] = $cur_topic['subject'].', '.$cur_topic['description'];
 
 // Generate paging and posting links
-$forum_page['page_post']['paging'] = '<div class="pagination"><ul>'.paginate($forum_page['num_pages'], $forum_page['page'], $forum_url[$page_url], $lang_common['Paging separator'], array($id, sef_friendly($cur_topic['subject']))).'</ul></div>';
+$forum_page['page_post']['paging'] = '<p class="paging"><span class="pages">'.$lang_common['Pages'].'</span> '.paginate($forum_page['num_pages'], $forum_page['page'], $forum_url[$page_url], $lang_common['Paging separator'], array($id, sef_friendly($cur_topic['subject']))).'</p>';
 
 if ($forum_user['may_post'])
-	$forum_page['page_post']['posting'] = '<div class="buttons"><a class="button font-icon" href="'.forum_link($forum_url['new_reply'], $id).'"><i class="fa fa-reply"></i>'.$lang_topic['Post reply'].'</a></div>';
+	$forum_page['page_post']['posting'] = '<p class="posting"><a class="newpost" href="'.forum_link($forum_url['new_reply'], $id).'"><span>'.$lang_topic['Post reply'].'</span></a></p>';
 else if ($forum_user['is_guest'])
-	$forum_page['page_post']['posting'] = '<div class="stat-block online-list"><p>'.sprintf($lang_topic['Login to post'], '
-	<a href="'.forum_link($forum_url['login']).'">'.$lang_common['login'].'</a>',
-	'<a href="'.forum_link($forum_url['register']).'">'.$lang_common['register'].'</a>').'</p></div>';
+	$forum_page['page_post']['posting'] = '<p class="posting">'.sprintf($lang_topic['Login to post'], '<a href="'.forum_link($forum_url['login']).'">'.$lang_common['login'].'</a>', '<a href="'.forum_link($forum_url['register']).'">'.$lang_common['register'].'</a>').'</p>';
 else if ($cur_topic['closed'])
-	$forum_page['page_post']['posting'] = '<div class="stat-block online-list"><p class="posting">'.$lang_topic['Topic closed info'].'</p></div>';
+	$forum_page['page_post']['posting'] = '<p class="posting">'.$lang_topic['Topic closed info'].'</p>';
 else
-	$forum_page['page_post']['posting'] = '<div class="stat-block online-list"><p class="posting">'.$lang_topic['No permission'].'</p></div>';
+	$forum_page['page_post']['posting'] = '<p class="posting">'.$lang_topic['No permission'].'</p>';
 
 // Setup main options
 $forum_page['main_options_head'] = $lang_topic['Topic options'];
@@ -386,7 +386,7 @@ if ($forum_config['o_users_online'] && $forum_config['o_online_ft'])
 	if (!defined('FORUM_FUNCTIONS_ONLINE_FT'))
 		require FORUM_ROOT.'include/functions/online_user.php';
 
-	$forum_page['main_extra']['online'] = '<h3>'.$lang_topic['Users online'].'</h3><p>'.online_user($id, 'viewtopic').'</p>';
+	$forum_page['main_extra']['online'] = '<p class="user-online"><span class="pages">'.$lang_topic['Users online'].'</span> '.online_user($id, 'viewtopic').'</p>';
 }
 
 $forum_page['main_extra']['print'] = '<p class="posting"><a href="'.forum_link($forum_url['print'], array($id, sef_friendly($cur_topic['subject']))).'"><span>'.$lang_topic['Print'].'</span></a></p>';
@@ -411,13 +411,28 @@ if ($forum_page['num_pages'] > 1)
 if (!$pid)
 	define('FORUM_ALLOW_INDEX', 1);
 
-
+$forum_js->file(array('jquery', 'tooltip'));
+$forum_js->code('$(document).ready( function() {
+	$(\'.hide-head\').toggle(
+		function() {
+		$(this).children().text(\''.$lang_common['Hidden text'].'\');
+			$(this).next().show(\'slow\');
+			
+		},
+		function() {
+			$(this).children().text(\''.$lang_common['Hidden show text'].'\');
+			$(this).next().hide(\'slow\');
+		}
+	);
+	$(\'.p .posting img, .popup\').tooltip({ track: true, delay: 0, showURL: false, showBody: " - ", fade: 250 });
+	$(\'#block\').click($.tooltip.block);
+});');
 
 if ($action == 'print')
 	define('FORUM_PRINT', 1);
 define('FORUM_PAGE', 'viewtopic');
 require FORUM_ROOT.'header.php';
-	$forum_js->file('jquery');
+
 // START SUBST - <forum_main>
 ob_start();
 
@@ -681,8 +696,16 @@ if ($cur_topic['question'] != '')
 ($hook = get_hook('vt_main_output_start')) ? eval($hook) : null;
 
 ?>
+	<div class="main-head">
+<?php
 
+	if (!empty($forum_page['main_head_options']))
+		echo "\t\t".'<p class="options">'.implode(' ', $forum_page['main_head_options']).'</p>'."\n";
 
+?>
+		<h2 class="hn"><span><?php echo $forum_page['items_info'] ?></span></h2>
+	</div>
+	<div id="forum<?php echo $cur_topic['forum_id'] ?>" class="main-content main-topic">
 <?php
 
 if (!defined('FORUM_PARSER_LOADED'))
@@ -708,7 +731,7 @@ while ($row = $forum_db->fetch_row($result))
 
 // Retrieve the posts (and their respective poster/online status)
 $query = array(
-	'SELECT'	=> 'u.email, u.title, u.avatar, u.skype, u.country, u.signature, u.email_setting, u.num_posts, u.admin_note, u.user_agent, u.reputation_plus, u.reputation_minus, u.rep_enable, p.id, p.poster AS username, p.poster_id, p.poster_ip, p.poster_email, p.message, p.hide_smilies, p.posted, p.edited, p.edited_by, g.g_id, g.g_user_title, o.user_id AS is_online',
+	'SELECT'	=> 'u.email, u.title, u.avatar, u.sex, u.country, u.signature, u.email_setting, u.num_posts, u.admin_note, u.user_agent, u.reputation_plus, u.reputation_minus, u.rep_enable, p.id, p.poster AS username, p.poster_id, p.poster_ip, p.poster_email, p.message, p.hide_smilies, p.posted, p.edited, p.edited_by, g.g_id, g.g_user_title, o.user_id AS is_online',
 	'FROM'		=> 'posts AS p',
 	'JOINS'		=> array(
 		array(
@@ -728,7 +751,7 @@ $query = array(
 );
 
 if ($forum_config['o_show_user_info'])
-	$query['SELECT'] .= ', u.group_id, u.location, u.registered, u.timezone, u.url, u.jabber, u.icq, u.msn, u.yahoo, u.magent, u.vkontakte, u.classmates, u.mirtesen, u.moikrug, u.facebook, u.twitter, u.lastfm';
+	$query['SELECT'] .= ', u.location, u.registered, u.timezone, u.url, u.jabber, u.icq, u.msn, u.yahoo, u.magent, u.vkontakte, u.classmates, u.mirtesen, u.moikrug, u.facebook, u.twitter, u.lastfm';
 if ($forum_config['o_report_enabled'])
 	$query['SELECT'] .= ', p.reported';
 
@@ -752,7 +775,6 @@ foreach ($posts_info as $cur_post)
 
 	$forum_page['post_ident'] = array();
 	$forum_page['author_ident'] = array();
-	$forum_page['author_socials'] = array();
 	$forum_page['picture'] = array();
 	$forum_page['author_info'] = array();
 	$forum_page['post_options'] = array();
@@ -762,8 +784,19 @@ foreach ($posts_info as $cur_post)
 	$forum_page['message'] = array();
 
 	// Generate the post heading
+	$forum_page['post_ident']['num'] = '<span class="post-num">'.forum_number_format($forum_page['start_from'] + $forum_page['item_count']).'</span>';
 
-	$forum_page['post_ident']['link'] = '<a rel="bookmark" title="'.$lang_topic['Permalink post'].'" href="'.forum_link($forum_url['post'], $cur_post['id']).'">'.format_time($cur_post['posted']).$lang_common['Title separator'].flazy_format_time($cur_post['posted']).'</a>';
+	if ($cur_post['poster_id'] > 1)
+	{
+		if(!$forum_user['is_guest'])
+			$forum_page['post_ident']['byline'] = '<span class="post-byline">'.sprintf((($cur_post['id'] == $cur_topic['first_post_id']) ? $lang_topic['Topic byline'] : $lang_topic['Reply byline']), (($forum_user['g_view_users']) ? '<a title="'.sprintf($lang_topic['Reply to user'], forum_htmlencode($cur_post['username'])).'" href="javascript:Forum.to(\''.$cur_post['username'].'\')">'.forum_htmlencode($cur_post['username']).'</a> <a title="'.sprintf($lang_topic['Go to profile'], forum_htmlencode($cur_post['username'])).'" href="'.forum_link($forum_url['user'], $cur_post['poster_id']).'"> ↓ </a>' : '<strong>'.forum_htmlencode($cur_post['username']).'</strong>')).'</span>';
+		else
+			$forum_page['post_ident']['byline'] = '<span class="post-byline">'.sprintf((($cur_post['id'] == $cur_topic['first_post_id']) ? $lang_topic['Topic byline'] : $lang_topic['Reply byline']), (($forum_user['g_view_users']) ? '<a title="'.sprintf($lang_topic['Go to profile'], forum_htmlencode($cur_post['username'])).'" href="'.forum_link($forum_url['user'], $cur_post['poster_id']).'">'.forum_htmlencode($cur_post['username']).'</a>' : '<strong>'.forum_htmlencode($cur_post['username']).'</strong>')).'</span>';
+	}
+	else
+		$forum_page['post_ident']['byline'] = '<span class="post-byline">'.sprintf((($cur_post['id'] == $cur_topic['first_post_id']) ? $lang_topic['Topic byline'] : $lang_topic['Reply byline']), '<strong>'.forum_htmlencode($cur_post['username']).'</strong>').'</span>';
+
+	$forum_page['post_ident']['link'] = '<span class="post-link"><a class="permalink" rel="bookmark" title="'.$lang_topic['Permalink post'].'" href="'.forum_link($forum_url['post'], $cur_post['id']).'">'.format_time($cur_post['posted']).$lang_common['Title separator'].flazy_format_time($cur_post['posted']).'</a></span>';
 
 	($hook = get_hook('vt_row_pre_post_ident_merge')) ? eval($hook) : null;
 
@@ -774,37 +807,42 @@ foreach ($posts_info as $cur_post)
 		// Generate author identification
 		if ($cur_post['poster_id'] > 1)
 		{
+			$forum_page['author_ident']['usertitle'] = '<li class="usertitle"><span>'.get_title($cur_post).'</span></li>';
 			if ($forum_config['o_avatars'] && $forum_user['show_avatars'])
 			{
 				if (!defined('FORUM_FUNCTIONS_GENERATE_AVATAR'))
 					require FORUM_ROOT.'include/functions/generate_avatar_markup.php';
 
 				$forum_page['avatar_markup'] = generate_avatar_markup($cur_post['poster_id'], $cur_post['avatar'], $cur_post['email']);
-
+		
 				if (!empty($forum_page['avatar_markup']))
-					$forum_page['author_ident']['avatar'] = '<dt class="has-profile-rank has-avatar"><div class="avatar-container">'.$forum_page['avatar_markup'].'</div>';
-			$forum_page['author_ident']['username'] = (($forum_user['g_view_users']) ? '<a class="username-coloured" title="'.sprintf($lang_topic['Go to profile'], forum_htmlencode($cur_post['username'])).'" href="'.forum_link($forum_url['user'], $cur_post['poster_id']).'">'.forum_htmlencode($cur_post['username']).'</a>' : '<strong>'.forum_htmlencode($cur_post['username']).'</strong></dt>');
-
+					$forum_page['author_ident']['avatar'] = '<li class="useravatar">'.$forum_page['avatar_markup'].'</li>';
 			}
 
-			$forum_page['author_ident']['usertitle'] = '<dd class="profile-rank">'.get_title($cur_post).'</dd>';
+			if ($cur_post['sex'] == '1')
+				$forum_page['picture']['sex'] = '<img class="popup" src="'.$base_url.'/img/style/male.png" width="16" height="16" alt="" title="'.$lang_topic['Sex'].' - '.$lang_topic['Male'].'"/>';
+			else if ($cur_post['sex'] == '2')
+				$forum_page['picture']['sex'] = '<img class="popup" src="'.$base_url.'/img/style/female.png" width="16" height="16" alt="" title="'.$lang_topic['Sex'].' - '.$lang_topic['Female'].'"/>';
 
 			if ($cur_post['country'] != '')
-				$forum_page['picture']['country'] = '<dd class="profile-country">' .$lang_topic['Country']. '<img class="popup" src="'.$base_url.'/resources/flags/'.$cur_post['country'].'.png" title="'.$lang_topic['Country'].' - '.$lang_country[$cur_post['country']].'" alt=""/></dd>';
+				$forum_page['picture']['country'] = '<img class="popup" src="'.$base_url.'/img/flags/'.$cur_post['country'].'.gif" title="'.$lang_topic['Country'].' - '.$lang_country[$cur_post['country']].'" alt=""/>';
 
 			if (!empty($forum_page['picture']))
-				$forum_page['author_ident']['picture'] = '<dd class="profile-picture">'.implode(' ', $forum_page['picture']).'</dd>';
+				$forum_page['author_ident']['picture'] = '<li class="picture">'.implode(' ', $forum_page['picture']).'</li>';
 
+			$forum_page['author_ident']['username'] = '<li class="username">'.(($forum_user['g_view_users']) ? '<a title="'.sprintf($lang_topic['Go to profile'], forum_htmlencode($cur_post['username'])).'" href="'.forum_link($forum_url['user'], $cur_post['poster_id']).'">'.forum_htmlencode($cur_post['username']).'</a>' : '<strong>'.forum_htmlencode($cur_post['username']).'</strong>').'</li>';
 
+			if ($cur_post['is_online'] == $cur_post['poster_id'])
+				$forum_page['author_ident']['status'] = '<li class="userstatus"><span>'.$lang_topic['Online'].'</span></li>';
+			else
+				$forum_page['author_ident']['status'] = '<li class="userstatus"><span>'.$lang_topic['Offline'].'</span></li>';
 		}
 		else
 		{
-			$forum_page['author_ident']['username'] = '<dd class="profile-username">'.forum_htmlencode($cur_post['username']).'</dd>';
-			$forum_page['author_ident']['usertitle'] = '<dd class="profile-usertitle">'.get_title($cur_post).'</dd>';
+			$forum_page['author_ident']['username'] = '<li class="username"><strong>'.forum_htmlencode($cur_post['username']).'</strong></li>';
+			$forum_page['author_ident']['usertitle'] = '<li class="usertitle"><span>'.get_title($cur_post).'</span></li>';
 		}
-
 	}
-
 
 	if (isset($user_data_cache[$cur_post['poster_id']]['author_info']))
 		$forum_page['author_info'] = $user_data_cache[$cur_post['poster_id']]['author_info'];
@@ -815,48 +853,46 @@ foreach ($posts_info as $cur_post)
 		{
 			if ($forum_config['o_show_user_info'])
 			{
-
 				if ($cur_post['location'] != '')
 				{
 					if ($forum_config['o_censoring'])
 						$cur_post['location'] = censor_words($cur_post['location']);
 
-					$forum_page['author_info']['from'] = '<dd class="profile-from">'.$lang_topic['From'].' <strong> '.forum_htmlencode($cur_post['location']).'</strong></dd>';
+					$forum_page['author_info']['from'] = '<li><span>'.$lang_topic['From'].' <strong> '.forum_htmlencode($cur_post['location']).'</strong></span></li>';
 				}
 
-				$forum_page['author_info']['registered'] = '<dd class="profile-registered">'.$lang_topic['Registered'].' <strong> '.format_time($cur_post['registered'], 1).'</strong></dd>';
+				$forum_page['author_info']['registered'] = '<li><span>'.$lang_topic['Registered'].' <strong> '.format_time($cur_post['registered'], 1).'</strong></span></li>';
 
 				// Разница во времени
 				$time_dif = $forum_user['timezone'] - $cur_post['timezone'];
 				if ($time_dif != 0 && $forum_user['id'] > 1)
-					$forum_page['author_info']['timezone'] = '<dd class="profile-timezone"><strong>'.$lang_topic['Timezone'].' </strong>'.$time_dif.' '.$lang_topic['From yours'].'</dd>';
+					$forum_page['author_info']['timezone'] = '<li><span><strong>'.$lang_topic['Timezone'].' </strong>'.$time_dif.' '.$lang_topic['From yours'].'</span></li>';
 			}
 
 			if ($forum_config['o_show_post_count'] || $forum_user['is_admmod'])
-				$forum_page['author_info']['posts'] = '<dd class="profile-posts">'.$lang_topic['Posts info'].' <strong><a href="'.forum_link($forum_url['search_user_posts'], $cur_post['poster_id']).'">'.forum_number_format($cur_post['num_posts']).'</a></strong></dd>';
+				$forum_page['author_info']['posts'] = '<li><span>'.$lang_topic['Posts info'].' <strong><a href="'.forum_link($forum_url['search_user_posts'], $cur_post['poster_id']).'">'.forum_number_format($cur_post['num_posts']).'</a></strong></span></li>';
 
 			if ($forum_config['o_rep_enabled'] && $forum_user['rep_enable'] && $forum_user['rep_enable_adm'] && $forum_user['g_rep_enable'] && $cur_post['rep_enable'] && $cur_post['poster_id'] != 1)
 			{
 				if (!$forum_user['is_guest'] && $forum_user['username'] != $cur_post['username'])
-					$vote = '<a href="'.forum_link($forum_url['reputation_change'], array($cur_post['poster_id'], $cur_post['id'], 'positive')).'"><i class="fa fa-thumbs-up"></i></a>  <strong>'.forum_number_format($cur_post['reputation_plus'] - $cur_post['reputation_minus']).'</strong>  <a href="'.forum_link($forum_url['reputation_change'], array($cur_post['poster_id'], $cur_post['id'], 'negative')).'"><i class="fa fa-thumbs-down"></i></a><br>';
+					$vote = '<a href="'.forum_link($forum_url['reputation_change'], array($cur_post['poster_id'], $cur_post['id'], 'positive')).'"><img src="'.$base_url.'/img/style/plus.gif" alt="+" /></a>  <strong>'.forum_number_format($cur_post['reputation_plus'] - $cur_post['reputation_minus']).'</strong>  <a href="'.forum_link($forum_url['reputation_change'], array($cur_post['poster_id'], $cur_post['id'], 'negative')).'"><img src="'.$base_url.'/img/style/minus.gif" alt="-" /></a>';
 				else
-					$vote = '<strong><a href="'.forum_link($forum_url['reputation'], array($cur_post['poster_id'], 'reputation', )).'">'.forum_number_format($cur_post['reputation_plus'] - $cur_post['reputation_minus']).'</a></strong>';
+					$vote = '<strong>'.forum_number_format($cur_post['reputation_plus'] - $cur_post['reputation_minus']).'</strong>';
 
-				$forum_page['author_info']['reputation'] = '<dd class="profile-reputation">'.$lang_topic['Reputation'].': '.$vote.'</dd>';
+				$forum_page['author_info']['reputation'] = '<li><span><a href="'.forum_link($forum_url['reputation'], array($cur_post['poster_id'], 'reputation', )).'">'.$lang_topic['Reputation'].'</a>: '.$vote.'</span></li>';
 			}
 
 			if ($forum_user['is_admmod'])
 			{
 				if ($cur_post['admin_note'] != '')
-					$forum_page['author_info']['note'] = '<dd class="profile-note">'.$lang_topic['Note'].' <strong> '.forum_htmlencode($cur_post['admin_note']).'</strong></dd>';
+					$forum_page['author_info']['note'] = '<li><span>'.$lang_topic['Note'].' <strong> '.forum_htmlencode($cur_post['admin_note']).'</strong></span></li>';
 			}
 		}
 	}
 
-
 	// Создание инфорции об IP для модераторов/администраторов
 	if ($forum_user['is_admmod'])
-		$forum_page['author_info']['ip'] = '<dd class="profile-ip">'.$lang_topic['IP'].' <a href="'.forum_link($forum_url['get_host'], forum_htmlencode($cur_post['id'])).'">'.forum_htmlencode($cur_post['poster_ip']).'</a> <a href="'.forum_link('click.php').'?http://www.ripe.net/whois?form_type=simple&amp;full_query_string=&amp;searchtext='.forum_htmlencode($cur_post['poster_ip']).'&amp;do_search=Search" onclick="window.open(this.href); return false">Whois</a></dd>';
+		$forum_page['author_info']['ip'] = '<li><span>'.$lang_topic['IP'].' <a href="'.forum_link($forum_url['get_host'], forum_htmlencode($cur_post['id'])).'">'.forum_htmlencode($cur_post['poster_ip']).'</a> <a href="'.forum_link('click.php').'?http://www.ripe.net/whois?form_type=simple&amp;full_query_string=&amp;searchtext='.forum_htmlencode($cur_post['poster_ip']).'&amp;do_search=Search" onclick="window.open(this.href); return false">Whois</a></span></li>';
 
 	// Создать контактную информацию об авторе
 	if ($forum_config['o_show_user_info'])
@@ -870,7 +906,7 @@ foreach ($posts_info as $cur_post)
 				if ($cur_post['url'] != '')
 					$forum_page['post_contacts']['url'] = '<span class="user-url'.(empty($forum_page['post_contacts']) ? ' first-item' : '').'"><a class="external" href="'.forum_link('click.php').'?'.forum_htmlencode(($forum_config['o_censoring']) ? censor_words($cur_post['url']) : $cur_post['url']).'" onclick="window.open(this.href); return false" rel="nofollow">'.sprintf($lang_topic['Visit website'], '<span>'.sprintf($lang_topic['User possessive'], forum_htmlencode($cur_post['username'])).'</span>').'</a></span>';
 				if ((($cur_post['email_setting'] == '0' && !$forum_user['is_guest']) || $forum_user['is_admmod']) && $forum_user['g_send_email'])
-					$forum_page['post_contacts']['email'] = '<a href="mailto:'.forum_htmlencode($cur_post['email']).'"><i class="fa fa-envelope-o"></i><span>'.$lang_topic['E-mail'].' '.forum_htmlencode($cur_post['username']).'</span></a></li>';
+					$forum_page['post_contacts']['email'] = '<span class="user-email'.(empty($forum_page['post_contacts']) ? ' first-item' : '').'"><a href="mailto:'.forum_htmlencode($cur_post['email']).'">'.$lang_topic['E-mail'].'<span>&#160;'.forum_htmlencode($cur_post['username']).'</span></a></span>';
 				else if ($cur_post['email_setting'] == '1' && !$forum_user['is_guest'] && $forum_user['g_send_email'])
 					$forum_page['post_contacts']['email'] = '<span class="user-email'.(empty($forum_page['post_contacts']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['email'], $cur_post['poster_id']).'">'.$lang_topic['E-mail'].'<span>&#160;'.forum_htmlencode($cur_post['username']).'</span></a></span>';
 				if (!$forum_user['is_guest'] && $forum_user['id'] != $cur_post['poster_id'])
@@ -878,7 +914,7 @@ foreach ($posts_info as $cur_post)
 			}
 			else
 			{
-				if ($cur_post['poster_email'] != '' && $forum_user['is_admmod'] && $forum_user['g_send_email'])
+				if ($cur_post['poster_email'] != '' && !$forum_user['is_guest'] && $forum_user['g_send_email'])
 					$forum_page['post_contacts']['email'] = '<span class="user-email'.(empty($forum_page['post_contacts']) ? ' first-item' : '').'"><a href="mailto:'.forum_htmlencode($cur_post['poster_email']).'">'.$lang_topic['E-mail'].'<span>&#160;'.forum_htmlencode($cur_post['username']).'</span></a></span>';
 			}
 		}
@@ -886,53 +922,55 @@ foreach ($posts_info as $cur_post)
 		($hook = get_hook('vt_row_pre_post_contacts_merge')) ? eval($hook) : null;
 
 		if (!empty($forum_page['post_contacts']))
-			$forum_page['post_options']['contacts'] = '<li>'.implode(' ', $forum_page['post_contacts']).'</li>';
-($hook = get_hook('vt_row_pre_post_identity_merge')) ? eval($hook) : null;
-		if (isset($user_data_cache[$cur_post['poster_id']]['author_socials']))
-			$forum_page['author_socials'] = $user_data_cache[$cur_post['poster_id']]['author_socials'];
+			$forum_page['post_options']['contacts'] = '<p class="post-contacts">'.implode(' ', $forum_page['post_contacts']).'</p>';
+
+		if (isset($user_data_cache[$cur_post['poster_id']]['post_identity']))
+			$forum_page['post_identity'] = $user_data_cache[$cur_post['poster_id']]['post_identity'];
 		else
 		{
 			if ($cur_post['poster_id'] > 1 && !$forum_user['is_guest'])
 			{
 				if ($cur_post['jabber'] != '')
-					$forum_page['author_socials']['jabber'] = '<a href="xmpp:'.forum_htmlencode($cur_post['jabber']).'"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/jabber.png" /></a>';
+					$forum_page['post_identity']['jabber'] = '<a href="xmpp:'.forum_htmlencode($cur_post['jabber']).'"><img src="'.$base_url.'/img/style/p_jabber.png" /></a>';
 				if ($cur_post['icq'] != '')
-					$forum_page['author_socials']['icq'] = '<a href="'.forum_link('click.php').'?http://icq.com/people/'.forum_htmlencode($cur_post['icq']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/icq.png" /></a>';
+					$forum_page['post_identity']['icq'] = '<a href="'.forum_link('click.php').'?http://icq.com/people/about_me.php?uin='.forum_htmlencode($cur_post['icq']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_icq.png" /></a>';
 				if ($cur_post['msn'] != '')
-					$forum_page['author_socials']['msn'] = '<a href="'.forum_link('click.php').'?http://members.msn.com/'.forum_htmlencode($cur_post['msn']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/msn.png" /></a>';
+					$forum_page['post_identity']['msn'] = '<a href="'.forum_link('click.php').'?http://members.msn.com/'.forum_htmlencode($cur_post['msn']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_msn.png" /></a>';
 				if ($cur_post['yahoo'] != '')
-					$forum_page['author_socials']['yahoo'] = '<a href="'.forum_link('click.php').'?http://edit.yahoo.com/config/send_webmesg?.target='.forum_htmlencode($cur_post['yahoo']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/yahoo.png" /></a>';
+					$forum_page['post_identity']['yahoo'] = '<a href="'.forum_link('click.php').'?http://edit.yahoo.com/config/send_webmesg?.target='.forum_htmlencode($cur_post['yahoo']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_yahoo.png" /></a>';
 				if ($cur_post['magent'] != '')
-					$forum_page['author_socials']['magent'] = '<a href="'.forum_link('click.php').'?http://mail.ru/agent?message&amp;to='.forum_htmlencode($cur_post['magent']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_magent.png" /></a>';
+					$forum_page['post_identity']['magent'] = '<a href="'.forum_link('click.php').'?http://mail.ru/agent?message&amp;to='.forum_htmlencode($cur_post['magent']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_magent.png" /></a>';
 				if ($cur_post['vkontakte'] != '')
-					$forum_page['author_socials']['vkontakte'] = '<a href="'.forum_link('click.php').'?http://vkontakte.ru/'.forum_htmlencode($cur_post['vkontakte']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/vk.png" /></a>';
+					$forum_page['post_identity']['vkontakte'] = '<a href="'.forum_link('click.php').'?http://vkontakte.ru/id'.forum_htmlencode($cur_post['vkontakte']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_vk.png" /></a>';
 				if ($cur_post['classmates'] != '')
-					$forum_page['author_socials']['classmates'] = '<a href="'.forum_link('click.php').'?'.forum_htmlencode($cur_post['classmates']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/classmates.png" /></a>';
+					$forum_page['post_identity']['classmates'] = '<a href="'.forum_link('click.php').'?'.forum_htmlencode($cur_post['classmates']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_odkl.png" /></a>';
 				if ($cur_post['mirtesen'] != '')
-					$forum_page['author_socials']['mirtesen'] = '<a href="'.forum_link('click.php').'?http://mirtesen.ru/people/'.forum_htmlencode($cur_post['mirtesen']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_mirtesen.png" /></a>';
+					$forum_page['post_identity']['mirtesen'] = '<a href="'.forum_link('click.php').'?http://mirtesen.ru/people/'.forum_htmlencode($cur_post['mirtesen']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_mirtesen.png" /></a>';
 				if ($cur_post['moikrug'] != '')
-					$forum_page['author_socials']['moikrug'] = '<a href="'.forum_link('click.php').'?http://'.forum_htmlencode($cur_post['moikrug']).'.moikrug.ru/" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_moikrug.png" /></a>';
+					$forum_page['post_identity']['moikrug'] = '<a href="'.forum_link('click.php').'?http://'.forum_htmlencode($cur_post['moikrug']).'.moikrug.ru/" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_moikrug.png" /></a>';
 				if ($cur_post['facebook'] != '')
 				{
 					$facebook_url = preg_match('([0-9])', $cur_post['facebook'], $matches) ? 'profile.php?id=' : '';
-					$forum_page['author_socials']['facebook'] = '<a href="'.forum_link('click.php').'?http://facebook.com/'.$facebook_url.forum_htmlencode($cur_post['facebook']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/facebook.png" /></a>';
+					$forum_page['post_identity']['facebook'] = '<a href="'.forum_link('click.php').'?http://facebook.com/'.$facebook_url.forum_htmlencode($cur_post['facebook']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_facebook.png" /></a>';
 				}
 				if ($cur_post['twitter'] != '')
-					$forum_page['author_socials']['twitter'] = '<a href="'.forum_link('click.php').'?http://twitter.com/'.forum_htmlencode($cur_post['twitter']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/twitter.png" /></a>';
+					$forum_page['post_identity']['twitter'] = '<a href="'.forum_link('click.php').'?http://twitter.com/'.forum_htmlencode($cur_post['twitter']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_twitter.png" /></a>';
 				if ($cur_post['lastfm'] != '')
-					$forum_page['author_socials']['lastfm'] = '<a href="'.forum_link('click.php').'?http://last.fm/user/'.forum_htmlencode($cur_post['lastfm']).'" onclick="window.open(this.href); return false" rel="nofollow"><img  src="'.$base_url.'/style/'.$forum_user['style'].'/images/lastfm.png" />';
+					$forum_page['post_identity']['lastfm'] = '<a href="'.forum_link('click.php').'?http://last.fm/user/'.forum_htmlencode($cur_post['lastfm']).'" onclick="window.open(this.href); return false" rel="nofollow"><img src="'.$base_url.'/img/style/p_lastfm.png" /></a>';
 			}
 		}
 
-		($hook = get_hook('vt_row_pre_author_socials_merge')) ? eval($hook) : null;
+		($hook = get_hook('vt_row_pre_post_identity_merge')) ? eval($hook) : null;
 
-
+		if (!empty($forum_page['post_identity']))
+			$forum_page['post_options']['identity'] = '<p class="post-identity">'.implode(' ', $forum_page['post_identity']).'</p>';
 	}
+
 	// Generate the post options links
 	if (!$forum_user['is_guest'])
 	{
 		if ($forum_config['o_report_enabled'])
-			$forum_page['post_actions']['report'] = '<li><a href="'.forum_link($forum_url['report'], array($cur_post['id'], 'post')).'"><i class="fa fa-flag"></i><span>'.$lang_topic['Report'].'</span></a>'.(($cur_post['reported']) ? '<span class="warn"><strong>'.$lang_topic['Already reported'].'</strong></span>' : '' ).'</li>';
+			$forum_page['post_actions']['report'] = '<span class="report-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['report'], array($cur_post['id'], 'post')).'">'.$lang_topic['Report'].'<span> '.$lang_topic['Post'].' '.forum_number_format($forum_page['start_from'] + $forum_page['item_count']).'</span></a>'.(($cur_post['reported']) ? '<span class="warn"><strong>'.$lang_topic['Already reported'].'</strong></span>' : '' ).'</span>';
 
 		if (!$forum_page['is_admmod'])
 		{
@@ -941,30 +979,30 @@ foreach ($posts_info as $cur_post)
 				if ($cur_post['poster_id'] == $forum_user['id'])
 				{
 					if (($forum_page['start_from'] + $forum_page['item_count']) == 1 && $forum_user['g_delete_topics'])
-						$forum_page['post_actions']['delete'] = '<li><a href="'.forum_link($forum_url['delete'], $cur_topic['first_post_id']).'"><i class="fa fa-trash-o"></i><span>'.$lang_topic['Delete topic'].'</span></a></li>';
+						$forum_page['post_actions']['delete'] = '<span class="delete-topic'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['delete'], $cur_topic['first_post_id']).'">'.$lang_topic['Delete topic'].'</a></span>';
 					if (($forum_page['start_from'] + $forum_page['item_count']) > 1 && $forum_user['g_delete_posts'])
-						$forum_page['post_actions']['delete'] = '<li><a href="'.forum_link($forum_url['delete'], $cur_post['id']).'"><i class="fa fa-trash-o"></i><span>'.$lang_topic['Delete'].'</span></a></li>';
+						$forum_page['post_actions']['delete'] = '<span class="delete-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['delete'], $cur_post['id']).'">'.$lang_topic['Delete'].'<span> '.$lang_topic['Post'].' '.forum_number_format($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 					if ($forum_user['g_edit_posts'])
-						$forum_page['post_actions']['edit'] = '<li><a href="'.forum_link($forum_url['edit'], $cur_post['id']).'"><i class="fa fa-pencil"></i><span>'.$lang_topic['Edit'].'</span></a></li>';
+						$forum_page['post_actions']['edit'] = '<span class="edit-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['edit'], $cur_post['id']).'">'.$lang_topic['Edit'].'<span> '.$lang_topic['Post'].' '.forum_number_format($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 				}
 
 				if (($cur_topic['post_replies'] == '' && $forum_user['g_post_replies']) || $cur_topic['post_replies'] == '1')
-					$forum_page['post_actions']['reply'] = '<li><a href="'.forum_link($forum_url['quote'], array($id, $cur_post['id'])).'" onclick="Forum.reply('.$cur_post['id'].', this); return false;"><i class="fa fa-reply"></i><span>'.$lang_topic['Reply'].'</span></a></li>';
+					$forum_page['post_actions']['reply'] = '<span class="reply-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['quote'], array($id, $cur_post['id'])).'" onclick="Forum.reply('.$cur_post['id'].', this); return false;">'.$lang_topic['Reply'].'<span>&#160;'.$lang_topic['Post'].' '.($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 				if ($forum_config['o_quickpost'])
-					$forum_page['post_actions']['quote'] = '<li><a href="javascript:Forum.quickQuote(\''.$cur_post['username'].'\')"><i class="fa fa-quote-right"></i><span>'.$lang_topic['Quote'].'</span></a></li>';
+					$forum_page['post_actions']['quote'] = '<span class="quote-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="javascript:Forum.quickQuote(\''.$cur_post['username'].'\')">'.$lang_topic['Quote'].'<span>&#160;'.$lang_topic['Post'].' '.($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 			}
 		}
 		else
 		{
 			if (($forum_page['start_from'] + $forum_page['item_count']) == 1)
-				$forum_page['post_actions']['delete'] = '<li><a href="'.forum_link($forum_url['delete'], $cur_topic['first_post_id']).'"><i class="fa fa-trash-o"></i><span>'.$lang_topic['Delete topic'].'</span></a></li>';
+				$forum_page['post_actions']['delete'] = '<span class="delete-topic'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['delete'], $cur_topic['first_post_id']).'">'.$lang_topic['Delete topic'].'</a></span>';
 			else
-				$forum_page['post_actions']['delete'] = '<li><a href="'.forum_link($forum_url['delete'], $cur_post['id']).'"><i class="fa fa-trash-o"></i><span>'.$lang_topic['Delete'].'</span></a></li>';
+				$forum_page['post_actions']['delete'] = '<span class="delete-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['delete'], $cur_post['id']).'">'.$lang_topic['Delete'].'<span> '.$lang_topic['Post'].' '.forum_number_format($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 
-			$forum_page['post_actions']['edit'] = '<li><a href="'.forum_link($forum_url['edit'], $cur_post['id']).'"><i class="fa fa-pencil"></i><span>'.$lang_topic['Edit'].'</span></a></li>';
-			$forum_page['post_actions']['reply'] = '<li><a href="'.forum_link($forum_url['quote'], array($id, $cur_post['id'])).'" onclick="Forum.reply('.$cur_post['id'].', this); return false;"><i class="fa fa-reply"></i><span>'.$lang_topic['Reply'].'</span></a></li>';
+			$forum_page['post_actions']['edit'] = '<span class="edit-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['edit'], $cur_post['id']).'">'.$lang_topic['Edit'].'<span> '.$lang_topic['Post'].' '.forum_number_format($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
+			$forum_page['post_actions']['reply'] = '<span class="reply-post first-item"><a href="'.forum_link($forum_url['quote'], array($id, $cur_post['id'])).'" onclick="Forum.reply('.$cur_post['id'].', this); return false;">'.$lang_topic['Reply'].'<span>&#160;'.$lang_topic['Post'].' '.($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 			if ($forum_config['o_quickpost'])
-				$forum_page['post_actions']['quote'] = '<li><a href="javascript:Forum.quickQuote(\''.$cur_post['username'].'\')"><i class="fa fa-quote-right"></i><span>'.$lang_topic['Quote'].'</span></a></li>';
+				$forum_page['post_actions']['quote'] = '<span class="quote-post first-item"><a href="javascript:Forum.quickQuote(\''.$cur_post['username'].'\')">'.$lang_topic['Quote'].'<span>&#160;'.$lang_topic['Post'].' '.($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 		}
 	}
 	else
@@ -972,7 +1010,7 @@ foreach ($posts_info as $cur_post)
 		if (!$cur_topic['closed'])
 		{
 			if (($cur_topic['post_replies'] == '' && $forum_user['g_post_replies']) || $cur_topic['post_replies'] == '1')
-				$forum_page['post_actions']['reply'] = '<li><a href="'.forum_link($forum_url['quote'], array($id, $cur_post['id'])).'" onclick="Reply('.$cur_post['id'].', this); return false;"><i class="fa fa-reply"></i><span>'.$lang_topic['Quote'].'</span></a></li>';
+				$forum_page['post_actions']['reply'] = '<span class="quote-post'.(empty($forum_page['post_actions']) ? ' first-item' : '').'"><a href="'.forum_link($forum_url['quote'], array($id, $cur_post['id'])).'" onclick="Reply('.$cur_post['id'].', this); return false;">'.$lang_topic['Quote'].'<span>&#160;'.$lang_topic['Post'].' '.($forum_page['start_from'] + $forum_page['item_count']).'</span></a></span>';
 		}
 	}
 
@@ -980,10 +1018,25 @@ foreach ($posts_info as $cur_post)
 
 
 	if (!empty($forum_page['post_actions']))
-		$forum_page['post_options']['actions'] = '<li>'.implode(' ', $forum_page['post_actions']).'</li>';
+		$forum_page['post_options']['actions'] = '<p class="post-actions">'.implode(' ', $forum_page['post_actions']).'</p>';
 
 	// Give the post some class
-	$forum_page['item_status'] = array('inner');
+	$forum_page['item_status'] = array(
+		'post',
+		($forum_page['item_count'] % 2 == 0) ? 'even' : 'odd'
+	);
+
+	if ($forum_page['item_count'] == 1)
+		$forum_page['item_status']['firstpost'] = 'firstpost';
+
+	if (($forum_page['start_from'] + $forum_page['item_count']) == $forum_page['finish_at'])
+		$forum_page['item_status']['lastpost'] = 'lastpost';
+
+	if ($cur_post['id'] == $cur_topic['first_post_id'])
+		$forum_page['item_status']['topicpost'] = 'topicpost';
+	else
+		$forum_page['item_status']['replypost'] = 'replypost';
+
 
 	// Generate the post title
 	if ($cur_post['id'] == $cur_topic['first_post_id'])
@@ -1017,85 +1070,77 @@ foreach ($posts_info as $cur_post)
 			'author_ident'	=> $forum_page['author_ident'],
 			'author_info'	=> $forum_page['author_info'],
 			'post_contacts'	=> $forum_page['post_contacts'],
-			'post_identity' => $forum_page['post_identity'],
-			'author_socials' => $forum_page['author_socials']
+			'post_identity' => $forum_page['post_identity']
 		);
 
 		($hook = get_hook('vt_row_add_user_data_cache')) ? eval($hook) : null;
 	}
 
 ?>
-<div id="p<?php echo $cur_topic['forum_id'] ?>" class="post has-profile bg<?php echo rand(1,3); ?> <?php echo ($cur_post['is_online'] == $cur_post['poster_id']) ? ' online' : '' ?>">
-	<div id="p<?php echo $cur_post['id'] ?>" class="<?php echo implode(' ', $forum_page['item_status']) ?>">
-		<dl class="postprofile" id="profile2">
-<?php echo implode("\n\t\t\t\t\t\t", $forum_page['author_ident'])."\n" ?>
-<?php echo implode("\n\t\t\t\t\t\t", $forum_page['author_info'])."\n" ?>
-		</dl>
-		<div class="postbody">
-			<div id="post_content2">
-					<h3 class="first"><a href="#p<?php echo $cur_post['id'] ?>"><?php echo $forum_page['item_subject'] ?></a></h3>
-<?php if (!empty($forum_page['post_options'])): ?>
-				<ul class="posts-buttons">
-					<?php echo implode("\n\t\t\t\t\t", $forum_page['post_options'])."\n" ?>
-				</ul>
-<?php endif; ?>
-				<p class="author">
-<?php echo implode(' ', $forum_page['post_ident']) ?>
-				</p>
-				<div class="content">
-<?php echo implode("\n\t\t\t\t\t\t", $forum_page['message'])."\n" ?>
-				</div>
-<?php ($hook = get_hook('vt_row_new_post_entry_data')) ? eval($hook) : null; ?>
+		<div id="p<?php echo $cur_post['id'] ?>" class="<?php echo implode(' ', $forum_page['item_status']) ?>">
+			<div class="posthead">
+				<h3 class="hn post-ident"><?php echo implode(' ', $forum_page['post_ident']) ?></h3>
 			</div>
+			<div class="postbody<?php echo ($cur_post['is_online'] == $cur_post['poster_id']) ? ' online' : '' ?>">
+				<div class="post-author">
+					<ul class="author-ident">
+						<?php echo implode("\n\t\t\t\t\t\t", $forum_page['author_ident'])."\n" ?>
+					</ul>
+					<ul class="author-info">
+						<?php echo implode("\n\t\t\t\t\t\t", $forum_page['author_info'])."\n" ?>
+					</ul>
+				</div>
+				<div class="post-entry">
+					<h4 class="entry-title hn"><?php echo $forum_page['item_subject'] ?></h4>
+					<div class="entry-content">
+						<?php echo implode("\n\t\t\t\t\t\t", $forum_page['message'])."\n" ?>
+					</div>
+<?php ($hook = get_hook('vt_row_new_post_entry_data')) ? eval($hook) : null; ?>
+				</div>
+			</div>
+<?php if (!empty($forum_page['post_options'])): ?>
+			<div class="postfoot">
+				<div class="post-options">
+					<?php echo implode("\n\t\t\t\t\t", $forum_page['post_options'])."\n" ?>
+				</div>
+			</div>
+<?php endif; ?>
 		</div>
-	</div>
-</div>
-<hr class="divider">
 <?php
-	
+
 	if ($forum_page['item_count'] == $forum_config['o_topicbox'] && !defined('FORUM_DISABLE_HTML'))
 	{
 ?>
-<div class="post">
-	<div class="post-entry">
-		<div class="entry-content">
-<?php echo $forum_config['o_topicbox_message'] ?>
+		<div class="post">
+			<div class="post-entry">
+				<div class="entry-content">
+					<?php echo $forum_config['o_topicbox_message'] ?>
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
+
 <?php
+
 	}
 }
 
 ?>
-<form action="<?php echo forum_link('post.php'); ?>" method="post" id="qq">
-	<div class="hidden">
-		<input type="hidden" value="" id="post_msg" name="post_msg"/>
-		<input type="hidden" value="<?php echo forum_link($forum_url['quote'], array($id, $cur_post['id'])) ?>" id="quote_url" name="quote_url" />
 	</div>
-</form>
-<div class="main-foot">
+	<form action="<?php echo forum_link('post.php'); ?>" method="post" id="qq">
+		<div class="hidden">
+			<input type="hidden" value="" id="post_msg" name="post_msg"/>
+			<input type="hidden" value="<?php echo forum_link($forum_url['quote'], array($id, $cur_post['id'])) ?>" id="quote_url" name="quote_url" />
+		</div>
+	</form>
+	<div class="main-foot">
 <?php
+
 	if (!empty($forum_page['main_foot_options']))
 		echo "\t\t".'<p class="options">'.implode(' ', $forum_page['main_foot_options']).'</p>'."\n";
-/*	($hook = get_hook('ft_about_pre_quickjump')) ? eval($hook) : null;
-// Display the "Jump to" drop list
-if ($forum_user['g_read_board'] && $forum_config['o_quickjump'])
-{
-	// Load cached quickjump
-	if (file_exists(FORUM_CACHE_DIR.'cache_quickjump_'.$forum_user['g_id'].'.php'))
-		include FORUM_CACHE_DIR.'cache_quickjump_'.$forum_user['g_id'].'.php';
-	if (!defined('FORUM_QJ_LOADED'))
-	{
-		if (!defined('FORUM_CACHE_QUICKJUMP_LOADED'))
-			require FORUM_ROOT.'include/cache/quickjump.php';
-		generate_quickjump_cache($forum_user['g_id']);
-		require FORUM_CACHE_DIR.'cache_quickjump_'.$forum_user['g_id'].'.php';
-	}
-}*/
+
 ?>
-	<h2 class="hn"><span><?php echo $forum_page['items_info'] ?></span></h2>
-</div>
+		<h2 class="hn"><span><?php echo $forum_page['items_info'] ?></span></h2>
+	</div>
 <?php
 
 ($hook = get_hook('vt_end')) ? eval($hook) : null;
@@ -1107,7 +1152,7 @@ ob_end_clean();
 
 
 // Display quick post if enabled
-if ($forum_config['o_quickpost'] &&
+if ($forum_config['o_quickpost'] && 
 	!$forum_user['is_guest'] &&
 	($cur_topic['post_replies'] == '1' || ($cur_topic['post_replies'] == '' && $forum_user['g_post_replies'])) &&
 	(!$cur_topic['closed'] || $forum_page['is_admmod']))
@@ -1146,11 +1191,10 @@ if ($forum_config['o_smilies'])
 ($hook = get_hook('vt_quickpost_pre_display')) ? eval($hook) : null;
 
 ?>
-<div id="qr_postform">
-	<div class="panel">
-		<div class="inner">
-			<h2 class="quickreply-title"><?php echo $lang_topic['Quick post'] ?></h2>
-
+<div class="main-subhead">
+	<h2 class="hn"><span><?php echo $lang_topic['Quick post'] ?></span></h2>
+</div>
+<div id="brd-qpost" class="main-content main-frm">
 <?php if (!empty($forum_page['text_options'])) echo "\t".'<p class="content-options options">'.sprintf($lang_common['You may use'], implode(' ', $forum_page['text_options'])).'</p>'."\n" ?>
 	<div id="req-msg" class="req-warn ct-box error-box">
 		<p class="important"><?php echo $lang_topic['Required warn'] ?></p>
@@ -1160,28 +1204,24 @@ if ($forum_config['o_smilies'])
 			<?php echo implode("\n\t\t\t", $forum_page['hidden_fields'])."\n" ?>
 		</div>
 <?php ($hook = get_hook('vt_quickpost_pre_fieldset')) ? eval($hook) : null; ?>
-				<fieldset class="fields1">
+		<fieldset class="frm-group group1">
+			<legend class="group-legend"><strong><?php echo $lang_common['Write message legend'] ?></strong></legend>
 <?php ($hook = get_hook('vt_quickpost_pre_message_box')) ? eval($hook) : null; ?>
-					<dl style="clear: left;">
-					<dt>
-						<label for="subject"><?php echo $lang_common['Write message'] ?></label>
-					</dt>
-				</dl>
-<?php require FORUM_ROOT.'resources/editor/reply_bb.php'; ?>
-				<div id="message-box">
-					<textarea id="req_message" style="height: 9em;" name="req_message"  rows="7" cols="76" tabindex="3" class="inputbox"></textarea>
+			<div class="txt-set set1">
+				<div class="txt-box textarea required">
+					<label for="fld1"><span><?php echo $lang_common['Write message'] ?></span></label>
+<?php require FORUM_ROOT.'bb.php'; ?>
+					<div class="txt-input"><span class="fld-input"><textarea id="text" name="req_message" rows="7" cols="95"></textarea></span></div>
 				</div>
-
+			</div>
 <?php ($hook = get_hook('vt_quickpost_pre_fieldset_end')) ? eval($hook) : null; ?>
-				</fieldset>
+		</fieldset>
 <?php ($hook = get_hook('vt_quickpost_fieldset_end')) ? eval($hook) : null; ?>
-				<fieldset class="submit-buttons">
-					<input type="submit" accesskey="f" tabindex="6" name="preview" value="<?php echo $lang_common['Preview'] ?>" class="button2" id="qr_full_editor">
-					<input type="submit" accesskey="s" tabindex="7" name="submit" value="<?php echo $lang_common['Submit'] ?>" class="button1">
-				</fieldset>
-			</form>
+		<div class="frm-buttons">
+			<span class="submit"><input type="submit" name="submit" value="<?php echo $lang_common['Submit'] ?>" /></span>
+			<span class="submit"><input type="submit" name="preview" value="<?php echo $lang_common['Preview'] ?>" /></span>
 		</div>
-	</div>
+	</form>
 </div>
 <?php
 

@@ -1,8 +1,11 @@
 <?php
 /**
+ * Станица удаления сообщений.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * Удаляет указанное сообщение (и если необходимо, то и всю тему).
+ *
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -23,7 +26,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/delete.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 1)
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 // Check for use of incorrect URLs
 confirm_current_url(forum_link($forum_url['delete'], $id));
@@ -52,7 +55,7 @@ $query = array(
 ($hook = get_hook('dl_qr_get_post_info')) ? eval($hook) : null;
 $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 if (!$forum_db->num_rows($result))
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 $cur_post = $forum_db->fetch_assoc($result);
 
@@ -70,7 +73,7 @@ if (((!$forum_user['g_delete_posts'] && !$cur_post['is_topic']) ||
 	$cur_post['poster_id'] != $forum_user['id'] ||
 	$cur_post['closed'] == '1') &&
 	!$forum_page['is_admmod'])
-	message($lang_common['No permission'], false, '403 Forbidden');
+	message($lang_common['No permission']);
 
 
 ($hook = get_hook('dl_post_selected')) ? eval($hook) : null;
@@ -143,15 +146,15 @@ $forum_page['hidden_fields'] = array(
 
 // Setup form information
 $forum_page['frm_info'] = array(
-
-	'<span>'.$lang_delete['Topic'].':<strong> '.forum_htmlencode($cur_post['subject']).'</strong></span><br>',
-	'<span>'.sprintf((($cur_post['is_topic']) ? $lang_delete['Delete topic info'] : $lang_delete['Delete post info']), forum_htmlencode($cur_post['poster']), format_time($cur_post['posted'])).'</span>'
+	'<li><span>'.$lang_delete['Forum'].':<strong> '.forum_htmlencode($cur_post['forum_name']).'</strong></span></li>',
+	'<li><span>'.$lang_delete['Topic'].':<strong> '.forum_htmlencode($cur_post['subject']).'</strong></span></li>',
+	'<li><span>'.sprintf((($cur_post['is_topic']) ? $lang_delete['Delete topic info'] : $lang_delete['Delete post info']), forum_htmlencode($cur_post['poster']), format_time($cur_post['posted'])).'</span></li>'
 );
 
 // Generate the post heading
 $forum_page['post_ident'] = array();
-$forum_page['post_ident']['byline'] = sprintf((($cur_post['is_topic']) ? '<strong>'.$lang_delete['Topic byline'] : $lang_delete['Reply byline']), forum_htmlencode($cur_post['poster']).'</strong>').'';
-$forum_page['post_ident']['link'] = '<a class="permalink" href="'.forum_link($forum_url['post'], $cur_post['tid']).'">'.format_time($cur_post['posted']).'</a>';
+$forum_page['post_ident']['byline'] = '<span class="post-byline">'.sprintf((($cur_post['is_topic']) ? $lang_delete['Topic byline'] : $lang_delete['Reply byline']), '<strong>'.forum_htmlencode($cur_post['poster']).'</strong>').'</span>';
+$forum_page['post_ident']['link'] = '<span class="post-link"><a class="permalink" href="'.forum_link($forum_url['post'], $cur_post['tid']).'">'.format_time($cur_post['posted']).'</a></span>';
 
 ($hook = get_hook('dl_pre_item_ident_merge')) ? eval($hook) : null;
 
@@ -188,48 +191,34 @@ ob_start();
 ($hook = get_hook('dl_main_output_start')) ? eval($hook) : null;
 
 ?>
+	<div class="main-content main-frm">
+		<div class="ct-box info-box">
+			<ul class="info-list">
+				<?php echo implode("\n\t\t\t\t", $forum_page['frm_info'])."\n" ?>
+			</ul>
+		</div>
 <?php ($hook = get_hook('dl_pre_post_display')) ? eval($hook) : null; ?>
-	<div id="forumlist">
-		<div id="forumlist-inner">
-			<div class="forabg">
-				<div class="inner">
-				<ul class="topiclist">
-					<li class="header">
-						<dl>
-							<dt>
-								<div class="list-inner">
-									<?php echo implode(' ', $forum_page['post_ident']) ?>
-								</div>
-							</dt>
-						</dl>
-					</li>
-				</ul>
+		<div class="post singlepost">
+			<div class="posthead">
+				<h3 class="hn post-ident"><?php echo implode(' ', $forum_page['post_ident']) ?></h3>
 <?php ($hook = get_hook('dl_new_post_head_option')) ? eval($hook) : null; ?>
-				<ul class="topiclist forums">							
-					<li>
-						<dl>
-							<dt>
-								<div class="list-inner">
-									
-									<?php echo implode("\n\t\t\t\t", $forum_page['frm_info'])."\n" ?>
-								</div>
+			</div>
+			<div class="postbody">
+				<div class="post-entry">
+					<h4 class="entry-title hn"><?php echo $forum_page['item_subject'] ?></h4>
+					<div class="entry-content">
+						<?php echo $cur_post['message']."\n" ?>
+					</div>
 <?php ($hook = get_hook('dl_new_post_entry_data')) ? eval($hook) : null; ?>
-							</dt>
-						</dl>
-					</li>
-				</ul>
 				</div>
 			</div>
 		</div>
-	</div>
 		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>">
-			<div class="panel">
-				<div class="hidden">
-					<?php echo implode("\n\t\t\t\t", $forum_page['hidden_fields'])."\n" ?>
-				</div>
-			
+			<div class="hidden">
+				<?php echo implode("\n\t\t\t\t", $forum_page['hidden_fields'])."\n" ?>
+			</div>
 <?php ($hook = get_hook('dl_pre_confirm_delete_fieldset')) ? eval($hook) : null; ?>
-			<dl class="set<?php echo ++$forum_page['group_count'] ?>">
+			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $forum_page['delete_title'] ?></strong></legend>
 <?php ($hook = get_hook('dl_pre_confirm_delete_checkbox')) ? eval($hook) : null; ?>
 				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
@@ -239,13 +228,11 @@ ob_start();
 					</div>
 				</div>
 <?php ($hook = get_hook('dl_pre_confirm_delete_fieldset_end')) ? eval($hook) : null; ?>
-			</dl>
-<?php ($hook = get_hook('dl_confirm_delete_fieldset_end')) ? eval($hook) : null; ?>
-			<fieldset class="submit-buttons">
-				<hr>
-				<input type="submit" name="delete" class="button1" value="<?php echo $forum_page['delete_title'] ?>" />
-				<input type="submit" name="cancel" class="button2" value="<?php echo $lang_common['Cancel'] ?>" />
 			</fieldset>
+<?php ($hook = get_hook('dl_confirm_delete_fieldset_end')) ? eval($hook) : null; ?>
+			<div class="frm-buttons">
+				<span class="submit"><input type="submit" name="delete" value="<?php echo $forum_page['delete_title'] ?>" /></span>
+				<span class="cancel"><input type="submit" name="cancel" value="<?php echo $lang_common['Cancel'] ?>" /></span>
 			</div>
 		</form>
 	</div>

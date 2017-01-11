@@ -5,7 +5,7 @@
  * Даёт обзор некоторых статистических данных для администраторов и модераторов.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.Us
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -52,7 +52,7 @@ else if ($action == 'update')
 	redirect(forum_link('admin/admin.php'), $lang_admin_common['Redirect']);
 }
 
-/*
+
 // Generate check for updates text block
 if ($forum_user['g_id'] == FORUM_ADMIN)
 {
@@ -104,7 +104,7 @@ if ($forum_user['g_id'] == FORUM_ADMIN)
 
 		$updates = '<a href="'.forum_link('admin/admin.php?action=update').'">'.$lang_admin_index['Check for updates'].'</a>';
 	}
-}*/
+}
 
 
 // Get the server load averages (if possible)

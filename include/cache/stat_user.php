@@ -1,8 +1,8 @@
 <?php
 /**
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
- * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
+ * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
 
@@ -50,12 +50,12 @@ function generate_stat_user_cache($id = null, $username = null)
 	$load_info = '$forum_stat_user = array('."\n".
 		'\'total_users\'	=> \''.$stats['total_users'].'\','."\n".
 		'\'id\'				=> \''.$id.'\','."\n".
-		'\'username\'		=> "'.$username.'",'."\n".
+		'\'username\'		=> \''.$username.'\','."\n".
 		')';
 
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_stat_user.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл колличества участников в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'FORUM_STAT_USER_LOADED\', 1);'."\n\n".$load_info.';'."\n\n".'?>');
 	fclose($fh);

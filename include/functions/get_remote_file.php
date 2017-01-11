@@ -1,7 +1,9 @@
 <?php
 /**
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * Функция получения файлы.
+ *
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -17,9 +19,11 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 	$result = null;
 	$parsed_url = parse_url($url);
 	$allow_url_fopen = strtolower(@ini_get('allow_url_fopen'));
+
 	// Quite unlikely that this will be allowed on a shared host, but it can't hurt
 	if (function_exists('ini_set'))
 		@ini_set('default_socket_timeout', $timeout);
+
 	// If we have cURL, we might as well use it
 	if (function_exists('curl_init'))
 	{
@@ -32,10 +36,12 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 		curl_setopt($ch, CURLOPT_NOBODY, $head_only);
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'Flazy');
+
 		// Grab the page
 		$content = @curl_exec($ch);
 		$responce_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
+
 		// Process 301/302 redirect
 		if ($content !== false && ($responce_code == '301' || $responce_code == '302') && $max_redirects > 0)
 		{
@@ -49,6 +55,7 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 					return $responce;
 				}
 		}
+
 		// Ignore everything except a 200 response code
 		if ($content !== false && $responce_code == '200')
 		{
@@ -78,8 +85,10 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 			fwrite($remote, 'Host: '.$parsed_url['host']."\r\n");
 			fwrite($remote, 'User-Agent: Flazy'."\r\n");
 			fwrite($remote, 'Connection: Close'."\r\n\r\n");
+
 			stream_set_timeout($remote, $timeout);
 			$stream_meta = stream_get_meta_data($remote);
+
 			// Fetch the response 1024 bytes at a time and watch out for a timeout
 			$content = false;
 			while (!feof($remote) && !$stream_meta['timed_out'])
@@ -87,7 +96,9 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 				$content .= fgets($remote, 1024);
 				$stream_meta = stream_get_meta_data($remote);
 			}
+
 			fclose($remote);
+
 			// Process 301/302 redirect
 			if ($content !== false && $max_redirects > 0 && preg_match('#^HTTP/1.[01] 30[12]#', $content))
 			{
@@ -101,6 +112,7 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 						return $responce;
 					}
 			}
+
 			// Ignore everything except a 200 response code
 			if ($content !== false && preg_match('#^HTTP/1.[01] 200 OK#', $content))
 			{
@@ -127,7 +139,7 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 			// Setup a stream context
 			$stream_context = stream_context_create(
 				array(
-					'https' => array(
+					'http' => array(
 						'method'		=> $head_only ? 'HEAD' : 'GET',
 						'user_agent'		=> 'Flazy',
 						'max_redirects'		=> $max_redirects + 1, // PHP >=5.1.0 only
@@ -135,10 +147,12 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 					)
 				)
 			);
+
 			$content = @file_get_contents($url, false, $stream_context);
 		}
 		else
 			$content = @file_get_contents($url);
+
 		// Did we get anything?
 		if ($content !== false)
 		{
@@ -148,6 +162,7 @@ function get_remote_file($url, $timeout, $head_only = false, $max_redirects = 10
 				$result['content'] = $content;
 		}
 	}
+
 	return $result;
 }
 

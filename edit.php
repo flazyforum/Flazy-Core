@@ -1,8 +1,9 @@
 <?php
 /**
+ * Редактирование сообщений. Изменяет содержание указанного сообщения.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -22,7 +23,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/post.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 1)
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 // Check for use of incorrect URLs
 confirm_current_url(forum_link($forum_url['edit'], $id));
@@ -55,7 +56,7 @@ $query = array(
 ($hook = get_hook('ed_qr_get_post_info')) ? eval($hook) : null;
 $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 if (!$forum_db->num_rows($result))
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 $cur_post = $forum_db->fetch_assoc($result);
 
@@ -70,7 +71,7 @@ if ((!$forum_user['g_edit_posts'] ||
 	$cur_post['poster_id'] != $forum_user['id'] ||
 	$cur_post['closed'] == '1') &&
 	!$forum_page['is_admmod'])
-	message($lang_common['No permission'], false, '403 Forbidden');
+	message($lang_common['No permission']);
 
 
 $can_edit_subject = $id == $cur_post['first_post_id'];
@@ -139,7 +140,7 @@ if (isset($_POST['update_poll']))
 }
 
 
-else if (isset($_POST['form_sent']))
+if (isset($_POST['form_sent']))
 {
 	($hook = get_hook('ed_form_submitted')) ? eval($hook) : null;
 
@@ -279,7 +280,7 @@ else if (isset($_POST['form_sent']))
 					//Remove poll
 					$query = array(
 						'UPDATE'	=> 'topics',
-						'SET'		=> 'question=\'\', read_unvote=0, revote=0, poll_created=0, days_count=0, votes_count=0',
+						'SET'		=> 'question=\'\', read_unvote=\'NULL\', revote=\'NULL\', poll_created=\'NULL\', days_count=\'NULL\', votes_count=\'NULL\'',
 						'WHERE'		=> 'id='.$cur_post['tid']
 					);
 
@@ -521,7 +522,7 @@ if (isset($forum_page['errors']))
 		<div id="req-msg" class="req-warn ct-box error-box">
 			<p><?php printf($lang_common['Required warn'], '<em>'.$lang_common['Required'].'</em>') ?></p>
 		</div>
-		<form onsubmit="return submitForm(this)" id="afocus" class="frm-form" name="post" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>"<?php if (!empty($forum_page['form_attributes'])) echo ' '.implode(' ', $forum_page['form_attributes']) ?>>
+		<form id="afocus" class="frm-form" name="post" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>"<?php if (!empty($forum_page['form_attributes'])) echo ' '.implode(' ', $forum_page['form_attributes']) ?>>
 			<div class="hidden">
 				<?php echo implode("\n\t\t\t\t", $forum_page['hidden_fields'])."\n" ?>
 			</div>
@@ -546,7 +547,7 @@ if (isset($forum_page['errors']))
 				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
 					<div class="txt-box textarea required">
 						<label for="fld<?php echo ++ $forum_page['fld_count'] ?>"><span><?php echo $lang_post['Write message'] ?>  <em><?php echo $lang_common['Required'] ?></em></span></label>
-<?php require FORUM_ROOT.'resources/editor/post_bb.php'; ?>
+<?php require FORUM_ROOT.'bb.php'; ?>
 						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="req_message" rows="14" cols="95"><?php echo forum_htmlencode(isset($_POST['req_message']) ? $message : $cur_post['message']) ?></textarea></span></div>
 					</div>
 				</div>

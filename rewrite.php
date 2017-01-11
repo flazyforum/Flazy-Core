@@ -1,11 +1,13 @@
 <?php
 /**
+ * Замема SEF URL на реальные адреса.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
+
 
 define('FORUM_ROOT', './');
 require FORUM_ROOT.'include/essentials.php';
@@ -88,7 +90,7 @@ if (empty($rewritten_url))
 	// Allow an extension to override the "Bad request" message with a custom 404 page
 	($hook = get_hook('re_page_not_found')) ? eval($hook) : null;
 
-	error('Страницата/папката <em>'.forum_htmlencode($request_uri).'</em> не беше намерена. Моля напуснете.');
+	error('Страница не найдена (ошибка 404): Запрашиваемая страница <em>'.forum_htmlencode($request_uri).'</em> отсутствует на сервере.');
 }
 
 // We change $_SERVER['PHP_SELF'] so that it reflects the file we're actually loading

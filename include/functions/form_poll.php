@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -44,8 +44,8 @@ function form_poll($question, $answers, $options_count, $days, $votes)
 			<fieldset id="poll" class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
 					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span>Poll</span></label>
-						<span class="fld-input"><p><a id="add" href="javascript:void(0)">Add poll</a></p></span>
+						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span>Опрос</span></label>
+						<span class="fld-input"><p><a id="add" href="javascript:void(0)">Добавить опрос</a></p></span>
 					</div>
 				</div>
 				

@@ -1,9 +1,10 @@
 <?php
 /**
+ * FAQ форума.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2015 Flazy.us
- * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
+ * @modified Copyright (C) 2008 Flazy.ru
+ * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
 
@@ -22,7 +23,7 @@ require FORUM_ROOT.'lang/'.$forum_user['language'].'/help.php';
 
 $section = isset($_GET['section']) ? $_GET['section'] : null;
 if (!$section)
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 // Check for use of incorrect URLs
 confirm_current_url(forum_link($forum_url['help'], $section));

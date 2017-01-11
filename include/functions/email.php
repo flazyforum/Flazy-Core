@@ -1,7 +1,9 @@
 <?php
 /**
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * Функции используемые в работе с адресом электоронной почты.
+ *
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -185,7 +187,7 @@ function smtp_mail($to, $subject, $message, $headers = '')
 	}
 
 	if ($forum_config['o_smtp_ssl'])
-		$smtp_host = 'ssl://'.$smtp_host.':465';
+		$smtp_host = 'ssl://'.$smtp_host;
 
 	if (!($socket = fsockopen($smtp_host, $smtp_port, $errno, $errstr, 15)))
 		error('Не удалось подключиться к SMTP серверу "'.$forum_config['o_smtp_host'].'" ('.$errno.') ('.$errstr.').', __FILE__, __LINE__);

@@ -4,8 +4,8 @@
  *
  * Этот скрипт содержит все функции используемые для создания кеш-файлов.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008-2015 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.Us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -40,7 +40,7 @@ function generate_config_cache()
 	// Output config as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_config.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл конфигурации в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'FORUM_CONFIG_LOADED\', 1);'."\n\n".'$forum_config = '.var_export($output, true).';'."\n\n".'?>');
 	fclose($fh);
@@ -78,7 +78,7 @@ function generate_bans_cache()
 	// Output ban list as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_bans.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл заблокированых в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'FORUM_BANS_LOADED\', 1);'."\n\n".'$forum_bans = '.var_export($output, true).';'."\n\n".'?>');
 	fclose($fh);
@@ -110,7 +110,7 @@ function generate_ranks_cache()
 	// Output ranks list as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_ranks.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл рангов в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'FORUM_RANKS_LOADED\', 1);'."\n\n".'$forum_ranks = '.var_export($output, true).';'."\n\n".'?>');
 	fclose($fh);
@@ -142,7 +142,7 @@ function generate_censors_cache()
 	// Output censors list as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_censors.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл цензуры в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'FORUM_CENSORS_LOADED\', 1);'."\n\n".'$forum_censors = '.var_export($output, true).';'."\n\n".'?>');
 	fclose($fh);
@@ -205,7 +205,7 @@ function generate_hooks_cache()
 	// Output hooks as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_hooks.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл расширений в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'define(\'FORUM_HOOKS_LOADED\', 1);'."\n\n".'$hooks = '.var_export($output, true).';'."\n\n".'?>');
 	fclose($fh);
@@ -215,30 +215,37 @@ function generate_hooks_cache()
 function generate_updates_cache()
 {
 	global $forum_db, $forum_config;
+
 	$return = ($hook = get_hook('ch_fn_generate_updates_cache_start')) ? eval($hook) : null;
 	if ($return != null)
 		return;
+
 	// Get a list of installed hotfix extensions
 	$query = array(
 		'SELECT'	=> 'e.id',
 		'FROM'		=> 'extensions AS e',
 		'WHERE'		=> 'e.id LIKE \'hotfix_%\''
 	);
+
 	($hook = get_hook('ch_fn_generate_updates_cache_qr_get_hotfixes')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 	$num_hotfixes = $forum_db->num_rows($result);
+
 	$hotfixes = array();
 	for ($i = 0; $i < $num_hotfixes; ++$i)
 		$hotfixes[] = urlencode($forum_db->result($result, $i));
+
 	// Contact the flazy.ru updates service
 	if (!defined('FORUM_FUNCTIONS_GET_REMOTE_FILE'))
 		require FORUM_ROOT.'include/functions/get_remote_file.php';
-	$result = get_remote_file('https://flazy.us/update/index.php?version='.str_replace(' ', '', $forum_config['o_cur_version']).'&hotfixes='.implode(',', $hotfixes), 8);
+	$result = get_remote_file('http://flazy.ru/update/index.php?version='.str_replace(' ', '', $forum_config['o_cur_version']).'&hotfixes='.implode(',', $hotfixes), 8);
+
 	// Make sure we got everything we need
 	if ($result != null && strpos($result['content'], '</updates>') !== false)
 	{
 		if (!defined('FORUM_XML_FUNCTIONS_LOADED'))
 			require FORUM_ROOT.'include/xml.php';
+
 		$output = xml_to_array($result['content']);
 		$output = current($output);
 		$output['cached'] = time();
@@ -253,7 +260,7 @@ function generate_updates_cache()
 	// Output update status as PHP code
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_updates.php', 'wb');
 	if (!$fh)
-		error('Can not write the files in the \'cache\' directory. Please make sure that PHP has writen access to the folder.', __FILE__, __LINE__);
+		error('Невозможно записать файл обновлений в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 	fwrite($fh, '<?php'."\n\n".'if (!defined(\'FORUM_UPDATES_LOADED\')) define(\'FORUM_UPDATES_LOADED\', 1);'."\n\n".'$forum_updates = '.var_export($output, true).';'."\n\n".'?>');
 	fclose($fh);

@@ -211,21 +211,21 @@ function tag(bbopen, bbclose, tag)
 }
 function tag_url()
 {
-	var enterURL = prompt("Поставете връзка към уеб страница", "http://");
+	var enterURL = prompt("Поместите ссылку веб-страницы", "http://");
 	if (!enterURL)
 	{
-		alert("Грешка! Няма връзка");
+		alert("Ошибка! Нет ссылки");
 		return false;
 	}
-	var enterTITLE = prompt("Въведете името на връзката", "Име на сайта");
-	if (!enterTITLE || enterTITLE == "Име на сайта")
+	var enterTITLE = prompt("Введите название ссылки", "Название сайта");
+	if (!enterTITLE || enterTITLE == "Название сайта")
 		insert('[url]'+enterURL+'[/url]');
 	else
 		insert('[url='+enterURL+']'+enterTITLE+'[/url]');	
 }
 function tag_email()
 {
-	var enter = prompt("Въведете E-mail адрес.", "");
+	var enter = prompt("Введите e-mail адрес", "");
 	if (!enter)
 	{
 		alert("Нет E-mail'а");
@@ -235,13 +235,13 @@ function tag_email()
 }
 function tag_image()
 {
-	var image = prompt("Въведете пълния URL на изображението", "http://");
+	var image = prompt("Введите полный URL изображения", "http://");
 	if (!image)
 	{
-		alert("Грешка! Няма връзка");
+		alert("Ошибка! Нет ссылки");
 		return false;
 	}
-	var desc = prompt("Въведете описание", "Описание");
+	var desc = prompt("Введите описание", "Описание");
 	if (!desc || desc == "Описание")
 		insert('[img]'+image+'[/img]');
 	else
@@ -249,17 +249,17 @@ function tag_image()
 }
 function tag_video()
 {
-	var enter = prompt("Връзка към видео", "http://");
+	var enter = prompt("Поместите ссылку на видео", "http://");
 	if (!enter)
 	{
-		alert("Грешка! Няма връзка");
+		alert("Ошибка! Нет ссылки");
 		return;
 	}
 	insert('[video]'+enter+'[/video]');
 }
 function tag_hide()
 {
-	var enter = prompt("Въведете минималните мнения, за да видите текста (0 — далеч от страна на гостите)", "");
+	var enter = prompt("Введите минимум сообщений для просмотра текста (0 — убрать от гостей)", "");
 	if (!enter)
 		bbcode('[hide]','[/hide]');
 	else

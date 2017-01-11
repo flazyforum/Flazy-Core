@@ -1,12 +1,13 @@
 <?php
 /**
+ * Позволяет участникам просматривать\редактировать\отправлять личные сообщения.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
- 
+
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
 require FORUM_ROOT.'include/common.php';
@@ -14,7 +15,7 @@ require FORUM_ROOT.'include/common.php';
 ($hook = get_hook('pm_fl_start')) ? eval($hook) : null;
 
 if ($forum_user['is_guest'])
-	message($lang_common['No permission'], false, '403 Forbidden');
+	message($lang_common['No permission']);
 
 $section = isset($_GET['section']) ? $_GET['section'] : 'inbox';
 $errors = array();
@@ -29,7 +30,7 @@ if ($section == 'delete')
 	{
 		$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 		if ($id < 1)
-			message($lang_common['Bad request'], false, '404 Not Found');
+			message($lang_common['Bad request']);
 
 		confirm_current_url(forum_link($forum_url['pm_delete'], $id));
 
@@ -43,7 +44,7 @@ if ($section == 'delete')
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request'], false, '404 Not Found');
+			message($lang_common['Bad request']);
 
 		$cur_delete = $forum_db->fetch_assoc($result);
 		$section = ($cur_delete['receiver_id'] == $forum_user['id'] ? 'inbox' : 'outbox');
@@ -185,25 +186,25 @@ if (isset($_POST['form_sent']))
 
 // Setup navigation menu
 $forum_page['main_menu'] = array();
-$forum_page['main_menu']['about'] = '<li class="first-item"><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'about')).'"><span>'.$lang_profile['Section about'].'</span></a></li>';
-$forum_page['main_menu']['identity'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'identity')).'"><span>'.$lang_profile['Section identity'].'</span></a></li>';
-$forum_page['main_menu']['settings'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'settings')).'"><span>'.$lang_profile['Section settings'].'</span></a></li>';
+$forum_page['main_menu']['about'] = '<li class="first-item"><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'about')).'#brd-crumbs-top"><span>'.$lang_profile['Section about'].'</span></a></li>';
+$forum_page['main_menu']['identity'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'identity')).'#brd-crumbs-top"><span>'.$lang_profile['Section identity'].'</span></a></li>';
+$forum_page['main_menu']['settings'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'settings')).'#brd-crumbs-top"><span>'.$lang_profile['Section settings'].'</span></a></li>';
 
 if ($forum_config['o_signatures'])
-	$forum_page['main_menu']['signature'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'signature')).'"><span>'.$lang_profile['Section signature'].'</span></a></li>';
+	$forum_page['main_menu']['signature'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'signature')).'#brd-crumbs-top"><span>'.$lang_profile['Section signature'].'</span></a></li>';
 
 if ($forum_config['o_avatars'])
-	$forum_page['main_menu']['avatar'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'avatar')).'"><span>'.$lang_profile['Section avatar'].'</span></a></li>';
+	$forum_page['main_menu']['avatar'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'avatar')).'#brd-crumbs-top"><span>'.$lang_profile['Section avatar'].'</span></a></li>';
 
-$forum_page['main_menu']['pm'] = '<li class="active"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><span>'.$lang_profile['Private messages'].'</span></a></li>';
+$forum_page['main_menu']['pm'] = '<li class="active"><a href="'.forum_link($forum_url['pm'], 'inbox').'#brd-crumbs-top"><span>'.$lang_profile['Private messages'].'</span></a></li>';
 
 if ($forum_user['g_id'] == FORUM_ADMIN || ($forum_user['g_moderator'] == '1' && $forum_user['g_mod_ban_users'] && !$forum_page['own_profile']))
 	$forum_page['main_menu']['admin'] = '<li><a href="'.forum_link($forum_url['profile'], array($forum_user['id'], 'admin')).'#brd-crumbs-top"><span>'.$lang_profile['Section admin'].'</span></a></li>';
 
 $forum_links['pm'] = array(
- 	'<li'.($section == 'inbox' ? ' class="active-subsection first-item"' : ' class="normal"').'><a href="'.forum_link($forum_url['pm'], 'inbox').'">'.$lang_pm['Inbox'].'</a></li>',
- 	'<li'.($section == 'outbox' ? ' class="active-subsection first-item"' : ' class="normal"').'><a href="'.forum_link($forum_url['pm'], 'outbox').'">'.$lang_pm['Outbox'].'</a></li>',
- 	'<li'.($section == 'write' ? ' class="active-subsection first-item"' : ' class="normal"').'><a href="'.forum_link($forum_url['pm'], 'write').'">'.$lang_pm['Compose message'].'</a></li>'
+ 	'<li'.($section == 'inbox' ? ' class="active first-item"' : ' class="normal"').'><a href="'.forum_link($forum_url['pm'], 'inbox').'#brd-crumbs-top">'.$lang_pm['Inbox'].'</a></li>',
+ 	'<li'.($section == 'outbox' ? ' class="active first-item"' : ' class="normal"').'><a href="'.forum_link($forum_url['pm'], 'outbox').'#brd-crumbs-top">'.$lang_pm['Outbox'].'</a></li>',
+ 	'<li'.($section == 'write' ? ' class="active first-item"' : ' class="normal"').'><a href="'.forum_link($forum_url['pm'], 'write').'#brd-crumbs-top">'.$lang_pm['Compose message'].'</a></li>'
 );
 
 ($hook = get_hook('pm_change_details_modify_main_menu')) ? eval($hook) : null;
@@ -247,15 +248,13 @@ if ($section == 'inbox' || $section == 'outbox')
 	ob_start();
 
 ?>
-<div id="cp-menu">
-	<div id="navigation" role="navigation">
-		<ul>
+	<div class="admin-submenu gen-content">
+ 		<ul>
 			<?php echo implode("\n\t\t\t\t", $forum_links['pm'])."\n" ?>
-		</ul>
-	</div>
-</div>
+ 		</ul>
+ 	</div>
 	<div class="main-subhead">
-		<h2 class="hn"><span></span></h2>
+		<h2 class="hn"><span><?php echo $forum_page['heading'] ?></span></h2>
 	</div>
 <?php
 
@@ -307,7 +306,7 @@ if ($section == 'inbox' || $section == 'outbox')
 				'LEFT JOIN'	=> 'users AS u',
 				'ON'		=> '(u.id=m.sender_id)'
 			);
-			$query['WHERE'] = 'm.receiver_id='.$forum_user['id'].' AND m.deleted_by_receiver=0 AND (m.status=\'sent\' OR m.status=\'delivered\')';
+			$query['WHERE'] = 'm.receiver_id='.$forum_user['id'].' AND m.deleted_by_receiver=0 AND (m.status=\'read\' OR m.status=\'delivered\')';
 		}
 		else
 		{
@@ -338,35 +337,33 @@ if ($section == 'inbox' || $section == 'outbox')
 		$forum_page['main_foot_options']['select_all'] = '<span '.(empty($forum_page['main_foot_options']) ? ' class="first-item"' : '').'><a href="#" onclick="return Forum.toggleCheckboxes(document.getElementById(\'pm-actions-form\'))">'.$lang_pm['Select all'].'</a></span>';
 
 		$forum_page['table_header'] = array();
-		$forum_page['table_header']['subject'] = '<dt><div class="list-inner with-mark">'.$lang_pm['Subject'].'</div></dt>';
-		$forum_page['table_header']['select'] = '<dd class="mark">Mark</dd>';
+		$forum_page['table_header']['icons'] = '<th class="tc'.count($forum_page['table_header']).'" scope="col"><img src="'.$base_url.'/img/style/p_sent.png" height="16" width="16" alt="Status" title="Status"/></th>';
+		$forum_page['table_header']['role'] = '<th class="tc'.count($forum_page['table_header']).'" scope="col">'.$forum_page['user_role'].'</th>';
+		$forum_page['table_header']['subject'] = '<th class="tc'.count($forum_page['table_header']).'" scope="col">'.$lang_pm['Subject'].'</th>';
+		$forum_page['table_header']['edited'] = '<th class="tc'.count($forum_page['table_header']).'" scope="col">'.$lang_pm['Edited'].'</th>';
+		$forum_page['table_header']['select'] = '<th class="info-select" scope="col"></th>';
 
 		($hook = get_hook('pm_fl_box_results_pre_header_output')) ? eval($hook) : null;
 
 ?>
-<div id="cp-main-pm" class="ucp-main panel-container">
-	<div id="cp-main-inner">
-		<form id="viewfolder" class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>">
-			<div class="panel">
-				<div class="inner">
-					<p>
-						<?php echo $forum_page['heading'] ?>
-					</p>
+	<form id="pm-actions-form" class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>">
+		<div class="main-content main-frm">
 			<div class="hidden">
 				<?php echo implode("\n\t\t\t\t", $forum_page['hidden_fields']), "\n" ?>
 			</div>
-			<p>
-				<?php echo $lang_pm['Intro'] ?>
-			</p>
-			
-					<ul class="topiclist two-columns">
-						<li class="header">
-							<dl>
-<?php echo implode("\n\t\t\t\t\t\t\t", $forum_page['table_header'])."\n" ?>
-							</dl>
-						</li>
-					</ul>
-
+			<div class="ct-box">
+				<h2 class="hn"><span><?php echo $lang_pm['Intro'] ?></span></h2>
+			</div>
+			<fieldset class="frm-set set<?php echo ++$forum_page['set_count'] ?>">
+				<legend class="group-legend"><strong><?php echo $forum_page['heading'] ?></strong></legend>
+				<div class="ct-group">
+					<table cellspacing="0" class="pm-list">
+					<thead>
+						<tr>
+							<?php echo implode("\n\t\t\t\t\t\t\t", $forum_page['table_header'])."\n" ?>
+						</tr>
+					</thead>
+					<tbody>
 <?php
 
 		while ($cur_pm = $forum_db->fetch_assoc($result))
@@ -374,43 +371,36 @@ if ($section == 'inbox' || $section == 'outbox')
 			$message_link = forum_link($forum_url['pm_view'], $cur_pm['id']);
 
 			($hook = get_hook('pm_fl_box_pre_message_link')) ? eval($hook) : null;
+
 			$forum_page['table_row'] = array();
-			$forum_page['table_row']['subject'] = '<dt><div class="list-inner with-mark"><a class="topictitle" href="'.$message_link.'">'.forum_trim($cur_pm['subject'] ? forum_htmlencode($cur_pm['subject']) : $lang_pm['Empty']).'</a><br>'.($forum_user['pm_long_subject'] ? ' <a class="topictitle" href="'.$message_link.'">'.forum_htmlencode(preg_replace('#(?:\s*(?:\[quote(?:=(&quot;|"|\'|)(?:.*?)\\1)?\](?:.*)\[\/quote\])*)((?:\S*\s*){20})(?:.*)$#su', '$2', $cur_pm['message'])).'</a><br>' : '').'</span>';
-			$forum_page['table_row']['username'] = 'by '.($cur_pm['username'] ? '<a class="username" href="'.forum_link($forum_url['user'], $cur_pm['user_id']).'">'.forum_htmlencode($cur_pm['username']).'</a>' : $lang_pm['Empty']).'';
-			$forum_page['table_row']['edited'] = '»'.format_time($cur_pm['edited']).'<div class="responsive-show" style="display:none;"></div></div></dt>';
-			$forum_page['table_row2'] = array();
-			$forum_page['table_row2']['select'] = '<dd class="mark"><input type="checkbox" name="id[]" value="'.$cur_pm['id'].'" /></dd>';
+			$forum_page['table_row']['icons'] = '<td class="tc'.count($forum_page['table_row']).'"><img src="'.$base_url.'/img/style/'.($cur_pm['status'] == 'delivered' ? 'p_'.$section.'_' : 'p_').''.$cur_pm['status'].'.png" height="16" width="16" alt="'.$lang_pm['Status '.$cur_pm['status']].'" title="'.$lang_pm['Status '.$cur_pm['status']].'" /></td>';
+			$forum_page['table_row']['username'] = '<td class="tc'.count($forum_page['table_row']).'">'.($cur_pm['username'] ? '<a href="'.forum_link($forum_url['user'], $cur_pm['user_id']).'">'.forum_htmlencode($cur_pm['username']).'</a>' : $lang_pm['Empty']).'</td>';
+			$forum_page['table_row']['subject'] = '<td class="tc'.count($forum_page['table_row']).'"><span><a href="'.$message_link.'">'.forum_trim($cur_pm['subject'] ? forum_htmlencode($cur_pm['subject']) : $lang_pm['Empty']).'</a>'.($forum_user['pm_long_subject'] ? ' <a class="message" href="'.$message_link.'">'.forum_htmlencode(preg_replace('#(?:\s*(?:\[quote(?:=(&quot;|"|\'|)(?:.*?)\\1)?\](?:.*)\[\/quote\])*)((?:\S*\s*){20})(?:.*)$#su', '$2', $cur_pm['message'])).'</a>' : '').'</span></td>';
+			$forum_page['table_row']['edited'] = '<td class="tc'.count($forum_page['table_row']).'">'.format_time($cur_pm['edited']).'</td>';
+			$forum_page['table_row']['select'] = '<td class="info-select"><input type="checkbox" name="id[]" value="'.$cur_pm['id'].'" /></td>';
 
 			++$forum_page['item_count'];
 
 			($hook = get_hook('pm_fl_box_results_row_pre_data_output')) ? eval($hook) : null;
 
 ?>
-					<ul class="topiclist cplist pmlist responsive-show-all two-columns">
-						<li class="<?php echo ($forum_page['item_count'] % 2 != 0) ? 'row' : 'even' ?><?php echo ($forum_page['item_count'] == 1) ? ' bg1' : 'bg2' ?>">
-							<dl class="icon <?php echo ($cur_pm['status'] == 'delivered') ? ' pm unread' : 'pm read' ?>">
-								
-<?php echo implode("\n\t\t\t\t\t\t\t", $forum_page['table_row'])."\n" ?>
-								
-<?php echo implode("\n\t\t\t\t\t\t\t", $forum_page['table_row2'])."\n" ?>
-							</dl>
-						</li>
-					</ul>
+						<tr class="<?php echo ($forum_page['item_count'] % 2 != 0) ? 'odd' : 'even' ?><?php echo ($forum_page['item_count'] == 1) ? ' row1' : '' ?><?php echo ($cur_pm['status'] == 'delivered') ? ' pm-new' : '' ?>">
+							<?php echo implode("\n\t\t\t\t\t\t\t", $forum_page['table_row'])."\n" ?>
+						</tr>
 <?php
 
 		}
 
 ?>
-
-				
-			
-		</div>	</div>
+					</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</div>
 		<div class="main-options mod-options gen-content">
 			<p class="options"><?php echo implode(' ', $forum_page['mod_options']) ?></p>
 		</div>
 	</form>
-</div>
-</div>
 	<script type="text/javascript">
 	function confirm_delete()
 	{
@@ -440,7 +430,7 @@ if ($section == 'inbox' || $section == 'outbox')
 	</div>
 	<div id="brd-pagepost-end" class="main-pagepost gen-content">
 		<p class="paging"><span class="pages"><?php echo $lang_common['Pages'].'</span> '.paginate($forum_page['num_pages'], $forum_page['page'], $forum_url['pm'.($section ? '' : '_outbox')], $lang_common['Paging separator'], $forum_user['id']) ?></p>
-		<p class="posting"><a class="newpost" href="<?php echo forum_link($forum_url['pm'], 'write') ?>"><span><?php echo $lang_pm['New message'] ?></span></a></p>
+		<p class="posting"><a class="newpost" href="<? echo forum_link($forum_url['pm'], 'write') ?>"><span><?php echo $lang_pm['New message'] ?></span></a></p>
 	</div>
 <?php
 
@@ -461,7 +451,7 @@ else if ($section == 'write' || $section == 'edit')
 	{
 		$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 		if ($id < 1)
-			message($lang_common['Bad request'], false, '404 Not Found');
+			message($lang_common['Bad request']);
 
 		confirm_current_url(forum_link($forum_url['pm_edit'], $id));
 
@@ -481,7 +471,7 @@ else if ($section == 'write' || $section == 'edit')
 		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 		if (!$forum_db->num_rows($result))
-			message($lang_common['Bad request'], false, '404 Not Found');
+			message($lang_common['Bad request']);
 
 		list($receiver, $subject, $message, $status) = $forum_db->fetch_row($result);
 
@@ -496,7 +486,7 @@ else if ($section == 'write' || $section == 'edit')
 		{
 			$id = intval($_GET['id']);
 			if ($id < 2)
-				message($lang_common['Bad request'], false, '404 Not Found');
+				message($lang_common['Bad request']);
 
 			$query = array(
 				'SELECT'	=> 'u.username',
@@ -668,7 +658,7 @@ if (isset($_POST['preview']) && empty($errors))
 				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
 					<div class="txt-box textarea required">
 						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_pm['Message'] ?> <em><?php echo $lang_common['Required'] ?></em></span></label>
-<?php require FORUM_ROOT.'resources/editor/post_bb.php'; ?>
+<?php require FORUM_ROOT.'bb.php'; ?>
 						<div class="txt-input"><span class="fld-input"><textarea id="text" name="req_message" rows="10" cols="65"><?php if (isset($_POST['req_message']) || isset($message)) echo forum_htmlencode($message); ?></textarea></span></div>
 					</div>
 				</div>
@@ -693,7 +683,7 @@ else if ($section == 'message')
 {
 	$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 	if ($id < 1)
-		message($lang_common['Bad request'], false, '404 Not Found');
+		message($lang_common['Bad request']);
 
 	confirm_current_url(forum_link($forum_url['pm_view'], $id));
 
@@ -729,7 +719,7 @@ else if ($section == 'message')
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 	if (!$forum_db->num_rows($result))
-		message($lang_common['Bad request'], false, '404 Not Found');
+		message($lang_common['Bad request']);
 
 	$cur_message = $forum_db->fetch_assoc($result);
 	$type = ($cur_message['receiver_id'] == $forum_user['id'] ? 'inbox' : 'outbox');
@@ -987,7 +977,7 @@ else if ($section == 'message')
 	if (substr($cur_message['subject'], 0, 4) == 'Ответ: ')
 		$cur_message['subject'] = 'Oтвет[2]: ' . substr($cur_message['subject'], 4);
 
-	$subject_reply = preg_replace_callback('#^Ответ\[(\d{1,10})\]: #eu', '\'Ответ[\'.(\\1 + 1).\']: \'', $cur_message['subject']);
+	$subject_reply = preg_replace('#^Ответ\[(\d{1,10})\]: #eu', '\'Ответ[\'.(\\1 + 1).\']: \'', $cur_message['subject']);
 
 	$cur_message['subject'] = $cur_message['subject'] == $subject_reply ? 'Ответ: ' . $cur_message['subject'] : $subject_reply;
 
@@ -1009,7 +999,7 @@ else if ($section == 'message')
 				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
 					<div class="txt-box textarea required">
 						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_pm['Message'] ?> <em><?php echo $lang_common['Required'] ?></em></span></label>
-<?php require FORUM_ROOT.'resources/editor/post_bb.php'; ?>
+<?php require FORUM_ROOT.'bb.php'; ?>
 						<div class="txt-input"><span class="fld-input"><textarea id="text" name="req_message" rows="10" cols="65"></textarea></span></div>
 					</div>
 				</div>
@@ -1035,4 +1025,4 @@ else if ($section == 'message')
 
 ($hook = get_hook('pm_change_details_new_section')) ? eval($hook) : null;
 
-message($lang_common['Bad request'], false, '404 Not Found');
+message($lang_common['Bad request']);

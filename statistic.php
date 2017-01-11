@@ -1,11 +1,13 @@
 <?php
 /**
+ * Скрипт позволящий просматривать разнообразную статистику.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
+
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -138,7 +140,6 @@ if ($section == 'visit')
 	ob_start();
 
 ?>
-
 	<div class="main-content main-frm">
 		<div class="ct-box user-box">
 			<h2 class="hn"><span><?php echo $lang_stat['Desc visit'] ?></span></h2>
@@ -169,14 +170,13 @@ if ($section == 'visit')
 	else
 	{
 		$forum_page['table_header'] = array();
-		$forum_page['table_header']['username'] = '<th class="group '.count($forum_page['table_header']).'" scope="col">'.$lang_common['Username'].'</th>';
-		$forum_page['table_header']['last_visit'] = '<th class="group '.count($forum_page['table_header']).'" scope="col">'.$lang_stat['Last visit'].'</th>';
+		$forum_page['table_header']['username'] = '<th class="tc'.count($forum_page['table_header']).'" style="width:25%" scope="col">'.$lang_common['Username'].'</th>';
+		$forum_page['table_header']['last_visit'] = '<th class="tc'.count($forum_page['table_header']).'" style="width:75%" scope="col">'.$lang_stat['Last visit'].'</th>';
 
 		($hook = get_hook('st_fl_visit_results_pre_header_output')) ? eval($hook) : null;
 ?>
-<div class="forumbg forumbg-table">
-	<div class="inner">
-		<table class="table1 show-header responsive" id="memberlist" summary="List of users filtered and sorted according to the criteria (if any) you have chosen.">
+		<div class="ct-group">
+			<table cellspacing="0">
 			<thead>
 				<tr>
 					<?php echo implode("\n\t\t\t\t\t", $forum_page['table_header'])."\n" ?>
@@ -189,26 +189,24 @@ if ($section == 'visit')
 		while ($cur_stats = $forum_db->fetch_assoc($result))
 		{
 			$forum_page['table_row'] = array();
-			$forum_page['table_row']['username'] = '<dd class="posts '.count($forum_page['table_row']).'"><a href="'.forum_link($forum_url['user'], $cur_stats['id']).'">'.forum_htmlencode($cur_stats['username']).'</a></dd>';
-			$forum_page['table_row']['last_visit'] = '<dd class="views '.count($forum_page['table_row']).'">'.format_time($cur_stats['last_visit']).$lang_common['Title separator'].flazy_format_time($cur_stats['last_visit']).'</dd>';
+			$forum_page['table_row']['username'] = '<td class="tc'.count($forum_page['table_row']).'"><a href="'.forum_link($forum_url['user'], $cur_stats['id']).'">'.forum_htmlencode($cur_stats['username']).'</a></td>';
+			$forum_page['table_row']['last_visit'] = '<td class="tc'.count($forum_page['table_row']).'">'.format_time($cur_stats['last_visit']).$lang_common['Title separator'].flazy_format_time($cur_stats['last_visit']).'</td>';
 
 			++$forum_page['item_count'];
 
 			($hook = get_hook('st_fl_visit_results_row_pre_data_output')) ? eval($hook) : null;
 
 ?>
-				<tr class="bg<?php echo ($forum_page['item_count'] % 2 != 0) ? '1' : '2' ?><?php echo ($forum_page['item_count'] == 1) ? '1' : '2' ?>">
-					<td class="tc0">
-<?php echo implode("\n\t\t\t\t\t", $forum_page['table_row'])."\n" ?>
+				<tr class="<?php echo ($forum_page['item_count'] % 2 != 0) ? 'odd' : 'even' ?><?php echo ($forum_page['item_count'] == 1) ? ' row1' : '' ?>">
+					<?php echo implode("\n\t\t\t\t\t", $forum_page['table_row'])."\n" ?>
 				</tr>
 <?php
 		}
 
 ?>
 			</tbody>
-		</table>
-	</div>
-</div>
+			</table>
+		</div>
 <?php
 
 	}
@@ -746,4 +744,4 @@ else if ($section == 'bans')
 	require FORUM_ROOT.'footer.php';
 }
 
-message($lang_common['Bad request'], false, '404 Not Found');
+message($lang_common['Bad request']);

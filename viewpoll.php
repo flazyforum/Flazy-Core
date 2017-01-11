@@ -1,11 +1,13 @@
 <?php
 /**
+ * Скрипт для просмотра и редактирования результатов голосования.
  *
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2008 Flazy.ru
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
+
 
 if (!defined('FORUM_ROOT'))
 	define('FORUM_ROOT', './');
@@ -15,7 +17,7 @@ require FORUM_ROOT.'include/common.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id < 1)
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 ($hook = get_hook('vp_fl_info')) ? eval($hook) : null;
 
@@ -46,12 +48,12 @@ $query = array(
 $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
 if (!$forum_db->num_rows($result))
-	message($lang_common['Bad request'], false, '404 Not Found');
+	message($lang_common['Bad request']);
 
 $cur_topic = $forum_db->fetch_assoc($result);
 
 if (!$cur_topic['read_unvote'] && !$forum_user['is_admmod'])
-	message($lang_common['No permission'], false, '403 Forbidden');
+	message($lang_common['No permission']);
 
 // Check for use of incorrect URLs
 confirm_current_url(forum_link($forum_url['poll'], array($id, sef_friendly($cur_topic['subject']))));
