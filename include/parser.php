@@ -3,7 +3,7 @@
  * Загружает различные функции, используемые для парсинга сообщений.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -45,9 +45,9 @@ function preparse_bbcode($text, &$errors, $is_signature = false)
 	}
 
 	// Tidy up lists
-	$pattern = array('%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise');
-	$replace = array('preparse_list_tag(\'$2\', \'$1\', $errors)');
-	$text = preg_replace($pattern, $replace, $text);
+	$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+	$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';
+	$text = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $text);
 
 	$text = str_replace('*'."\0".']', '*]', $text);
 
@@ -508,9 +508,9 @@ function preparse_list_tag($content, $type = '*', &$errors)
 	
 	if (strpos($content,'[list') !== false)
 	{
-		$pattern = array('%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise');
-		$replace = array('preparse_list_tag(\'$2\', \'$1\', $errors)');
-		$content = preg_replace($pattern, $replace, $content);
+		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';	
+		$content = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $content);
 	}
 
 	$items = explode('[*]', str_replace('\"', '"', $content));
@@ -696,9 +696,9 @@ function handle_list_tag($content, $type = '*')
 
 	if (strpos($content,'[list') !== false)
 	{
-		$pattern = array('%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise');
-		$replace = array('handle_list_tag(\'$2\', \'$1\')');
-		$content = preg_replace($pattern, $replace, $content);
+		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback = 'handle_list_tag($matches[2], $matches[1])';
+		$content = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $content);
 	}
 
 	$content = preg_replace('#\s*\[\*\](.*?)\[/\*\]\s*#s', '<li><p>$1</p></li>', forum_trim($content));
@@ -728,7 +728,7 @@ function do_bbcode($text, $is_signature = false)
 
 	if (strpos($text, '[quote') !== false)
 	{
-		$text = preg_replace('#\[quote=(&quot;|"|\'|)(.*?)\\1\]#se', '"</p><div class=\"quotebox\"><cite>".str_replace(array(\'[\', \'\\"\'), array(\'&#91;\', \'"\'), \'$2\')." ".$lang_common[\'wrote\'].":</cite><blockquote><div><p>"', $text);
+		$text = preg_replace_callback('#\[quote=(&\#039;|&quot;|"|\'|)(.*?)\\1\]#',create_function('$matches', 'global $lang_common; return \'</p><div class="quotebox"><cite>\'.str_replace(array(\'[\', \'\"\'), array(\'&#91;\', \'"\'), $matches[2])." ".$lang_common[\'wrote\'].":</cite><blockquote><p>";'),$text);
 		$text = preg_replace('#\[quote\]\s*#', '</p><div class="quotebox"><blockquote><div><p>', $text);
 		$text = preg_replace('#\s*\[\/quote\]#S', '</p></div></blockquote></div><p>', $text);
 	}
@@ -751,15 +751,15 @@ function do_bbcode($text, $is_signature = false)
 					$text_hide = preg_replace("#\[hide=([0-9]*)](.*?)\[/hide\]#s", '<strong>'.sprintf($lang_common['Hidden count text'], $hide_count['1']).'</strong>', $temp[0][$i]);
 
 				if (isset($text_hide))
-					$text = str_replace($temp[0][$i], $text_hide, $text);
+					$text = $text = preg_replace('#\[quote=(&\#039;|&quot;|"|\'|)(.*?)\\1\]#e', '"</p><div class=\"quotebox\"><cite>".str_replace(array(\'[\', \'\\"\'), array(\'&#91;\', \'"\'), \'$2\')." ".$lang_common[\'wrote\'].":</cite><blockquote><p>"', $text);str_replace($temp[0][$i], $text_hide, $text);
 			}
 		}
 	}
 
 	if (!$is_signature)
 	{
-		$pattern[] = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise';
-		$replace[] = 'handle_list_tag(\'$2\', \'$1\')';
+		$pattern_callback[] = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback[] = 'handle_list_tag($matches[2], $matches[1])';
 	}
 
 	$pattern[] = '#\[b\](.*?)\[/b\]#ms';
@@ -824,6 +824,10 @@ function do_bbcode($text, $is_signature = false)
 
 	// This thing takes a while! :)
 	$text = preg_replace($pattern, $replace, $text);
+	$count = count($pattern_callback);
+ 	for ($i = 0; $i < $count; $i++) {
+ 		$text = preg_replace_callback($pattern_callback[$i], create_function('$matches', 'return '.$replace_callback[$i].';'), $text);
+ 	}
 
 	$return = ($hook = get_hook('ps_do_bbcode_end')) ? eval($hook) : null;
 	if ($return != null)
