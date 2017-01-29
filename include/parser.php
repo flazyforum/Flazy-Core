@@ -776,12 +776,12 @@ function do_bbcode($text, $is_signature = false)
 	$pattern[] = '#\[wiki=(\w{2})\](.*?)\[/wiki\]#s';
 	$pattern[] = '#\[hr\]#s';
 
-	$replace[] = '<strong>$1</strong>';
-	$replace[] = '<em>$1</em>';
-	$replace[] = '<span class="bbu">$1</span>';
+	$replace[] = '<strong>$matches[1]</strong>';
+	$replace[] = '<em>$matches[1]</em>';
+	$replace[] = '<span class=\"bbu\">$matches[1]</span>';
 	$replace[] = '<del>$1</del>';
-	$replace[] = '<span style="color: $1">$2</span>';
-	$replace[] = '</p><h5>$1</h5><p>';
+	$replace[] = '<span style=\"color: $matches[1]\">$matches[2]</span>';
+	$replace[] = '</p><h5>$matches[1]</h5><p>';
 	$replace[] = '</p><p style="text-align:center">$1</p><p>';
 	$replace[] = '</p><p style="text-align:right">$1</p><p>';
 	$replace[] = '</p><p style="text-align:left">$1</p><p>';
@@ -792,17 +792,17 @@ function do_bbcode($text, $is_signature = false)
 
 	if (($is_signature && $forum_config['p_sig_img_tag']) || (!$is_signature && $forum_config['p_message_img_tag']))
 	{
-		$pattern[] = '#\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#e';
-		$pattern[] = '#\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#e';
+		$pattern[] = '#\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#';
+		$pattern[] = '#\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#';
 		if ($is_signature)
 		{
-			$replace[] = 'handle_img_tag(\'$1$3\', true)';
-			$replace[] = 'handle_img_tag(\'$2$4\', true, \'$1\')';
+			$replace[] = '".handle_img_tag($matches[1].$matches[3], true)."';
+			$replace[] = '".handle_img_tag($matches[2].$matches[4], true, $matches[1])."';
 		}
 		else
 		{
-			$replace[] = 'handle_img_tag(\'$1$3\', false)';
-			$replace[] = 'handle_img_tag(\'$2$4\', false, \'$1\')';
+			$replace[] = '".handle_img_tag($matches[1].$matches[3], false)."';
+			$replace[] = '".handle_img_tag($matches[2].$matches[4], false, $matches[1])."';
 		}
 	}
 
@@ -815,8 +815,8 @@ function do_bbcode($text, $is_signature = false)
 	$replace[] = 'video(\'$1\')';
 	$replace[] = 'handle_url_tag(\'$1\')';
 	$replace[] = 'handle_url_tag(\'$1\', \'$2\')';
-	$replace[] = '<a href="mailto:$1">$1</a>';
-	$replace[] = '<a href="mailto:$1">$2</a>';
+	$replace[] = '<a href=\"mailto:$matches[1]\">$matches[1]</a>';
+	$replace[] = '<a href=\"mailto:$matches[1]\">$matches[2]</a>';
 
 	$return = ($hook = get_hook('ps_do_bbcode_replace')) ? eval($hook) : null;
 	if ($return != null)
