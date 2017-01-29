@@ -4,13 +4,8 @@
  *
  * Allows administrators to control the extensions and hotfixes installed in the site.
  *
-<<<<<<< HEAD
- * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2013-2015 Flazy.us
-=======
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
  * @modified Copyright (C) 2014-2017 Flazy.org
->>>>>>> origin/master
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -65,19 +60,7 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 	$errors = validate_manifest($ext_data, $id);
 
 	if (!empty($errors))
-		if (!empty($errors)) {
- 		foreach ($errors as $i => $cur_error) {
- 			$errors[$i] = '<li class="warn"><span>' . $cur_error . '</span></li>';
- 		}
- 		$msg_errors =
- 			'<div class="ct-box error-box"><h2 class="warn hn">'
- 				. $lang_admin_ext['Install ext errors']
- 				. '<ul class="error-list">'
-					. implode("\n", $errors)
- 				. '</ul>'
- 			. '</div>';
- 		message(isset($_GET['install'])? $msg_errors : $lang_admin_ext['Hotfix download failed']);
- 	}
+		message(isset($_GET['install']) ? $lang_common['Bad request'] : $lang_admin_ext['Hotfix download failed']);
 
 	// Make sure we have an array of dependencies
 	if (!isset($ext_data['extension']['dependencies']['dependency']))
@@ -928,17 +911,7 @@ else if ($section == 'manage')
 			$errors = validate_manifest($ext_data, $entry);
 			if (!empty($errors))
 			{
-				foreach ($errors as $i => $cur_error) {
- 					$errors[$i] = '<li class="warn"><span>' . $cur_error . '</span></li>';
- 				}
- 				$forum_page['ext_error'][] =
- 					'<div class="ext-error databox db' . ++$forum_page['item_num'] . '">'
- 						. "\n\t\t\t\t"
- 						. '<h3 class="legend"><span>' . sprintf($lang_admin_ext['Extension loading error'], forum_htmlencode($entry)) . '</span></h3>'
- 						. "\n\t\t\t\t"
- 						. '<p><ul class="error-list">' . implode(' ', $errors) . '</ul></p>'
- 						. "\n\t\t\t"
- 					. '</div>';
+				$forum_page['ext_error'][] = '<div class="ext-error databox db'.++$forum_page['item_num'].'">'."\n\t\t\t\t".'<h3 class="legend"><span>'.sprintf($lang_admin_ext['Extension loading error'], forum_htmlencode($entry)).'</span></h3>'."\n\t\t\t\t".'<p>'.implode(' ', $errors).'</p>'."\n\t\t\t".'</div>';
 				++$num_failed;
 			}
 			else

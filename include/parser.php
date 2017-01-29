@@ -45,16 +45,10 @@ function preparse_bbcode($text, &$errors, $is_signature = false)
 	}
 
 	// Tidy up lists
-<<<<<<< HEAD
 		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
 		$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';
 		$text = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $text);
 
-=======
-	$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
-	$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';
-	$text = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $text);
->>>>>>> origin/master
 
 	$text = str_replace('*'."\0".']', '*]', $text);
 
@@ -516,11 +510,7 @@ function preparse_list_tag($content, $type = '*', &$errors)
 	if (strpos($content,'[list') !== false)
 	{
 		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
-<<<<<<< HEAD
 		$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';
-=======
-		$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';	
->>>>>>> origin/master
 		$content = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $content);
 	}
 
@@ -738,16 +728,10 @@ function do_bbcode($text, $is_signature = false)
 
 	if (strpos($text, '[quote') !== false)
 	{
-<<<<<<< HEAD
 		$text = preg_replace_callback('#\[quote=(&\#039;|&quot;|"|\'|)(.*?)\\1\]#',create_function('$matches', 'global $lang_common; return \'</p><div class="quotebox"><cite>\'.str_replace(array(\'[\', \'\"\'), array(\'&#91;\', \'"\'), $matches[2])." ".$lang_common[\'wrote\'].":</cite><blockquote><p>";'),
 $text);
 		$text = preg_replace('#\[quote\]\s*#', '</p><div class="quotebox"><blockquote><p>', $text);
 		$text = preg_replace('#\s*\[\/quote\]#S', '</p></blockquote></div><p>', $text);
-=======
-		$text = preg_replace_callback('#\[quote=(&\#039;|&quot;|"|\'|)(.*?)\\1\]#',create_function('$matches', 'global $lang_common; return \'</p><div class="quotebox"><cite>\'.str_replace(array(\'[\', \'\"\'), array(\'&#91;\', \'"\'), $matches[2])." ".$lang_common[\'wrote\'].":</cite><blockquote><p>";'),$text);
-		$text = preg_replace('#\[quote\]\s*#', '</p><div class="quotebox"><blockquote><div><p>', $text);
-		$text = preg_replace('#\s*\[\/quote\]#S', '</p></div></blockquote></div><p>', $text);
->>>>>>> origin/master
 	}
 
 	if (strpos($text, '[hide') !== false)
@@ -768,7 +752,7 @@ $text);
 					$text_hide = preg_replace("#\[hide=([0-9]*)](.*?)\[/hide\]#s", '<strong>'.sprintf($lang_common['Hidden count text'], $hide_count['1']).'</strong>', $temp[0][$i]);
 
 				if (isset($text_hide))
-					$text = $text = preg_replace('#\[quote=(&\#039;|&quot;|"|\'|)(.*?)\\1\]#e', '"</p><div class=\"quotebox\"><cite>".str_replace(array(\'[\', \'\\"\'), array(\'&#91;\', \'"\'), \'$2\')." ".$lang_common[\'wrote\'].":</cite><blockquote><p>"', $text);str_replace($temp[0][$i], $text_hide, $text);
+					$text = str_replace($temp[0][$i], $text_hide, $text);
 			}
 		}
 	}
@@ -790,18 +774,12 @@ $text);
 	$pattern[] = '#\[left\](.*?)\[/left\]#ms';
 	$pattern[] = '#\[font=(.*?)](.*?)\[/font\]#ms';
 	$pattern[] = '#\[size=([0-9]*)](.*?)\[/size\]#ms';
-<<<<<<< HEAD
 	$pattern[] = '#\[wiki=(\w{2})\](.*?)\[/wiki\]#ms';
 	$pattern[] = '#\[hr\]#ms';
-=======
-	$pattern[] = '#\[wiki=(\w{2})\](.*?)\[/wiki\]#s';
-	$pattern[] = '#\[hr\]#s';
->>>>>>> origin/master
 
 	$replace[] = '<strong>$matches[1]</strong>';
 	$replace[] = '<em>$matches[1]</em>';
 	$replace[] = '<span class=\"bbu\">$matches[1]</span>';
-<<<<<<< HEAD
 	$replace[] = '<del>$matches[1]</del>';
 	$replace[] = '<span style=\"color: $matches[1]\">$matches[2]</span>';
 	$replace[] = '<p><h5>$matches[1]</h5><p>';
@@ -811,17 +789,6 @@ $text);
 	$replace[] = '<span style=\"font-family: $matches[1]\">$matches[2]</span>';
 	$replace[] = '<span style=\"font-size: $matches[1]%\">$matches[2]</span>';
 	$replace[] = '<a href=\"'.forum_link('click.php').'?http://$matches[1].wikipedia.org/wiki/$matches[2]\" class=\"wiki\" onclick=\"window.open(this.href); return false\" rel=\"nofollow\">$matches[2]</a>';
-=======
-	$replace[] = '<del>$1</del>';
-	$replace[] = '<span style=\"color: $matches[1]\">$matches[2]</span>';
-	$replace[] = '</p><h5>$matches[1]</h5><p>';
-	$replace[] = '</p><p style="text-align:center">$1</p><p>';
-	$replace[] = '</p><p style="text-align:right">$1</p><p>';
-	$replace[] = '</p><p style="text-align:left">$1</p><p>';
-	$replace[] = '<span style="font-family: $1">$2</span>';
-	$replace[] = '<span style="font-size: $1px">$2</span>';
-	$replace[] = '<a href="'.forum_link('click.php').'?http://$1.wikipedia.org/wiki/$2" class="wiki" onclick="window.open(this.href); return false" rel="nofollow">$2</a>';
->>>>>>> origin/master
 	$replace[] = '<hr />';
 
 	if (($is_signature && $forum_config['p_sig_img_tag']) || (!$is_signature && $forum_config['p_message_img_tag']))
@@ -846,15 +813,9 @@ $text);
 	$pattern[] = '#\[email\]([^\[]*?)\[/email\]#';
 	$pattern[] = '#\[email=([^\[]+?)\](.*?)\[/email\]#';
 
-<<<<<<< HEAD
 	$replace[] = 'video(\'$matches[1]\')';
 	$replace[] = 'handle_url_tag(\'$matches[1]\')';
 	$replace[] = 'handle_url_tag(\'$matches[1]\', \'$matches[2]\')';
-=======
-	$replace[] = 'video(\'$1\')';
-	$replace[] = 'handle_url_tag(\'$1\')';
-	$replace[] = 'handle_url_tag(\'$1\', \'$2\')';
->>>>>>> origin/master
 	$replace[] = '<a href=\"mailto:$matches[1]\">$matches[1]</a>';
 	$replace[] = '<a href=\"mailto:$matches[1]\">$matches[2]</a>';
 
@@ -863,7 +824,6 @@ $text);
 		return $return;
 
 	// This thing takes a while! :)
-<<<<<<< HEAD
 	$count = count($pattern);
 	for ($i = 0; $i < $count; $i++) {
 		$text = preg_replace_callback($pattern[$i], create_function('$matches', 'return "'.$replace[$i].'";'), $text);
@@ -873,14 +833,6 @@ $text);
 	for ($i = 0; $i < $count; $i++) {
 		$text = preg_replace_callback($pattern_callback[$i], create_function('$matches', 'return '.$replace_callback[$i].';'), $text);
 	}
-=======
-	$text = preg_replace($pattern, $replace, $text);
-	$count = count($pattern_callback);
- 	for ($i = 0; $i < $count; $i++) {
- 		$text = preg_replace_callback($pattern_callback[$i], create_function('$matches', 'return '.$replace_callback[$i].';'), $text);
- 	}
-
->>>>>>> origin/master
 	$return = ($hook = get_hook('ps_do_bbcode_end')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
