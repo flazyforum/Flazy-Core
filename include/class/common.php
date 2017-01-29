@@ -3,7 +3,7 @@
  * Общие классы используемые на форуме.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
@@ -22,7 +22,7 @@ $js = array(
 /**
  * Добавление java-script файлов в <head> форума.
  * @author Copyright (C) 2009 hcs
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  */
 class forum_js
 {

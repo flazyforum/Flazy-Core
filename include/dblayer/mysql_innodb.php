@@ -3,7 +3,7 @@
  * A database layer class that relies on the MySQL PHP extension.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */

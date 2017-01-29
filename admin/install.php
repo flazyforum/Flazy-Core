@@ -5,7 +5,7 @@
  * Используется для установки Flazy
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -26,7 +26,7 @@ define('FORUM_SEARCH_MAX_WORD', 20);
 header('Content-Type: text/html; charset=utf-8');
 
 if (file_exists(FORUM_ROOT.'include/config.php'))
-	die('Файл \'config.php\' уже есть. Это значит что Flazy уже установлен. Перейдите на <a href="'.FORUM_ROOT.'index.php">главную страницу</a>.');
+	die('The \'config.php\' already exists. That means the Flazy is already installed.Go to the  <a href="'.FORUM_ROOT.'index.php">main page</a>.');
 
 // Make sure we are running at least MIN_PHP_VERSION
 if (!function_exists('version_compare') || version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
