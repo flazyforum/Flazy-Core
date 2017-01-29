@@ -30,7 +30,7 @@ Installation
 Features
 --------
 Forum
-* Unlimited Forums (Main only)
+* Unlimited Forums 
 * Create topics or polls
 * Reply to topics, or quote previous posts
 * Post up and down ratings
@@ -58,7 +58,7 @@ Miscellaneous
 Compatibility
 -------------
 * Web-server (Apache is recommended)
-* PHP 5.4 and newer versions (PHP 7.0 included)
+* PHP 5.6 and newer versions (PHP 7.1 included)
 * Database: MYSQL 4.1.2 and newer versions. PostgreSQL 7.0 and newer versions or SQLite 2 (SQLite 3 still dosn't work properly).
 
 Upgrading
@@ -93,9 +93,9 @@ This project also uses many other open source libraries such as:
         <td><strong>Website</strong></td>
     </tr>
     <tr>
-        <td>Bootstrap</td>
+        <td>Font Awesome</td>
         <td>The MIT License</td>
-        <td>https://getbootstrap.com/</td>
+        <td>http://fontawesome.io/</td>
     </tr>	
 </table>
 
