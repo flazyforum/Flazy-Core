@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -75,7 +75,6 @@ function delete_post($post_info)
 	sync_forum($post_info['forum_id']);
 
 	($hook = get_hook('fn_delete_post_end')) ? eval($hook) : null;
-
 }
 
 define('FORUM_FUNCTIONS_DELETE_POST', 1);

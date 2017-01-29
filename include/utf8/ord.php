@@ -21,7 +21,7 @@ function utf8_ord($chr)
 	if ($ord0 >= 0 && $ord0 <= 127)
 		return $ord0;
 
-	if (!isset($chr{1})
+	if (!isset($chr{1}))
 	{
 		trigger_error('Short sequence - at least 2 bytes expected, only 1 seen');
 		return false;
@@ -57,7 +57,7 @@ function utf8_ord($chr)
 		return false;
 	}
 
-	$ord4 = ord($chr{4]);
+        $ord4 = ord($chr{4});
 	if ($ord0 >= 248 && $ord0 <= 251)
 		return ($ord0-248)*16777216 + ($ord1-128)*262144 + ($ord2-128)*4096 + ($ord3-128)*64 + ($ord4-128);
 

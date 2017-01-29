@@ -3,7 +3,7 @@
  * Загружает различные функции, используемые для парсинга сообщений.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -45,9 +45,10 @@ function preparse_bbcode($text, &$errors, $is_signature = false)
 	}
 
 	// Tidy up lists
-	$pattern = array('%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise');
-	$replace = array('preparse_list_tag(\'$2\', \'$1\', $errors)');
-	$text = preg_replace($pattern, $replace, $text);
+		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';
+		$text = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $text);
+
 
 	$text = str_replace('*'."\0".']', '*]', $text);
 
@@ -508,9 +509,9 @@ function preparse_list_tag($content, $type = '*', &$errors)
 	
 	if (strpos($content,'[list') !== false)
 	{
-		$pattern = array('%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise');
-		$replace = array('preparse_list_tag(\'$2\', \'$1\', $errors)');
-		$content = preg_replace($pattern, $replace, $content);
+		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback = 'preparse_list_tag($matches[2], $matches[1], $errors)';
+		$content = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $content);
 	}
 
 	$items = explode('[*]', str_replace('\"', '"', $content));
@@ -577,7 +578,7 @@ function handle_url_tag($url, $link = '', $bbcode = false)
 
 	// Ok, not very pretty :-)
 	if (!$bbcode)
-		$link = ($link == '' || $link == $url) ? ((utf8_strlen($url) > 55) ? utf8_substr($url, 0 , 39).' … '.utf8_substr($url, -10) : $url) : stripslashes($link);
+		$link = ($link == '' || $link == $url) ? ((utf8_strlen($url) > 55) ? utf8_substr($url, 0, 39).' … '.utf8_substr($url, -10) : $url) : stripslashes($link);
 
 
 	$return = ($hook = get_hook('ps_handle_url_tag_end')) ? eval($hook) : null;
@@ -650,9 +651,9 @@ function video($url)
 	$return = ($hook = get_hook('ps_fl_video_bbcode_parser')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
-
-	if (preg_match('#http://.*youtube\.com/watch\?v=([0-9a-zA-Z_-]+)#s', $url, $matches))
-		return '<object width="425" height="355"><param name="movie" value="http://www.youtube.com/v/'.forum_htmlencode($matches['1']).'" /><param name="wmode" value="transparent" /><embed src="http://www.youtube.com/v/'.forum_htmlencode($matches['1']).'" type="application/x-shockwave-flash" wmode="transparent" width="425" height="355"></embed></object>';
+	
+	if (preg_match('#http://.*youtube\.com/embed\?v=([0-9a-zA-Z_-]+)#s', $url, $matches))
+		return '<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/'.forum_htmlencode($matches['1']).'" frameborder="0" allowfullscreen></iframe>';
 	else if (preg_match('#http://www\.veoh\.com/videos/(.*)#', $url, $matches))
 		return '<embed src="http://www.veoh.com/videodetails2.swf?permalinkId='.forum_htmlencode($matches['1']).'&amp;id=anonymous&amp;player=videodetailsembedded&amp;videoAutoPlay=0" allowFullScreen="true" width="540" height="438" bgcolor="#FFFFFF" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed>';
 	else if (preg_match('#http://tinypic\.com/player\.php\?v=(.*)#s', $url, $matches))
@@ -681,7 +682,6 @@ function video($url)
 		return '<object width="470" height="353"><param name="movie" value="http://video.rutube.ru/'.forum_htmlencode($matches['2']).'"></param><param name="wmode" value="window"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="never" /><embed allowscriptaccess="never" src="http://video.rutube.ru/'.forum_htmlencode($matches['2']).'" type="application/x-shockwave-flash" wmode="window" width="470" height="353" allowFullScreen="true" ></embed></object>';
 	else
 		return forum_htmlencode($url);
-
 	$return = ($hook = get_hook('ps_fl_video_end')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
@@ -696,9 +696,9 @@ function handle_list_tag($content, $type = '*')
 
 	if (strpos($content,'[list') !== false)
 	{
-		$pattern = array('%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise');
-		$replace = array('handle_list_tag(\'$2\', \'$1\')');
-		$content = preg_replace($pattern, $replace, $content);
+		$pattern_callback = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback = 'handle_list_tag($matches[2], $matches[1])';
+		$content = preg_replace_callback($pattern_callback, create_function('$matches', 'return '.$replace_callback.';'), $content);
 	}
 
 	$content = preg_replace('#\s*\[\*\](.*?)\[/\*\]\s*#s', '<li><p>$1</p></li>', forum_trim($content));
@@ -728,9 +728,10 @@ function do_bbcode($text, $is_signature = false)
 
 	if (strpos($text, '[quote') !== false)
 	{
-		$text = preg_replace('#\[quote=(&quot;|"|\'|)(.*?)\\1\]#se', '"</p><div class=\"quotebox\"><cite>".str_replace(array(\'[\', \'\\"\'), array(\'&#91;\', \'"\'), \'$2\')." ".$lang_common[\'wrote\'].":</cite><blockquote><div><p>"', $text);
-		$text = preg_replace('#\[quote\]\s*#', '</p><div class="quotebox"><blockquote><div><p>', $text);
-		$text = preg_replace('#\s*\[\/quote\]#S', '</p></div></blockquote></div><p>', $text);
+		$text = preg_replace_callback('#\[quote=(&\#039;|&quot;|"|\'|)(.*?)\\1\]#',create_function('$matches', 'global $lang_common; return \'</p><div class="quotebox"><cite>\'.str_replace(array(\'[\', \'\"\'), array(\'&#91;\', \'"\'), $matches[2])." ".$lang_common[\'wrote\'].":</cite><blockquote><p>";'),
+$text);
+		$text = preg_replace('#\[quote\]\s*#', '</p><div class="quotebox"><blockquote><p>', $text);
+		$text = preg_replace('#\s*\[\/quote\]#S', '</p></blockquote></div><p>', $text);
 	}
 
 	if (strpos($text, '[hide') !== false)
@@ -758,8 +759,8 @@ function do_bbcode($text, $is_signature = false)
 
 	if (!$is_signature)
 	{
-		$pattern[] = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%ise';
-		$replace[] = 'handle_list_tag(\'$2\', \'$1\')';
+		$pattern_callback[] = '%\[list(?:=([1a*]))?+\]((?:(?>.*?(?=\[list(?:=[1a*])?+\]|\[/list\]))|(?R))*)\[/list\]%is';
+		$replace_callback[] = 'handle_list_tag($matches[2], $matches[1])';
 	}
 
 	$pattern[] = '#\[b\](.*?)\[/b\]#ms';
@@ -773,97 +774,106 @@ function do_bbcode($text, $is_signature = false)
 	$pattern[] = '#\[left\](.*?)\[/left\]#ms';
 	$pattern[] = '#\[font=(.*?)](.*?)\[/font\]#ms';
 	$pattern[] = '#\[size=([0-9]*)](.*?)\[/size\]#ms';
-	$pattern[] = '#\[wiki=(\w{2})\](.*?)\[/wiki\]#s';
-	$pattern[] = '#\[hr\]#s';
+	$pattern[] = '#\[wiki=(\w{2})\](.*?)\[/wiki\]#ms';
+	$pattern[] = '#\[hr\]#ms';
 
-	$replace[] = '<strong>$1</strong>';
-	$replace[] = '<em>$1</em>';
-	$replace[] = '<span class="bbu">$1</span>';
-	$replace[] = '<del>$1</del>';
-	$replace[] = '<span style="color: $1">$2</span>';
-	$replace[] = '</p><h5>$1</h5><p>';
-	$replace[] = '</p><p style="text-align:center">$1</p><p>';
-	$replace[] = '</p><p style="text-align:right">$1</p><p>';
-	$replace[] = '</p><p style="text-align:left">$1</p><p>';
-	$replace[] = '<span style="font-family: $1">$2</span>';
-	$replace[] = '<span style="font-size: $1px">$2</span>';
-	$replace[] = '<a href="'.forum_link('click.php').'?http://$1.wikipedia.org/wiki/$2" class="wiki" onclick="window.open(this.href); return false" rel="nofollow">$2</a>';
+	$replace[] = '<strong>$matches[1]</strong>';
+	$replace[] = '<em>$matches[1]</em>';
+	$replace[] = '<span class=\"bbu\">$matches[1]</span>';
+	$replace[] = '<del>$matches[1]</del>';
+	$replace[] = '<span style=\"color: $matches[1]\">$matches[2]</span>';
+	$replace[] = '<p><h5>$matches[1]</h5><p>';
+	$replace[] = '<p style=\"text-align:center\">$matches[1]</p>';
+	$replace[] = '<p style=\"text-align:right\">$matches[1]</p>';
+	$replace[] = '<p style=\"text-align:left\">$matches[1]</p>';
+	$replace[] = '<span style=\"font-family: $matches[1]\">$matches[2]</span>';
+	$replace[] = '<span style=\"font-size: $matches[1]%\">$matches[2]</span>';
+	$replace[] = '<a href=\"'.forum_link('click.php').'?http://$matches[1].wikipedia.org/wiki/$matches[2]\" class=\"wiki\" onclick=\"window.open(this.href); return false\" rel=\"nofollow\">$matches[2]</a>';
 	$replace[] = '<hr />';
 
 	if (($is_signature && $forum_config['p_sig_img_tag']) || (!$is_signature && $forum_config['p_message_img_tag']))
 	{
-		$pattern[] = '#\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#e';
-		$pattern[] = '#\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#e';
+		$pattern[] = '#\[img\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#';
+		$pattern[] = '#\[img=([^\[]*?)\]((ht|f)tps?://)([^\s<"]*?)\[/img\]#';
 		if ($is_signature)
 		{
-			$replace[] = 'handle_img_tag(\'$1$3\', true)';
-			$replace[] = 'handle_img_tag(\'$2$4\', true, \'$1\')';
+			$replace[] = '".handle_img_tag($matches[1].$matches[3], true)."';
+			$replace[] = '".handle_img_tag($matches[2].$matches[4], true, $matches[1])."';
 		}
 		else
 		{
-			$replace[] = 'handle_img_tag(\'$1$3\', false)';
-			$replace[] = 'handle_img_tag(\'$2$4\', false, \'$1\')';
+			$replace[] = '".handle_img_tag($matches[1].$matches[3], false)."';
+			$replace[] = '".handle_img_tag($matches[2].$matches[4], false, $matches[1])."';
 		}
 	}
 
-	$pattern[] = '#\[video\](.*?)\[/video\]#e';
-	$pattern[] = '#\[url\]([^\[]*?)\[/url\]#e';
-	$pattern[] = '#\[url=([^\[]+?)\](.*?)\[/url\]#e';
+	$pattern[] = '#\[video\](.*?)\[/video\]#';
+	$pattern[] = '#\[url\]([^\[]*?)\[/url\]#';
+	$pattern[] = '#\[url=([^\[]+?)\](.*?)\[/url\]#';
 	$pattern[] = '#\[email\]([^\[]*?)\[/email\]#';
 	$pattern[] = '#\[email=([^\[]+?)\](.*?)\[/email\]#';
 
-	$replace[] = 'video(\'$1\')';
-	$replace[] = 'handle_url_tag(\'$1\')';
-	$replace[] = 'handle_url_tag(\'$1\', \'$2\')';
-	$replace[] = '<a href="mailto:$1">$1</a>';
-	$replace[] = '<a href="mailto:$1">$2</a>';
+	$replace[] = 'video(\'$matches[1]\')';
+	$replace[] = 'handle_url_tag(\'$matches[1]\')';
+	$replace[] = 'handle_url_tag(\'$matches[1]\', \'$matches[2]\')';
+	$replace[] = '<a href=\"mailto:$matches[1]\">$matches[1]</a>';
+	$replace[] = '<a href=\"mailto:$matches[1]\">$matches[2]</a>';
 
 	$return = ($hook = get_hook('ps_do_bbcode_replace')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
 
 	// This thing takes a while! :)
-	$text = preg_replace($pattern, $replace, $text);
-
+	$count = count($pattern);
+	for ($i = 0; $i < $count; $i++) {
+		$text = preg_replace_callback($pattern[$i], create_function('$matches', 'return "'.$replace[$i].'";'), $text);
+	}
+	
+	$count = count($pattern_callback);
+	for ($i = 0; $i < $count; $i++) {
+		$text = preg_replace_callback($pattern_callback[$i], create_function('$matches', 'return '.$replace_callback[$i].';'), $text);
+	}
 	$return = ($hook = get_hook('ps_do_bbcode_end')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
-
 	return $text;
 }
 
 
 // Make hyperlinks clickable
-function do_clickable($text)
+function do_clickable($text, $unicode = FALSE)
 {
 	$text = ' '.$text;
-
-	$text = preg_replace('#(?<=[\s\]\)])(<)?(\[)?(\()?([\'"]?)(https?|ftp|news){1}://([\w\-]+\.([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^\s\[]*[^\s.,?!\[;:-])?)\4(?(3)(\)))(?(2)(\]))(?(1)(>))(?![^\s]*\[/(?:url|img)\])#ie', 'stripslashes(\'$1$2$3$4\').handle_url_tag(\'$5://$6\', \'$5://$6\', true).stripslashes(\'$4$10$11$12\')', $text);
-	$text = preg_replace('#(?<=[\s\]\)])(<)?(\[)?(\()?([\'"]?)(www|ftp)\.(([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^\s\[]*[^\s.,?!\[;:-])?)\4(?(3)(\)))(?(2)(\]))(?(1)(>))(?![^\s]*\[/(?:url|img)\])#ie', 'stripslashes(\'$1$2$3$4\').handle_url_tag(\'$5.$6\', \'$5.$6\', true).stripslashes(\'$4$10$11$12\')', $text);
-
+	if ($unicode)
+	{
+		$text= preg_replace_callback('#(?<=[\s\]\)])(<)?(\[)?(\()?([\'"]?)(https?|ftp|news){1}://([\p{Nd}\p{L}\-]+\.([\p{Nd}\p{L}\-]+\.)*[\p{Nd}\p{L}\-]+(:[0-9]+)?(/[^\s\[]*[^\s.,?!\[;:-]?)?)\4(?(3)(\)))(?(2)(\]))(?(1)(>))(?![^\s]*\[/(?:url|img)\])#iu', create_function('$matches', 'for($i=1;$i<=12;$i++){ $matches[$i]=isset($matches[$i])?$matches[$i]:\'\';} return stripslashes($matches[1].$matches[2].$matches[3].$matches[4]).handle_url_tag($matches[5].\'://\'.$matches[6], $matches[5].\'://\'.$matches[6], true).stripslashes($matches[4].$matches[10].$matches[11].$matches[12]);'), $text);
+		$text = preg_replace_callback('#(?<=[\s\]\)])(<)?(\[)?(\()?([\'"]?)(www|ftp)\.(([\p{Nd}\p{L}\-]+\.)*[\p{Nd}\p{L}\-]+(:[0-9]+)?(/[^\s\[]*[^\s.,?!\[;:-])?)\4(?(3)(\)))(?(2)(\]))(?(1)(>))(?![^\s]*\[/(?:url|img)\])#iu', create_function('$matches', 'for($i=1;$i<=12;$i++){ $matches[$i]=isset($matches[$i])?$matches[$i]:\'\';} return stripslashes($matches[1].$matches[2].$matches[3].$matches[4]).handle_url_tag($matches[5].\'.\'.$matches[6], $matches[5].\'.\'.$matches[6], true).stripslashes($matches[4].$matches[10].$matches[11].$matches[12]);'), $text);
+	}
+	else
+	{
+		$text = preg_replace_callback('#(?<=[\s\]\)])(<)?(\[)?(\()?([\'"]?)(https?|ftp|news){1}://([\w\-]+\.([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^\s\[]*[^\s.,?!\[;:-]?)?)\4(?(3)(\)))(?(2)(\]))(?(1)(>))(?![^\s]*\[/(?:url|img)\])#i', create_function('$matches', 'for($i=1;$i<=12;$i++){ $matches[$i]=isset($matches[$i])?$matches[$i]:\'\';} return stripslashes($matches[1].$matches[2].$matches[3].$matches[4]).handle_url_tag($matches[5].\'://\'.$matches[6], $matches[5].\'://\'.$matches[6], true).stripslashes($matches[4].$matches[10].$matches[11].$matches[12]);'), $text);
+		$text = preg_replace_callback('#(?<=[\s\]\)])(<)?(\[)?(\()?([\'"]?)(www|ftp)\.(([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^\s\[]*[^\s.,?!\[;:-])?)\4(?(3)(\)))(?(2)(\]))(?(1)(>))(?![^\s]*\[/(?:url|img)\])#i', create_function('$matches', 'for($i=1;$i<=12;$i++){ $matches[$i]=isset($matches[$i])?$matches[$i]:\'\';} return stripslashes($matches[1].$matches[2].$matches[3].$matches[4]).handle_url_tag($matches[5].\'.\'.$matches[6], $matches[5].\'.\'.$matches[6], true).stripslashes($matches[4].$matches[10].$matches[11].$matches[12]);'), $text);
+	}
 	return substr($text, 1);
 }
+
 
 
 // Convert a series of smilies to images
 function do_smilies($text)
 {
 	global $forum_config, $base_url, $smilies;
-
+	
 	$return = ($hook = get_hook('ps_do_smilies_start')) ? eval($hook) : null; 
 	if ($return != null)
 		return $return;
-
 	$text = ' '.$text.' ';
-
 	foreach ($smilies as $smiley_text => $smiley_img)
 	{
 		if (strpos($text, $smiley_text) !== false)
-			$text = preg_replace("#(?<=[>\s])".preg_quote($smiley_text, '#')."(?=\W)#m", '<img src="'.$base_url.'/img/smilies/'.$smiley_img.'" alt="'.substr($smiley_img, 0, strrpos($smiley_img, '.')).'" />', $text);
+			$text = preg_replace("#(?<=[>\s])".preg_quote($smiley_text, '#')."(?=\W)#", '<img src="'.$base_url.'/img/smilies/'.$smiley_img.'" alt="'.substr($smiley_img, 0, strrpos($smiley_img, '.')).'" />', $text);
 	}
-
 	$return = ($hook = get_hook('ps_do_smilies_end')) ? eval($hook) : null;
-
 	return substr($text, 1, -1);
 }
 

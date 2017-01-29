@@ -3,7 +3,7 @@
  * Общие функции используемые на форуме.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
@@ -200,8 +200,8 @@ function clean_version($version)
 }
 
 
-// Checks if a string is in all uppercase
-function is_all_uppercase($string)
+// Check the text is CAPSED
+function check_is_all_caps($string)
 {
 	return utf8_strtoupper($string) == $string && utf8_strtolower($string) != $string;
 }
@@ -420,69 +420,93 @@ function declination($number, $words)
 function generate_navlinks()
 {
 	global $forum_config, $lang_common, $forum_url, $forum_url_admin, $forum_user;
-
 	$return = ($hook = get_hook('fn_generate_navlinks_start')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
-
 	// Index should always be displayed
-	$links['index'] = '<li id="navindex" class="nav'.((FORUM_PAGE == 'index') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['index']).'"><span>'.$lang_common['Index'].'</span></a></li>';
-
+	$links['index'] = '<li class="'.((FORUM_PAGE == 'index') ? ' active' : '').'"><a href="'.forum_link($forum_url['index']).'"><i class="material-icons left">home</i>'.$lang_common['Index'].'</a></li>';
 	if ($forum_user['g_read_board'] && $forum_user['g_view_users'])
-		$links['userlist'] = '<li id="navuserlist" class="nav'.((FORUM_PAGE == 'userlist') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['users']).'"><span>'.$lang_common['User list'].'</span></a></li>';
-
+		$links['userlist'] = '<li class="'.((FORUM_PAGE == 'userlist') ? ' active' : '').'"><a href="'.forum_link($forum_url['users']).'"><i class="material-icons left">people</i>'.$lang_common['User list'].'</a></li>';
+		$links['search'] = '<li class="'.((FORUM_PAGE == 'search') ? ' active' : '').'"><a href="'.forum_link($forum_url['search']).'"> <i class="material-icons left">search</i>'.$lang_common['Search'].'</a></li>';
 	if ($forum_config['o_rules'] && (!$forum_user['is_guest'] || $forum_user['g_read_board'] || $forum_config['o_regs_allow']))
-		$links['rules'] = '<li id="navrules" class="nav'.((FORUM_PAGE == 'rules') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['rules']).'"><span>'.$lang_common['Rules'].'</span></a></li>';
-
-	if ($forum_user['is_guest'])
-	{
-		if ($forum_user['g_read_board'] && $forum_user['g_search'])
-			$links['search'] = '<li id="navsearch" class="nav'.((FORUM_PAGE == 'search') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['search']).'"><span>'.$lang_common['Search'].'</span></a></li>';
-
-		$links['register'] = '<li id="navregister" class="nav'.((FORUM_PAGE == 'register') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['register']).'"><span>'.$lang_common['Register'].'</span></a></li>';
-		$links['login'] = '<li id="navlogin" class="nav'.((FORUM_PAGE == 'login') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['login']).'"><span>'.$lang_common['Login'].'</span></a></li>';
-	}
-	else
-	{
-		if (!$forum_user['is_admmod'])
-		{
-			if ($forum_user['g_read_board'] && $forum_user['g_search'])
-				$links['search'] = '<li id="navsearch" class="nav'.((FORUM_PAGE == 'search') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['search']).'"><span>'.$lang_common['Search'].'</span></a></li>';
-
-			$links['profile'] = '<li id="navprofile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><span>'.$lang_common['Profile'].'</span></a></li>';
-
-			if ($forum_config['o_pm_show_global_link'])
-				$links['pm'] = '<li id="navpm" class="nav'.((FORUM_PAGE == 'profile-pm') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><span>'.$lang_common['Private messages'].'</span></a></li>';
-
-			$links['logout'] = '<li id="navlogout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><span>'.$lang_common['Logout'].'</span></a></li>';
-		}
-		else
-		{
-			$links['search'] = '<li id="navsearch" class="nav'.((FORUM_PAGE == 'search') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['search']).'"><span>'.$lang_common['Search'].'</span></a></li>';
-
-			$links['profile'] = '<li id="navprofile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><span>'.$lang_common['Profile'].'</span></a></li>';
-
-			if ($forum_config['o_pm_show_global_link'])
-				$links['pm'] = '<li id="navpm" class="nav'.((FORUM_PAGE == 'profile-pm') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><span>'.$lang_common['Private messages'].'</span></a></li>';
-
-			$links['logout'] = '<li id="navlogout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><span>'.$lang_common['Logout'].'</span></a></li>';
-			$links['admin'] = '<li id="navadmin" class="nav'.((substr(FORUM_PAGE, 0, 5) == 'admin') ? ' isactive' : '').'"><a href="'.forum_link('admin/admin.php').'"><span>'.$lang_common['Admin'].'</span></a></li>';
-		}
-	}
-
+		$links['rules'] = '<li class="'.((FORUM_PAGE == 'rules') ? ' active' : '').'"><a href="'.forum_link($forum_url['rules']).'"><i class="material-icons left">speaker_notes_off</i>'.$lang_common['Rules'].'</a></li>';
 	// Are there any additional navlinks we should insert into the array before imploding it?
 	if ($forum_config['o_additional_navlinks'] != '' && preg_match_all('#([0-9]+)\s*=\s*(.*?)\n#s', $forum_config['o_additional_navlinks']."\n", $extra_links))
 	{
 		// Insert any additional links into the $links array (at the correct index)
 		$num_links = count($extra_links[1]);
 		for ($i = 0; $i < $num_links; ++$i)
-			array_insert($links, (int)$extra_links[1][$i], '<li id="navextra'.($i + 1).'">'.$extra_links[2][$i].'</li>');
+			array_insert($links, (int)$extra_links[1][$i], '<li class="'.($i + 1).'">'.$extra_links[2][$i].'</li>');
 	}
-
 	($hook = get_hook('fn_generate_navlinks_end')) ? eval($hook) : null;
-
 	return implode("\n\t\t", $links);
 }
+	function generate_topnavlinks()
+{
+	global $forum_config, $lang_common, $forum_url, $forum_url_admin, $forum_user;
+        
+	$return = ($hook = get_hook('fn_generate_navlinks_start')) ? eval($hook) : null;
+	if ($return != null)
+		return $return;
+if ($forum_user['is_guest'])
+	{
+		if ($forum_user['g_read_board'] && $forum_user['g_search'])
+		$links['register'] = '<li class="'.((FORUM_PAGE == 'register') ? ' active' : '').'"><a href="'.forum_link($forum_url['register']).'"><i class="material-icons left">person_add</i>'.$lang_common['Register'].'</a></li>';
+		$links['login'] = '<li class="'.((FORUM_PAGE == 'login') ? ' active' : '').'" ><a href="'.forum_link($forum_url['login']).'"><i class="material-icons left">lock_open</i>'.$lang_common['Login'].'</a></li>';
+	}
+	else
+		if (!$forum_user['is_admmod'])
+		{
+			if ($forum_user['g_read_board'] && $forum_user['g_search'])
+			$links['logout'] = '<li><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><i class="material-icons left">exit_to_app</i>'.$lang_common['Logout'].'</a></li>';	
+			$links['profile'] = '<li class="'.((FORUM_PAGE == 'profile') ? ' active' : '').'"><a class="dropdown-button" href="#!" data-activates="profile_dropdown"><i class="material-icons left">perm_identity</i>'.$lang_common['Profile'].'</a></li>';
+			$pm_full = ($forum_user['pm_inbox'] < $forum_config['o_pm_inbox_size']) ? false : true;
+			if ($forum_user['pm_new'] && $forum_config['o_pm_show_new_count'] || $pm_full)
+				$links['pm_new']  = '<li class="'.((FORUM_PAGE == 'pm_new') ? ' active' : '').'"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><i class="material-icons left">message</i>'.$lang_common['Private messages'].'</a></li>';
+		}
+		else
+		{
+			$links['logout'] = '<li><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><i class="material-icons left">exit_to_app</i>'.$lang_common['Logout'].'</a></li>';	
+			$links['profile'] = '<li class="'.((FORUM_PAGE == 'profile') ? ' active' : '').'"><a class="dropdown-button" href="#!" data-activates="profile_dropdown"><i class="material-icons left">perm_identity</i>'.$lang_common['Profile'].'</a></li>';
+			$pm_full = ($forum_user['pm_inbox'] < $forum_config['o_pm_inbox_size']) ? false : true;
+			if ($forum_user['pm_new'] && $forum_config['o_pm_show_new_count'] || $pm_full)
+				$links['pm_new']  = '<li class="'.((FORUM_PAGE == 'pm_new') ? ' active' : '').'"><a href="'.forum_link($forum_url['pm'], 'inbox').'"><i class="material-icons left">message</i>'.$lang_common['Private messages'].'</a></li>';
+				
+			$links['admin'] = '<li> <a href="'.forum_link('admin').'" ><i class="material-icons left">lock</i> '.$lang_common['Admin'].'</a></li>';		
+		}
+	($hook = get_hook('fn_generate_topnavlinks_end')) ? eval($hook) : null;
+	return implode("\n\t\t", $links);
+	}
+function generate_navlinks_admins()
+{
+	global $forum_config, $lang_common, $forum_url, $forum_url_admin, $forum_user;
+	$return = ($hook = get_hook('fn_generate_navlinks_start')) ? eval($hook) : null;
+	if ($return != null)
+		return $return;
+	if ($forum_user['is_guest'])
+	{
+		if ($forum_user['g_read_board'] && $forum_user['g_search'])
+		$links['register'] = '<li class="font-icon rightside "  data-skip-responsive="true"><a href="'.forum_link($forum_url['register']).'" accesskey="x" role="menuitem"><i class="fa fa-user-plus"></i> '.$lang_common['Register'].'</a></li>';
+		$links['login'] = '<li class="font-icon rightside"  data-skip-responsive="true"><a href="'.forum_link($forum_url['login']).'" accesskey="x" role="menuitem"><i class="fa fa-sign-in"></i> '.$lang_common['Login'].'</a></li>';
+	}
+	else
+	{
+		if (!$forum_user['is_admmod'])
+		{
+			if ($forum_user['g_read_board'] && $forum_user['g_search'])
+			$links['profil'] = '<li id="navprofile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><span>'.$lang_common['Profile'].'</span></a></li>';
+			$links['logout'] = '<li id="navlogout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><span>'.$lang_common['Logout'].'</span></a></li>';
+		}
+		else
+		{
+			$links['towebsite'] = '<li id="nav_website" class="nav"><a href="'.forum_link($forum_url['index']).'"><i class="fa fa-globe"></i> '.$lang_common['To website'].'</a></li>';
+			$links['profil'] = '<li id="nav_profile" class="nav'.((substr(FORUM_PAGE, 0, 7) == 'profile') ? ' isactive' : '').'"><a href="'.forum_link($forum_url['user'], $forum_user['id']).'"><i class="fa fa-power-off"></i> '.$lang_common['Profile'].'</a></li>';
+			$links['logout'] = '<li id="nav_logout" class="nav"><a href="'.forum_link($forum_url['logout'], array($forum_user['id'], generate_form_token('logout'.$forum_user['id']))).'"><i class="fa fa-sign-out"></i> '.$lang_common['Logout'].'</a></li>';
+		}
+	}
+	($hook = get_hook('fn_generate_navlinks_end')) ? eval($hook) : null;
+	return implode("\n\t\t", $links);
+	}
 
 
 // Generate a string with page and item information for multipage headings
@@ -525,16 +549,16 @@ function paginate($num_pages, $cur_page, $link, $separator, $args = null)
 	}
 
 	if ($num_pages <= 1)
-		$pages = array('<strong class="first-item">1</strong>');
+		$pages = array('<li class="active"><a href="'.forum_sublink($link, $forum_url['page'], ($cur_page), $args).'">1</a></li>');
 	else
 	{
 		// Add a previous page link
 		if ($num_pages > 1 && $cur_page > 1)
-			$pages[] = '<span class="pevious"></span><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], ($cur_page - 1), $args).'">'.$lang_common['Previous'].'</a>';
+			$pages[] = '<li class="waves-effect"><a href="'.forum_sublink($link, $forum_url['page'], ($cur_page - 1), $args).'"><i class="material-icons">chevron_left</i></a></li>';
 
 		if ($cur_page > 3)
 		{
-			$pages[] = '<a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], 1, $args).'">1</a>';
+			$pages[] = '<li class="waves-effect"><a'.(empty($pages) ? ' class="active"' : '').' href="'.forum_sublink($link, $forum_url['page'], 1, $args).'">1</a></li>';
 
 			if ($cur_page > 5)
 				$pages[] = '<span>'.$lang_common['Spacer'].'</span>';
@@ -545,21 +569,21 @@ function paginate($num_pages, $cur_page, $link, $separator, $args = null)
 			if ($current < 1 || $current > $num_pages)
 				continue;
 			else if ($current != $cur_page || $link_to_all)
-				$pages[] = '<a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $current, $args).'">'.forum_number_format($current).'</a>';
+				$pages[] = '<li class="waves-effect"><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $current, $args).'">'.forum_number_format($current).'</a></li>';
 			else
-				$pages[] = '<strong'.(empty($pages) ? ' class="first-item"' : '').'>'.forum_number_format($current).'</strong>';
+				$pages[] = '<li class="active"><a href="'.forum_sublink($link, $forum_url['page'], $current, $args).'">'.forum_number_format($current).'</a></li>';
 
 		if ($cur_page <= ($num_pages-3))
 		{
 			if ($cur_page != ($num_pages-3) && $cur_page != ($num_pages-4))
 				$pages[] = '<span>'.$lang_common['Spacer'].'</span>';
 
-			$pages[] = '<a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $num_pages, $args).'">'.forum_number_format($num_pages).'</a>';
+			$pages[] = '<li class="waves-effect"><a'.(empty($pages) ? ' class="first-item"' : '').' href="'.forum_sublink($link, $forum_url['page'], $num_pages, $args).'">'.forum_number_format($num_pages).'</a></li>';
 		}
 
 		// Add a next page link
 		if ($num_pages > 1 && !$link_to_all && $cur_page < $num_pages)
-			$pages[] = '<a class="next" href="'.forum_sublink($link, $forum_url['page'], ($cur_page + 1), $args).'">'.$lang_common['Next'].'</a>';
+			$pages[] = '<li class="waves-effect"><a class="next" href="'.forum_sublink($link, $forum_url['page'], ($cur_page + 1), $args).'"><i class="material-icons">chevron_right</i></a></li>';
 	}
 
 	($hook = get_hook('fn_paginate_end')) ? eval($hook) : null;
@@ -1819,9 +1843,9 @@ function generate_crumbs($reverse)
 		for ($i = 0; $i < $num_crumbs; ++$i)
 		{
 			if ($i < ($num_crumbs - 1))
-				$crumbs .= '<span class="crumb'.(($i == 0) ? ' crumbfirst' : '').'">'.(($i >= 1) ? '<span>'.$lang_common['Crumb separator'].'</span>' : '').(is_array($forum_page['crumbs'][$i]) ? '<a href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i])).'</span> ';
+				$crumbs .= (is_array($forum_page['crumbs'][$i]) ? '<a href="'.$forum_page['crumbs'][$i][1].'" class="breadcrumb">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i]));
 			else
-				$crumbs .= '<span class="crumb crumblast'.(($i == 0) ? ' crumbfirst' : '').'">'.(($i >= 1) ? '<span>'.$lang_common['Crumb separator'].'</span>' : '').(is_array($forum_page['crumbs'][$i]) ? '<a href="'.$forum_page['crumbs'][$i][1].'">'.forum_htmlencode($forum_page['crumbs'][$i][0]).'</a>' : forum_htmlencode($forum_page['crumbs'][$i])).'</span> ';
+				$crumbs .= '<a  href="'.$forum_page['crumbs'][$i][1].'" class="breadcrumb">'.(is_array($forum_page['crumbs'][$i]) ? forum_htmlencode($forum_page['crumbs'][$i][0]) : forum_htmlencode($forum_page['crumbs'][$i])).'</a>';
 		}
 
 	($hook = get_hook('fn_generate_crumbs_end')) ? eval($hook) : null;
@@ -1942,22 +1966,19 @@ function csrf_confirm_form()
 	($hook = get_hook('fn_csrf_confirm_form_pre_header_load')) ? eval($hook) : null;
 
 ?>
-<div id="brd-main" class="main">
-
-	<div class="main-subhead">
-		<h2 class="hn"><?php echo $lang_common['Confirm action head'] ?></h2>
-	</div>
-	<div class="main-content main-frm">
-		<div class="ct-box error-box">
-			<h2 class="warn hn"><?php echo $lang_common['CSRF token mismatch'] ?></h2>
-		</div>
+<div class="card">
+	<div class="card-content">
+            <span clas="card-title"><?php echo $lang_common['Confirm action head'] ?></span>
+		
+			<p><?php echo $lang_common['CSRF token mismatch'] ?></p>
+		
 		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo $forum_page['form_action'] ?>">
 			<div class="hidden">
 				<?php echo implode("\n\t\t\t\t", $forum_page['hidden_fields'])."\n" ?>
 			</div>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" value="<?php echo $lang_common['Confirm'] ?>" /></span>
-				<span class="cancel"><input type="submit" name="confirm_cancel" value="<?php echo $lang_common['Cancel'] ?>" /></span>
+			<div class="card-actions">
+                            <input type="submit" value="<?php echo $lang_common['Confirm'] ?>" class="btn green" />
+                            <input type="submit" name="confirm_cancel" value="<?php echo $lang_common['Cancel'] ?>"  class="btn red"/>
 			</div>
 		</form>
 	</div>
@@ -2210,7 +2231,7 @@ function error()
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Ошибка - <?php echo forum_htmlencode($forum_config['o_board_title']) ?></title>
-<link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_url ?>'/favicon.ico" />
+<link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_url ?>/favicon.ico" />
 <style>
 body {
 	background:#fff;

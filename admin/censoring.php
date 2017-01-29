@@ -6,7 +6,7 @@
  * the software when censoring is enabled.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -140,7 +140,7 @@ $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'
 // Setup breadcrumbs
 $forum_page['crumbs'] = array(
 	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-	array($lang_admin_common['Forum administration'], forum_link('admin/admin.php'))
+	array($lang_admin_common['Forum administration'], forum_link('admin/index.php'))
 );
 
 if ($forum_user['g_id'] == FORUM_ADMIN)
@@ -159,22 +159,28 @@ ob_start();
 ($hook = get_hook('acs_main_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-subhead">
-		<h2 class="hn"><span><?php echo $lang_admin_censoring['Censored word head'] ?></span></h2>
+<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/censoring.php') ?>?action=foo">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/censoring.php').'?action=foo') ?>" />
 	</div>
-	<div class="main-content main-frm">
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/censoring.php') ?>?action=foo">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/censoring.php').'?action=foo') ?>" />
-			</div>
-			<div class="ct-box" id="info-censored-intro">
-				<p><?php echo $lang_admin_censoring['Add censored word intro']; if ($forum_user['g_id'] == FORUM_ADMIN) printf(' '.$lang_admin_censoring['Add censored word extra'], '<strong><a href="'.forum_link('admin/settings.php?section=features').'">'.$lang_admin_common['Settings'].' » '.$lang_admin_common['Features'].'</a></strong>') ?></p>
-			</div>
+<div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title"><?php echo $lang_admin_censoring['Censored word head'] ?></h3>
+              <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+                  <div class="alert alert-info alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-info"></i> Info!</h4>
+                    <p><?php echo $lang_admin_censoring['Add censored word intro']; if ($forum_user['g_id'] == FORUM_ADMIN) printf(' '.$lang_admin_censoring['Add censored word extra'], '<strong><a href="'.forum_link('admin/settings.php?section=features').'">'.$lang_admin_common['Settings'].' » '.$lang_admin_common['Features'].'</a></strong>') ?></p>
+                  </div>
 			<fieldset class="frm-group frm-hdgroup group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><span><?php echo $lang_admin_censoring['Add censored word legend'] ?></span></legend>
 <?php ($hook = get_hook('acs_pre_add_word_fieldset')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?><?php echo ($forum_page['item_count'] == 1) ? ' mf-head' : ' mf-extra' ?>">
-					<legend><span><?php echo $lang_admin_censoring['Add new word legend'] ?></span></legend>
 					<div class="mf-box">
 <?php ($hook = get_hook('acs_pre_add_search_for')) ? eval($hook) : null; ?>
 						<div class="mf-field mf-field1">
@@ -186,16 +192,19 @@ ob_start();
 							<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span class="fld-label"><?php echo $lang_admin_censoring['Replacement label'] ?></span></label><br />
 							<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="new_replace_with" size="24" maxlength="60" /></span>
 						</div>
-<?php ($hook = get_hook('acs_pre_add_submit')) ? eval($hook) : null; ?>
-						<div class="mf-field">
-							<span class="submit"><input type="submit" name="add_word" value=" <?php echo $lang_admin_censoring['Add word'] ?> " /></span>
-						</div>
+
 					</div>
 <?php ($hook = get_hook('acs_pre_add_word_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
 <?php ($hook = get_hook('acs_add_word_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
-		</form>
+            </div><!-- /.box-body -->
+<?php ($hook = get_hook('acs_pre_add_submit')) ? eval($hook) : null; ?>
+		<div class="box-footer">
+			<input class="btn btn-primary" type="submit" name="add_word" value=" <?php echo $lang_admin_censoring['Add word'] ?> " />
+		</div>
+          </div>
+</form>
 <?php
 
 if (!empty($forum_censors))
@@ -204,61 +213,67 @@ if (!empty($forum_censors))
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/censoring.php') ?>?action=foo">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/censoring.php').'?action=foo') ?>" />
-			</div>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_censoring['Edit censored word legend'] ?></span></legend>
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/censoring.php') ?>?action=foo">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/censoring.php').'?action=foo') ?>" />
+	</div>
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_censoring['Edit censored word legend'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
+			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">	
 <?php
-
 	foreach ($forum_censors as $censor_key => $cur_word)
 	{
-
 	?>
 <?php ($hook = get_hook('acs_pre_edit_word_fieldset')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set mf-extra set<?php echo ++$forum_page['item_count'] ?><?php echo ($forum_page['item_count'] == 1) ? ' mf-head' : ' mf-extra' ?>">
-					<legend><span><?php echo $lang_admin_censoring['Existing censored word legend'] ?></span></legend>
-					<div class="mf-box">
+<table id="gc<?php echo ++$forum_page['group_count'] ?>" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+	<thead>
 <?php ($hook = get_hook('acs_pre_edit_search_for')) ? eval($hook) : null; ?>
-						<div class="mf-field mf-field1">
-							<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_censoring['Censored word label'] ?></span></label><br />
-							<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="search_for[<?php echo $cur_word['id'] ?>]" value="<?php echo forum_htmlencode($cur_word['search_for']) ?>" size="24" maxlength="60" /></span>
-						</div>
+		<tr role="row">
+			<th rowspan="1" colspan="1"><?php echo $lang_admin_censoring['Censored word label'] ?></th>
+			<th rowspan="1" colspan="1"><?php echo $lang_admin_censoring['Replacement label'] ?></th>
+			<th rowspan="1" colspan="1"></th>
+			<th rowspan="1" colspan="1"></th>
+		</tr>
+	</thead>
 <?php ($hook = get_hook('acs_pre_edit_replace_with')) ? eval($hook) : null; ?>
-						<div class="mf-field">
-							<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_censoring['Replacement label'] ?></span></label><br />
-							<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="replace_with[<?php echo $cur_word['id'] ?>]" value="<?php echo forum_htmlencode($cur_word['replace_with']) ?>" size="24" maxlength="60" /></span>
-						</div>
-<?php ($hook = get_hook('acs_pre_edit_submit')) ? eval($hook) : null; ?>
-						<div class="mf-field">
-							<span class="submit"><input type="submit" name="update[<?php echo $cur_word['id'] ?>]" value="<?php echo $lang_admin_common['Update'] ?>" /> <input type="submit" name="remove[<?php echo $cur_word['id'] ?>]" value="<?php echo $lang_admin_common['Delete'] ?>" /></span>
-						</div>
-					</div>
+	<tbody class="gc1">								
+		<tr role="row" class="set1 mf-head">
+			<td><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="search_for[<?php echo $cur_word['id'] ?>]" value="<?php echo forum_htmlencode($cur_word['search_for']) ?>" size="24" maxlength="60" class="form-control input-md"></td>
+			<td><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="replace_with[<?php echo $cur_word['id'] ?>]" value="<?php echo forum_htmlencode($cur_word['replace_with']) ?>" size="24" maxlength="60" class="form-control input-md"></td>
+			<td><button type="submit" name="update[<?php echo $cur_word['id'] ?>]" class="btn btn-success"><?php echo $lang_admin_common['Update'] ?></button></td>
+			<td><button type="submit" name="remove[<?php echo $cur_word['id'] ?>]" class="btn btn-danger"><?php echo $lang_admin_common['Delete'] ?></button></td>
+		</tr>
+	</tbody>
+</table>
 <?php ($hook = get_hook('acs_pre_edit_word_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
-<?php ($hook = get_hook('acs_edit_word_fieldset_end')) ? eval($hook) : null; ?>
 <?php
-
 	}
-
-?>
+?>				
+<?php ($hook = get_hook('acs_edit_word_fieldset_end')) ? eval($hook) : null; ?>
+	</div><!-- /.box-body -->
 			</fieldset>
+<?php ($hook = get_hook('acs_pre_edit_submit')) ? eval($hook) : null; ?>
 		</form>
-	</div>
+</div>
 <?php
-
 }
 else
 {
-
 ?>
-		<div class="frm-form">
-			<div class="ct-box">
-				<p><?php echo $lang_admin_censoring['No censored words'] ?></p>
-			</div>
-		</div>
-	</div>
+<div class="box ">
+	<div class="box-body">
+		<p class="lead"><?php echo $lang_admin_censoring['No censored words'] ?></p>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 }
@@ -270,4 +285,4 @@ $tpl_main = str_replace('<forum_main>', $tpl_temp, $tpl_main);
 ob_end_clean();
 // END SUBST - <forum_main>
 
-require FORUM_ROOT.'footer.php';
+require FORUM_ROOT.'admin/footer_adm.php';

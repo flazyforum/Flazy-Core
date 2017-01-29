@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
@@ -49,7 +49,9 @@ function generate_quickjump_cache($group_id = false)
 			error('Невозможно записать файл быстрого перехода в кеш каталог. Пожалуйста, убедитесь, что PHP имеет доступ на запись в папку \'cache\'.', __FILE__, __LINE__);
 
 		$output = '<?php'."\n\n".'if (!defined(\'FORUM\')) die;'."\n".'define(\'FORUM_QJ_LOADED\', 1);'."\n".'$forum_id = isset($forum_id) ? $forum_id : 0;'."\n\n".'?>';
-		$output .= '<form id="qjump" method="get" accept-charset="utf-8" action="'.$base_url.'/viewforum.php">'."\n\t".'<div class="frm-fld frm-select">'."\n\t\t".'<label for="qjump-select"><span><?php echo $lang_common[\'Jump to\'] ?>'.'</span></label><br />'."\n\t\t".'<span class="frm-input"><select id="qjump-select" name="id">'."\n";
+		$output .= '
+		<form id="qjump" method="get" accept-charset="utf-8" action="'.$base_url.'/viewforum.php">'."\n\t".'
+  <div class="input-field col s12">'."\n\t\t".'<select id="qjump-select" name="id" multiple>'."\n";
 
 		// Get the list of categories and forums from the DB
 		$query = array(
@@ -94,8 +96,8 @@ function generate_quickjump_cache($group_id = false)
 			$forum_count++;
 		}
 
-		$output .= "\t\t\t".'</optgroup>'."\n\t\t".'</select>'."\n\t\t".'<input type="submit" value="<?php echo $lang_common[\'Go\'] ?>" onclick="return Forum.doQuickjumpRedirect(forum_quickjump_url, sef_friendly_url_array);" /></span>'."\n\t".'</div>'."\n".'</form>'."\n";
-		$output .= '<script type="text/javascript">'."\n\t".'var forum_quickjump_url = "'.forum_link($forum_url['forum']).'";'."\n\t".'var sef_friendly_url_array = new Array('.$forum_db->num_rows($result).');';
+		$output .= "\t\t\t".'</optgroup>'."\n\t\t".'</select><label>'.$lang_common['Jump to'].'</label>'."\n\t\t".'<input type="submit" value="<?php echo $lang_common[\'Go\'] ?>" onclick="return Forum.doQuickjumpRedirect(forum_quickjump_url, sef_friendly_url_array);" />'."\n\t".'</div>'."\n".'</form>'."\n";
+		$output .= '<script type="text/javascript">$(document).ready(function() { $(\'select\').material_select(); }); '."\n\t".'var forum_quickjump_url = "'.forum_link($forum_url['forum']).'";'."\n\t".'var sef_friendly_url_array = new Array('.$forum_db->num_rows($result).');';
 
 		foreach ($sef_friendly_names as $forum_id => $forum_name)
 			$output .= "\n\t".'sef_friendly_url_array['.$forum_id.'] = "'.forum_htmlencode($forum_name).'";';

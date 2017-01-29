@@ -2,7 +2,7 @@
 <IfModule mod_rewrite.c>
 Options -MultiViews
 RewriteEngine On
-# Раскомментируйте и правильно настройте RewriteBase
+# Making the correct adjusments to RewriteBase
 #RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

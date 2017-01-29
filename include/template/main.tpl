@@ -1,66 +1,100 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" <forum_local>>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<forum_head>
-<forum_js>
-</head>
-<body>
-
-<forum_html_top>
-
-<div id="brd-wrap" class="brd">
-<div <forum_page>>
-
-<div id="brd-head" class="gen-content">
-	<forum_title>
-	<forum_desc>
+<!DOCTYPE html>
+<html <forum_local>>
+    <head>
+	<meta charset="utf-8">
+        <forum_head>
+        <forum_js>
+    </head>
+  <body>
+<div id="loader-wrapper">
+  <div id="loader"></div>
+  
+  <div class="loader-section section-left"></div>
+  <div class="loader-section section-right"></div>
+  
 </div>
-
-<div id="brd-navlinks" class="gen-content">
-	<forum_navlinks>
-	<forum_admod>
-</div>
-
-<div id="brd-visit" class="gen-content">
-	<forum_welcome>
-	<forum_visit>
-</div>
-
-<forum_adbox>
-<forum_guestbox>
-<forum_announcement>
-
-<div class="hr"><hr /></div>
-
-<div id="brd-main">
-	<forum_crumbs_top>
-	<forum_main_menu>
+      <forum_html_top>
+	  <main>
+			<div id="header">
+				<div class="header-primary">
+					<div class="container">
+					  <nav id="header-primary">
+						<div class="nav-wrapper">
+                                                    <forum_title>
+						  <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+						  <ul class="right hide-on-med-and-down">
+							<li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+							<li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+							<li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+						  </ul>
+						  <ul class="right hide-on-med-and-down">
+                                                      <forum_topnavlinks>
+						  </ul>
+						  <ul class="side-nav" id="nav-mobile">
+							<forum_navlinks>
+                                                        <forum_topnavlinks>
+							<li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+							<li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+							<li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+						  </ul>
+						</div>
+					  </nav>
+					</div>
+				</div>
+				<div class="header-sticky">
+				 <div class="container">
+					<!-- FAQ Dropdown -->
+					<ul id="quick_links" class="dropdown-content">
+                                            <forum_visit>
+					</ul>
+					<nav id="header-sticky">
+					  <div class="nav-wrapper">
+						<ul class="hide-on-med-and-down">
+							<li><a class="dropdown-button" href="#!" data-activates="quick_links">Quick Links<i class="material-icons left">reorder</i></a></li>
+							<forum_navlinks>
+						</ul>
+						<div class="right nav-wrapper">
+						  <form>
+							<div class="input-field">
+							  <input id="search" type="search" required>
+							  <label for="search"><i class="material-icons">search</i></label>
+							  <i class="material-icons">close</i>
+							</div>
+						  </form>
+						</div>
+					  </div>
+					</nav>
+				  </div>
+				</div>
+			</div>
+			<div class="forum">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col s12 m12 l12">
+                                        <forum_crumbs_top>					  
+                                    </div>
+                                </div>
+                                    
 	<forum_main_pagepost_top>
-	<forum_main_title>
 	<forum_main>
 	<forum_main_pagepost_end>
-	<forum_main_extra>
-	<forum_crumbs_end>
-</div>
-<forum_qpost>
-
-<forum_info>
-
-<div class="hr"><hr /></div>
-
-<div id="brd-about" class="gen-content">
-	<forum_about>
-</div>
-
-<forum_ga>
-<forum_debug>
-
-</div>
-</div>
-
-<forum_html_bottom>
-
-</body>
+	
+                                <div class="row">
+                                    <div class="col s12 m12 l12"> 
+                                        <forum_crumbs_end>
+                                    </div>
+                                </div>
+                            </div>
+			</div>
+		</main>
+		<div class="back-to-top">
+		    <button><i class="fa fa-angle-up"></i></button>
+		</div>
+		<footer class="page-footer">
+                <forum_about>
+                <forum_debug>
+		</footer>
+         <forum_ga>
+	<forum_html_bottom>
+   </body>
 </html>

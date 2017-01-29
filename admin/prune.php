@@ -2,8 +2,8 @@
 /**
  * Позволяет администраторам удалять старые темы с сайта.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -122,7 +122,7 @@ if (isset($_GET['action']) || isset($_POST['prune']) || isset($_POST['prune_comp
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Management'], forum_link('admin/reports.php')),
 		array($lang_admin_prune['Prune topics'], forum_link('admin/prune.php')),
 		$lang_admin_prune['Confirm prune heading']
@@ -171,7 +171,7 @@ if (isset($_GET['action']) || isset($_POST['prune']) || isset($_POST['prune_comp
 	ob_end_clean();
 	// END SUBST - <forum_main>
 
-	require FORUM_ROOT.'footer.php';
+	require FORUM_ROOT.'admin/footer_adm.php';
 }
 
 
@@ -183,7 +183,7 @@ else
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Management'], forum_link('admin/reports.php')),
 		array($lang_admin_common['Prune topics'], forum_link('admin/prune.php'))
 	);
@@ -200,31 +200,48 @@ else
 	($hook = get_hook('apr_main_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-subhead">
-		<h2 class="hn"><span><?php echo $lang_admin_prune['Prune settings head'] ?></span></h2>
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_prune['Prune settings head'] ?></h3>
+			<div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+            </div>
 	</div>
-	<div class="main-content main-frm">
-		<div class="ct-box">
+	<div class="box-body">
 			<p><?php echo $lang_admin_prune['Prune intro'] ?></p>
+			<div class="alert alert-danger alert-dismissable">
 			<p class="important"><?php echo $lang_admin_prune['Prune caution'] ?></p>
-		</div>
-		<div id="req-msg" class="req-warn ct-box error-box">
-			<p class="important"><?php printf($lang_admin_common['Required warn'], '<em>'.$lang_admin_common['Required'].'</em>') ?></p>
-		</div>
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/prune.php') ?>?action=foo">
+			<p class="important"><?php printf($lang_admin_common['Required warn'], '<em>'.$lang_admin_common['Required'].'</em>') ?></p></div>
+	</div><!-- /.box-body -->
+</div>
+          
+         
+<div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title"><?php echo $lang_admin_prune['Prune settings head'] ?></h3>
+              <div class="box-tools pull-right">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/prune.php') ?>?action=foo">
 			<div class="hidden">
 				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/prune.php').'?action=foo') ?>" />
 				<input type="hidden" name="form_sent" value="1" />
 			</div>
 <?php ($hook = get_hook('apr_pre_prune_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_prune['Prune legend'] ?></span></legend>
+	<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+		<legend>
+			<?php echo $lang_admin_prune['Prune legend'] ?>
+		</legend>
 <?php ($hook = get_hook('apr_pre_prune_from')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-					<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span class="fld-label"><?php echo $lang_admin_prune['Prune from'] ?></span></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="prune_from">
-							<option value="all"><?php echo $lang_admin_prune['All forums'] ?></option>
+		<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+			<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_prune['Prune from'] ?></label>
+			<div class="col-md-4">
+				<select id="fld<?php echo $forum_page['fld_count'] ?>" class="form-control" name="prune_from">
+<option value="all"><?php echo $lang_admin_prune['All forums'] ?></option>
 <?php
 
 	$query = array(
@@ -260,31 +277,41 @@ else
 
 ?>
 						</optgroup>
-						</select></span>
-					</div>
-				</div>
+					</select>
+			</div>
+		</div>
 <?php ($hook = get_hook('apr_pre_prune_days')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text required">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_prune['Days old'] ?> <em><?php echo $lang_admin_common['Required'] ?></em></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_prune_days" size="4" maxlength="4" /></span>
-					</div>
-				</div>
+		<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+			<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_prune['Days old'] ?> <em><?php echo $lang_admin_common['Required'] ?></em></label>
+			<div class="col-md-4">
+				<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_prune_days" size="4" maxlength="4" class="form-control input-md">
+			</div>
+		</div>
 <?php ($hook = get_hook('apr_pre_prune_sticky')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="prune_sticky" value="1" checked="checked" /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_prune['Prune sticky'] ?></span> <?php echo $lang_admin_prune['Prune sticky enable'] ?></label>
-					</div>
+		<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+			<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_prune['Prune sticky'] ?></label>
+			<div class="col-md-4">
+				<div class="checkbox">
+					<label for="checkboxes-0">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="prune_sticky" value="1" checked="checked">
+						<?php echo $lang_admin_prune['Prune sticky enable'] ?></label>
 				</div>
+			</div>
+		</div>
+
+			
+
 <?php ($hook = get_hook('apr_pre_prune_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('apr_prune_fieldset_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="prune" value="<?php echo $lang_admin_prune['Prune topics'] ?>" /></span>
+
+
+            </div><!-- /.box-body -->
+			<div class="box-footer">
+				<span class="submit"><input type="submit"  class="btn btn-primary" name="prune" value="<?php echo $lang_admin_prune['Prune topics'] ?>" /></span>
 			</div>
-		</form>
-	</div>
+</form>
+          </div>
 <?php
 
 	($hook = get_hook('apr_end')) ? eval($hook) : null;
@@ -294,5 +321,5 @@ else
 	ob_end_clean();
 	// END SUBST - <forum_main>
 
-	require FORUM_ROOT.'footer.php';
+	require FORUM_ROOT.'admin/footer_adm.php';
 }

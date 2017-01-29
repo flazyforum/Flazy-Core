@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -51,9 +51,10 @@ function maintenance_message()
 
 ?>
 <title><?php echo $lang_common['Maintenance mode'].$lang_common['Title separator'].forum_htmlencode($forum_config['o_board_title']) ?></title>
-<link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_url ?>'/favicon.ico" />
+<link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_url ?>/favicon.ico" />
 <?php
 
+	echo '<link rel="stylesheet" type="text/css" href="'.$base_url.'/style/base.css" />';
 	require FORUM_ROOT.'style/'.$forum_user['style'].'/'.$forum_user['style'].'.php';
 
 	$tpl_temp = forum_trim(ob_get_contents());
@@ -62,11 +63,7 @@ function maintenance_message()
 	// END SUBST - <forum_head>
 
 	// START SUBST - <forum_html_top>
-
-
-	if ($forum_config['o_html_top'])
-		$tpl_main = str_replace('<forum_html_top>', $forum_config['o_html_top_message'], $tpl_main);
-
+	$tpl_main = str_replace('<forum_html_top>', ($forum_config['o_html_top'] && !defined('FORUM_DISABLE_HTML') ? $forum_config['o_html_top_message'] : ''), $tpl_main);
 	// END SUBST - <forum_html_top>
 
 	// START SUBST - <forum_maint_main>
@@ -80,10 +77,9 @@ function maintenance_message()
 	</div>
 	<div class="main-content main-message">
 		<div class="ct-box user-box">
-			<?php echo $message."\n" ?>
+			<p><?php echo $message."\n" ?></p>
 		</div>
 	</div>
-
 </div>
 <?php
 
@@ -114,14 +110,9 @@ function maintenance_message()
 	// START SUBST - <forum_html_bottom>
 	ob_start();
 
-	if ($forum_config['o_html_bottom'])
-		$tpl_main = str_replace('<forum_html_bottom>', $forum_config['o_html_bottom_message'], $tpl_main);
+	$tpl_main = str_replace('<forum_html_bottom>', ($forum_config['o_html_bottom'] && !defined('FORUM_DISABLE_HTML') ? $forum_config['o_html_bottom_message'] : ''), $tpl_main);
 
-	$tpl_temp = ob_get_contents();
-	$tpl_main = str_replace('<forum_html_bottom>', $tpl_temp, $tpl_main);
-	ob_end_clean();
-	// END SUBST - <forum_html_bottom>
-
+	$tpl_main = str_replace('<forum_ga>', ($forum_config['o_google_analytics'] ? '<script type="text/javascript">var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");document.write(unescape("%3Cscript src=\'" + gaJsHost + "google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E"));</script><script type="text/javascript">var pageTracker = _gat._getTracker("'.$forum_config['o_google_analytics'].'");pageTracker._trackPageview();</script>' : ''), $tpl_main);
 
 	// Close the db connection (and free up any result data)
 	$forum_db->close();

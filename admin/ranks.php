@@ -4,8 +4,8 @@
  *
  * Allows administrators to control the tags given to posters based on their post count
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -169,7 +169,7 @@ $forum_page['fld_count'] = $forum_page['item_count'] = $forum_page['group_count'
 // Setup breadcrumbs
 $forum_page['crumbs'] = array(
 	array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-	array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+	array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 	array($lang_admin_common['Users'], forum_link('admin/users.php')),
 	array($lang_admin_common['Ranks'], forum_link('admin/ranks.php'))
 );
@@ -301,4 +301,4 @@ $tpl_main = str_replace('<forum_main>', $tpl_temp, $tpl_main);
 ob_end_clean();
 // END SUBST - <forum_main>
 
-require FORUM_ROOT.'footer.php';
+require FORUM_ROOT.'admin/footer_adm.php';

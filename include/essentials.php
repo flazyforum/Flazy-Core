@@ -3,7 +3,7 @@
  * Загрузка данных (например: функции, база данных, конфигурационные данные, и т.д.), необходимые для работы форума.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
@@ -16,13 +16,8 @@ if (!defined('FORUM_ROOT'))
 }
 
 // Define the version and database revision that this code was written for
-define('FORUM_VERSION', '0.7');
-define('FORUM_DB_REVISION', '13');
-
-// If we have the 1.2 constant defined, define the proper 1.3 constant so we don't get
-// an incorrect "need to install" message
-if (defined('FORUM'))
-	define('FORUM', 1);
+define('FORUM_VERSION', '0.7.2');
+define('FORUM_DB_REVISION', '13.2');
 
 // Загрузить скрипт с функциями
 require FORUM_ROOT.'include/functions/common.php';
@@ -78,7 +73,8 @@ else
 // Устанавливаем локаль для функций преобразования строк
 setlocale(LC_CTYPE, 'C');
 
-date_default_timezone_set('UTC');
+if(function_exists('date_default_timezone_set'))
+	date_default_timezone_set('UTC');
 
 // Construct REQUEST_URI if it isn't set (or if it's set improperly)
 if (!isset($_SERVER['REQUEST_URI']) || (!empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['REQUEST_URI'], '?') === false))
@@ -145,6 +141,10 @@ if (!isset($base_url))
 
 	$base_url = $base_url_guess;
 }
+
+// For sqlite "show dot" options always disabled
+if ($db_type == 'sqlite')
+	$forum_config['o_show_dot'] = '0';
 
 // Define a few commonly used constants
 define('FORUM_UNVERIFIED', 0);

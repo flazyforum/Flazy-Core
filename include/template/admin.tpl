@@ -1,55 +1,59 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" <forum_local>>
+<!DOCTYPE html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<forum_head>
-<forum_js>
+<forum_head_admin>
+    <forum_css>
+    <forum_js>
 </head>
-<body>
-
-<div id="brd-wrap" class="brd">
-<div <forum_page>>
-
-<div id="brd-head" class="gen-content">
-	<forum_skip>
-	<forum_title>
-	<forum_desc>
-</div>
-
-<div id="brd-navlinks" class="gen-content">
-	<forum_navlinks>
-	<forum_admod>
-</div>
-
-<div id="brd-visit" class="gen-content">
-	<forum_welcome>
-	<forum_visit>
-</div>
-
-<div class="hr"><hr /></div>
-
-<div id="brd-main">
-	<forum_crumbs_top>
-	<forum_main_pagepost_top>
-	<forum_admin_menu>
-	<forum_admin_submenu>
-	<forum_main>
-	<forum_main_pagepost_end>
-	<forum_crumbs_end>
-</div>
-
-<div class="hr"><hr /></div>
-
-<div id="brd-about" class="gen-content">
+<body class="skin-blue layout-boxed sidebar-mini">
+	<div class="wrapper">
+<header class="main-header">
+        	<!-- Logo -->
+       		 <a href="#" class="logo">
+          	<!-- mini logo for sidebar mini 50x50 pixels -->
+          		<span class="logo-mini"><forum_title_admin></span>
+          	<!-- logo for regular state and mobile devices -->
+          		<span class="logo-lg"><forum_title_admin></span>
+       		 </a>
+			<!-- Logo END -->
+	<nav class="navbar navbar-static-top" role="navigation">
+		<!-- Sidebar toggle button-->
+		<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a>
+		<div class="navbar-custom-menu">
+			<ul class="nav navbar-nav">
+				<li>
+					<forum_navlinks_admins>
+				</li>
+			</ul>
+		</div>
+	</nav>
+</header>
+<aside class="main-sidebar">
+	<!-- sidebar: style can be found in sidebar.less -->
+	<section class="sidebar" style="height: auto;">
+		<!-- sidebar menu: : style can be found in sidebar.less -->
+				<forum_admin_menu>
+	</section>
+	<!-- /.sidebar -->
+</aside>
+	<div class="content-wrapper">
+		<section class="content-header">
+			<forum_crumbs_top_admin>
+		</section>
+		<hr>
+		<section class="content">
+			<forum_main_pagepost_top>
+			<forum_main>
+			<forum_main_pagepost_end>
+		</section>	
+	</div>
+<footer class="main-footer">
 	<forum_about>
+	<forum_debug>
+	<forum_ga>
+</footer>
 </div>
-
-<forum_ga>
-<forum_debug>
-
-</div>
-</div>
-
+    <forum_js>
 </body>
 </html>

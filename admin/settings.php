@@ -4,22 +4,24 @@
  *
  * Allows administrators to control many of the settings used in the site.
  *
- * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2013-2015 Flazy.us
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
 
 
-if (!defined('FORUM_ROOT'))
-	define('FORUM_ROOT', '../');
+if (!defined('FORUM_ROOT')) {
+    define('FORUM_ROOT', '../');
+}
 require FORUM_ROOT.'include/common.php';
 require FORUM_ROOT.'include/functions/admin.php';
 
 ($hook = get_hook('aop_start')) ? eval($hook) : null;
 
-if ($forum_user['g_id'] != FORUM_ADMIN)
-	message($lang_common['No permission']);
+if ($forum_user['g_id'] != FORUM_ADMIN) {
+    message($lang_common['No permission'], false, '403 Forbidden');
+}
 
 // Load the admin.php language file
 require FORUM_ROOT.'lang/'.$forum_user['language'].'/admin_common.php';
@@ -40,10 +42,11 @@ if (isset($_POST['form_sent']))
 		{
 			($hook = get_hook('aop_setup_validation')) ? eval($hook) : null;
 
-			if ($form['board_title'] == '')
-				message($lang_admin_settings['Error no board title']);
+			if ($form['board_title'] == '') {
+                    message($lang_admin_settings['Error no board title']);
+                }
 
-			// Clean default_lang, default_style, and sef
+                // Clean default_lang, default_style, and sef
 			$form['default_style'] = preg_replace('#[\.\\\/]#', '', $form['default_style']);
 			$forced_style = preg_replace('#[\.\\\/]#', '', $form['forced_style']);
 			$form['default_lang'] = preg_replace('#[\.\\\/]#', '', $form['default_lang']);
@@ -51,40 +54,68 @@ if (isset($_POST['form_sent']))
 			$form['sef'] = preg_replace('#[\.\\\/]#', '', $form['sef']);
 
 			// Make sure default_lang, default_style, and sef exist
-			if (!file_exists(FORUM_ROOT.'style/'.$form['default_style'].'/'.$form['default_style'].'.php'))
-				message($lang_common['Bad request']);
-			if (!file_exists(FORUM_ROOT.'style/'.$forced_style.'/'.$forced_style.'.php') && $forced_style = '')
-				message($lang_common['Bad request']);
-			if (!file_exists(FORUM_ROOT.'lang/'.$form['default_lang'].'/common.php'))
-				message($lang_common['Bad request']);
-			if (!file_exists(FORUM_ROOT.'lang/'.$forced_lang.'/common.php') && $forced_lang = '')
-				message($lang_common['Bad request']);
-			if (!file_exists(FORUM_ROOT.'include/url/'.$form['sef'].'/forum_urls.php'))
-				message($lang_common['Bad request']);
+			if (!file_exists(FORUM_ROOT . 'style/' . $form['default_style'] . '/' . $form['default_style'] . '.php')) {
+                    message($lang_common['Bad request'], false, '404 Not Found');
+                }
+                if (!file_exists(FORUM_ROOT . 'style/' . $forced_style . '/' . $forced_style . '.php') && $forced_style = '') {
+                    message($lang_common['Bad request'], false, '404 Not Found');
+                }
+                if (!file_exists(FORUM_ROOT . 'lang/' . $form['default_lang'] . '/common.php')) {
+                    message($lang_common['Bad request'], false, '404 Not Found');
+                }
+                if (!file_exists(FORUM_ROOT . 'lang/' . $forced_lang . '/common.php') && $forced_lang = '') {
+                    message($lang_common['Bad request'], false, '404 Not Found');
+                }
+                if (!file_exists(FORUM_ROOT . 'include/url/' . $form['sef'] . '/forum_urls.php')) {
+                    message($lang_common['Bad request'], false, '404 Not Found');
+                }
 
-			if (!isset($form['user_style']) || $form['user_style'] != '1') $form['user_style'] = '0';
+                if (!isset($form['user_style']) || $form['user_style'] != '1') {
+                    $form['user_style'] = '0';
+                }
 
-			if (!isset($form['default_dst']) || $form['default_dst'] != '1')
-				$form['default_dst'] = '0';
+                if (!isset($form['default_dst']) || $form['default_dst'] != '1') {
+                    $form['default_dst'] = '0';
+                }
 
-			$form['timeout_visit'] = intval($form['timeout_visit']);
+                $form['timeout_visit'] = intval($form['timeout_visit']);
 			$form['timeout_online'] = intval($form['timeout_online']);
 			$form['redirect_delay'] = intval($form['redirect_delay']);
 
-			if ($form['timeout_online'] >= $form['timeout_visit'])
-				message($lang_admin_settings['Error timeout value']);
+			if ($form['timeout_online'] >= $form['timeout_visit']) {
+                    message($lang_admin_settings['Error timeout value']);
+                }
 
-			if ($form['disp_topics_default'] != '' && intval($form['disp_topics_default']) < 3) $form['disp_topics_default'] = 3;
-			if ($form['disp_topics_default'] != '' && intval($form['disp_topics_default']) > 75) $form['disp_topics_default'] = 75;
-			if ($form['disp_posts_default'] != '' && intval($form['disp_posts_default']) < 3) $form['disp_posts_default'] = 3;
-			if ($form['disp_posts_default'] != '' && intval($form['disp_posts_default']) > 75) $form['disp_posts_default'] = 75;
+                if ($form['disp_topics_default'] != '' && intval($form['disp_topics_default']) < 3) {
+                    $form['disp_topics_default'] = 3;
+                }
+                if ($form['disp_topics_default'] != '' && intval($form['disp_topics_default']) > 75) {
+                    $form['disp_topics_default'] = 75;
+                }
+                if ($form['disp_posts_default'] != '' && intval($form['disp_posts_default']) < 3) {
+                    $form['disp_posts_default'] = 3;
+                }
+                if ($form['disp_posts_default'] != '' && intval($form['disp_posts_default']) > 75) {
+                    $form['disp_posts_default'] = 75;
+                }
 
-			if (!isset($form['report_enabled']) || $form['report_enabled'] != '1') $form['report_enabled'] = '0';
+                if (!isset($form['report_enabled']) || $form['report_enabled'] != '1') {
+                    $form['report_enabled'] = '0';
+                }
 
-			if ($form['additional_navlinks'] != '')
-				$form['additional_navlinks'] = forum_trim(forum_linebreaks($form['additional_navlinks']));
+                if ($form['additional_navlinks'] != '') {
+                    $form['additional_navlinks'] = forum_trim(forum_linebreaks($form['additional_navlinks']));
+                }
 
-			if ($forced_style != '')
+                if ($form['useful_links'] != '') {
+                    $form['useful_links'] = forum_trim(forum_linebreaks($form['useful_links']));
+                }
+
+                if ($form['social_links'] != '') {
+                    $form['social_links'] = forum_trim(forum_linebreaks($form['social_links']));
+                }
+
+                if ($forced_style != '')
 			{
 				$query = array(
 					'UPDATE'	=> 'users',
@@ -262,7 +293,6 @@ if (isset($_POST['form_sent']))
 				$form['externbox_message'] = $lang_admin_settings['HTML message default'];
 
 			break;
-
 		}
 
 		case 'registration':
@@ -282,7 +312,7 @@ if (isset($_POST['form_sent']))
 
 			if (!isset($form['spam_ip']) || $form['spam_ip'] != '1') $form['spam_ip'] = '0';
 			if (!isset($form['spam_email']) || $form['spam_email'] != '1') $form['spam_email'] = '0';
-			if (!isset($form['spam_name']) || $form['spam_name'] != '1') $form['spam_name'] = '0';
+			if (!isset($form['spam_username']) || $form['spam_username'] != '1') $form['spam_username'] = '0';
 
 			if (!isset($form['rules']) || $form['rules'] != '1') $form['rules'] = '0';
 
@@ -443,7 +473,7 @@ if (!$section || $section == 'setup')
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Settings'], forum_link('admin/settings.php?section=setup')),
 		array($lang_admin_common['Setup'], forum_link('admin/settings.php?section=setup')) 
 	);
@@ -462,46 +492,56 @@ if (!$section || $section == 'setup')
 	($hook = get_hook('aop_setup_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content main-frm">
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=setup') ?>">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=setup')) ?>" />
-				<input type="hidden" name="form_sent" value="1" />
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=setup') ?>">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=setup')) ?>" />
+		<input type="hidden" name="form_sent" value="1" />
+	</div>
+	<div class="box ic">
+		<div class="box-header with-border">
+			<h3 class="box-title"><?php echo $lang_admin_settings['Setup personal'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+			<div class="box-tools pull-right">
+				<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+					<i class="fa fa-minus"></i>
+				</button>
+				<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+					<i class="fa fa-times"></i>
+				</button>
 			</div>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup personal'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+		</div>
+		<div class="box-body">
 <?php ($hook = get_hook('aop_setup_pre_personal_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup personal legend'] ?></strong></legend>
-<?php ($hook = get_hook('aop_setup_pre_board_title')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>">
-							<span><?php echo $lang_admin_settings['Board title label'] ?></span>
-						</label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[board_title]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_board_title']) ?>" /></span>
+			<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+				<legend>
+					<?php echo $lang_admin_settings['Setup personal legend'] ?>
+				</legend>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Board title label'] ?></label>
+					<div class="col-md-4">
+						<input id="fld<?php echo $forum_page['fld_count'] ?>" name="form[board_title]" size="50" maxlength="70" value="<?php echo forum_htmlencode($forum_config['o_board_title']) ?>" class="form-control input-md">
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_board_descrip')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>">
-							<span><?php echo $lang_admin_settings['Board description label'] ?></span>
-						</label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[board_desc]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_board_desc']) ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Board description label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[board_desc]" size="50" maxlength="160" value="<?php echo forum_htmlencode($forum_config['o_board_desc']) ?>" class="form-control input-md">
+					</div>
+				</div>
+<?php ($hook = get_hook('aop_setup_pre_board_keywords')) ? eval($hook) : null; ?>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Board keywords label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[board_keywords]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_board_keywords']) ?>" class="form-control input-md">
+						<span class="help-block"><?php echo $lang_admin_settings['Board keywords help'] ?></span>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_default_style')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>">
-							<span><?php echo $lang_admin_settings['Default style label'] ?></span>
-						</label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[default_style]">
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Default style label'] ?></label>
+					<div class="col-md-4">
+						<select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[default_style]" class="form-control">
 <?php
-
 	$styles = get_style_packs();
 	foreach ($styles as $temp)
 	{
@@ -510,18 +550,15 @@ if (!$section || $section == 'setup')
 		else
 			echo "\t\t\t\t\t\t\t".'<option value="'.$temp.'">'.forum_htmlencode(str_replace('_', ' ', $temp)).'</option>'."\n";
 	}
-
 ?>
-						</select></span>
+						</select>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_setup_pre_forced_style')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>">
-							<span><?php echo $lang_admin_settings['Forced style'] ?></span><small><?php echo $lang_admin_settings['Forced style help'] ?></small>
-						</label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[forced_style]">
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Forced style help'] ?></label>
+					<div class="col-md-4">
+						<select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[forced_style]" class="form-control">
 							<option value="" selected="selected"><?php echo $lang_admin_settings['Select'] ?></option>
 <?php
 
@@ -532,18 +569,26 @@ if (!$section || $section == 'setup')
 	}
 
 ?>
-						</select></span>
+						</select>
+						
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_user_style')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[user_style]" value="1" <?php if ($forum_config['o_user_style'] == 1) echo 'checked="checked" ' ?>/></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['User style'] ?></span> <?php echo $lang_admin_settings['User style help'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['User style'] ?></label>
+					<div class="col-md-4">
+						<div class="checkbox">
+							<label for="checkboxes-0">
+								<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[user_style]" value="1" <?php if ($forum_config['o_user_style'] == 1) echo 'checked="checked" ' ?>
+							</label>
+							<span class="help-block"><?php echo $lang_admin_settings['User style help'] ?></span>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_personal_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+		</div><!-- /.box-body -->
+	</div>
 <?php
 
 	($hook = get_hook('aop_setup_personal_fieldset_end')) ? eval($hook) : null;
@@ -552,18 +597,28 @@ if (!$section || $section == 'setup')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup local'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup local'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_setup_pre_local_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup local legend'] ?></strong></legend>
-<?php ($hook = get_hook('aop_setup_pre_default_language')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Default language label'] ?></span><small><?php echo $lang_admin_settings['Default language help'] ?></small></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[default_lang]">
+		<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+			<legend>
+<?php echo $lang_admin_settings['Setup local legend'] ?>
+			</legend>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Default language label'] ?></label>
+				<div class="col-md-4">
+					<select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[default_lang]"  class="form-control">
 <?php
 
 		$languages = get_language_packs();
@@ -579,15 +634,16 @@ if (!$section || $section == 'setup')
 		require FORUM_ROOT.'lang/'.$forum_user['language'].'/profile.php';
 
 ?>
-						</select></span>
-					</div>
+						</select>
+					<span class="help-block"><?php echo $lang_admin_settings['Default language help'] ?></span>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_default_language')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Forced language'] ?></span><small><?php echo $lang_admin_settings['Forced language help'] ?></small></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[forced_lang]">
-							<option value="" selected="selected"><?php echo $lang_admin_settings['Select'] ?></option>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>">Select Basic</label>
+				<div class="col-md-4">
+					<select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[forced_lang]">
+						<option value="" selected="selected"><?php echo $lang_admin_settings['Select'] ?></option>
 <?php
 
 		$languages = get_language_packs();
@@ -600,14 +656,14 @@ if (!$section || $section == 'setup')
 		require FORUM_ROOT.'lang/'.$forum_user['language'].'/profile.php';
 
 ?>
-						</select></span>
-					</div>
+					</select>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_forced_timezone')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Default timezone label'] ?></span></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[default_timezone]">
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Default timezone label'] ?></label>
+				<div class="col-md-4">
+						<select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[default_timezone]"class="form-control">
 							<option value="-12"<?php if ($forum_config['o_default_timezone'] == -12) echo ' selected="selected"' ?>><?php echo $lang_profile['UTC-12:00'] ?></option>
 							<option value="-11"<?php if ($forum_config['o_default_timezone'] == -11) echo ' selected="selected"' ?>><?php echo $lang_profile['UTC-11:00'] ?></option>
 							<option value="-10"<?php if ($forum_config['o_default_timezone'] == -10) echo ' selected="selected"' ?>><?php echo $lang_profile['UTC-10:00'] ?></option>
@@ -647,32 +703,41 @@ if (!$section || $section == 'setup')
 							<option value="12.75"<?php if ($forum_config['o_default_timezone'] == 12.75) echo ' selected="selected"' ?>><?php echo $lang_profile['UTC+12:45'] ?></option>
 							<option value="13"<?php if ($forum_config['o_default_timezone'] == 13) echo ' selected="selected"' ?>><?php echo $lang_profile['UTC+13:00'] ?></option>
 							<option value="14"<?php if ($forum_config['o_default_timezone'] == 14) echo ' selected="selected"' ?>><?php echo $lang_profile['UTC+14:00'] ?></option>
-						</select></span>
-					</div>
+						</select>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_default_dst')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_dst]" value="1" <?php if ($forum_config['o_default_dst'] == 1) echo 'checked="checked" ' ?>/></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Adjust for DST'] ?></span> <?php echo $lang_admin_settings['DST label'] ?></label>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Adjust for DST'] ?></label>
+				<div class="col-md-4">
+					<div class="checkbox">
+						<label for="checkboxes-0">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_dst]" value="1" <?php if ($forum_config['o_default_dst'] == 1) echo 'checked="checked" ' ?>>
+						</label>
+						<span class="help-block"><?php echo $lang_admin_settings['DST label'] ?></span>
 					</div>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_time_format')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Time format label'] ?></span><small><?php printf($lang_admin_settings['Current format'], format_time(time(), 2, null, $forum_config['o_time_format']), $lang_admin_settings['External format help']) ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[time_format]" size="25" maxlength="25" value="<?php echo forum_htmlencode($forum_config['o_time_format']) ?>" /></span>
-					</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Time format label'] ?></label>
+				<div class="col-md-4">
+					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[time_format]" size="25" maxlength="25" value="<?php echo forum_htmlencode($forum_config['o_time_format']) ?>" class="form-control input-md">
+					<span class="help-block"><?php printf($lang_admin_settings['Current format'], format_time(time(), 2, null, $forum_config['o_time_format']), $lang_admin_settings['External format help']) ?></span>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_date_format')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Date format label'] ?></span><small><?php printf($lang_admin_settings['Current format'], format_time(time(), 1, $forum_config['o_date_format'], null, true), $lang_admin_settings['External format help']) ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[date_format]" size="25" maxlength="25" value="<?php echo forum_htmlencode($forum_config['o_date_format']) ?>" /></span>
-					</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Date format label'] ?></label>
+				<div class="col-md-4">
+					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[date_format]" size="25" maxlength="25" value="<?php echo forum_htmlencode($forum_config['o_date_format']) ?>" class="form-control input-md">
+					<span class="help-block"><?php printf($lang_admin_settings['Current format'], format_time(time(), 1, $forum_config['o_date_format'], null, true), $lang_admin_settings['External format help']) ?></span>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_local_fieldset_end')) ? eval($hook) : null; ?>
-			</fieldset>
+		</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_setup_local_fieldset_end')) ? eval($hook) : null;
@@ -681,36 +746,52 @@ if (!$section || $section == 'setup')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup timeouts'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup timeouts'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_setup_pre_timeouts_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup timeouts legend'] ?></strong></legend>
+			<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+				<legend>
+<?php echo $lang_admin_settings['Setup timeouts legend'] ?>
+				</legend>
 <?php ($hook = get_hook('aop_setup_pre_visit_timeout')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Visit timeout label'] ?></span><small><?php echo $lang_admin_settings['Visit timeout help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[timeout_visit]" size="5" maxlength="5" value="<?php echo $forum_config['o_timeout_visit'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Visit timeout label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[timeout_visit]" size="5" maxlength="5" value="<?php echo $forum_config['o_timeout_visit'] ?>" class="form-control input-md">
+						<span class="help-block"><?php echo $lang_admin_settings['Visit timeout help'] ?></span>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_online_timeout')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Online timeout label'] ?></span><small><?php echo $lang_admin_settings['Online timeout help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[timeout_online]" size="5" maxlength="5" value="<?php echo $forum_config['o_timeout_online'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Online timeout label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[timeout_online]" size="5" maxlength="5" value="<?php echo $forum_config['o_timeout_online'] ?>" class="form-control input-md">
+						<span class="help-block"><?php echo $lang_admin_settings['Online timeout help'] ?></span>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_redirect_time')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Redirect time label'] ?></span><small><?php echo $lang_admin_settings['Redirect time help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[redirect_delay]" size="5" maxlength="5" value="<?php echo $forum_config['o_redirect_delay'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Redirect time label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[redirect_delay]" size="5" maxlength="5" value="<?php echo $forum_config['o_redirect_delay'] ?>" class="form-control input-md">
+						<span class="help-block"><?php echo $lang_admin_settings['Redirect time help'] ?></span>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_timeouts_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_setup_timeouts_fieldset_end')) ? eval($hook) : null;
@@ -719,36 +800,50 @@ if (!$section || $section == 'setup')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup pagination'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
-<?php ($hook = get_hook('aop_setup_pre_pagination_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup pagination legend'] ?></strong></legend>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup pagination'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+<?php ($hook = get_hook('aop_setup_pre_timeouts_fieldset')) ? eval($hook) : null; ?>
+			<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+				<legend>
+<?php echo $lang_admin_settings['Setup pagination legend'] ?>
+				</legend>
 <?php ($hook = get_hook('aop_setup_pre_topics_per_page')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Topics per page label'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[disp_topics_default]" size="3" maxlength="3" value="<?php echo $forum_config['o_disp_topics_default'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Topics per page label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[disp_topics_default]" size="3" maxlength="3" value="<?php echo $forum_config['o_disp_topics_default'] ?>" class="form-control input-md">
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_posts_per_page')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Posts per page label'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[disp_posts_default]" size="3" maxlength="3" value="<?php echo $forum_config['o_disp_posts_default'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Posts per page label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[disp_posts_default]" size="3" maxlength="3" value="<?php echo $forum_config['o_disp_posts_default'] ?>" class="form-control input-md">
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_topic_review')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box frm-short text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Topic review label'] ?></span><small><?php echo $lang_admin_settings['Topic review help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[topic_review]" size="3" maxlength="3" value="<?php echo $forum_config['o_topic_review'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Topic review label'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[topic_review]" size="3" maxlength="3" value="<?php echo $forum_config['o_topic_review'] ?>"  class="form-control input-md">
+						<span class="help-block"><?php echo $lang_admin_settings['Topic review help'] ?></span>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_setup_pre_pagination_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_setup_pagination_fieldset_end')) ? eval($hook) : null;
@@ -757,39 +852,77 @@ if (!$section || $section == 'setup')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup reports'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup reports'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_setup_pre_reports_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup reports legend'] ?></strong></legend>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_enabled]" value="1" <?php if ($forum_config['o_report_enabled']) echo 'checked="checked" ' ?>/></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Report enabled'] ?></span> <?php echo $lang_admin_settings['Report enabled help'] ?></label>
-					</div>
+			<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+				<legend>
+<?php echo $lang_admin_settings['Setup reports legend'] ?>
+				</legend>
+<?php ($hook = get_hook('aop_setup_pre_url_scheme')) ? eval($hook) : null; ?>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				 	<div class="col-md-6">
+						<div class="checkbox">
+                        	<label>
+                         	 <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_enabled]" value="1" <?php if ($forum_config['o_report_enabled']) echo 'checked="checked" ' ?>
+<?php echo $lang_admin_settings['Report enabled'] ?><small><?php echo $lang_admin_settings['Report enabled help'] ?></small>
+                       		</label>
+                      	</div>
+                	</div>
 				</div>
-				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_admin_settings['Reporting method'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_method]" value="0"<?php if ($forum_config['o_report_method'] == '0') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Report internal label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_method]" value="1"<?php if ($forum_config['o_report_method']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Report email label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_method]" value="2"<?php if ($forum_config['o_report_method'] == '2') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Report both label'] ?></label>
-						</div>
+				
+				<fieldset class="ic<?php echo ++$forum_page['item_count'] ?>">
+					<legend>
+<?php echo $lang_admin_settings['Reporting method'] ?>
+					</legend>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				  <div class="col-md-6">
+					<div class="radio">
+                        <label>
+                          <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_method]" value="0"<?php if ($forum_config['o_report_method'] == '0') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Report internal label'] ?>
+                        </label>
+                      </div>
+                  </div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				  <div class="col-md-6">
+					<div class="radio">
+                        <label>
+                          <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_method]" value="1"<?php if ($forum_config['o_report_method']) echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Report email label'] ?>
+                        </label>
+                      </div>
+                   </div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				  <div class="col-md-6">
+					<div class="radio">
+                        <label>
+                         <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[report_method]" value="2"<?php if ($forum_config['o_report_method'] == '2') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Report both label'] ?>
+                        </label>
+                      </div>
+                  </div>
+				</div>
 <?php ($hook = get_hook('aop_setup_new_reporting_method')) ? eval($hook) : null; ?>
-					</div>
 				</fieldset>
-<?php ($hook = get_hook('aop_setup_pre_reports_fieldset_end')) ? eval($hook) : null; ?>
+<?php ($hook = get_hook('aop_setup_pre_pagination_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_setup_reports_fieldset_end')) ? eval($hook) : null;
@@ -798,21 +931,32 @@ if (!$section || $section == 'setup')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup URL'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
-			<div class="ct-box">
-				<p class="warn"><?php echo $lang_admin_settings['URL scheme info'] ?></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup reports'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<div class="callout callout-warning">
+<?php echo $lang_admin_settings['URL scheme info']?>
+		</div>
 <?php ($hook = get_hook('aop_setup_pre_url_scheme_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup URL legend'] ?></strong></legend>
+		<fieldset>
+			<legend>
+<?php echo $lang_admin_settings['Setup URL legend'] ?>
+			</legend>
 <?php ($hook = get_hook('aop_setup_pre_url_scheme')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['URL scheme label'] ?></span><small><?php echo $lang_admin_settings['URL scheme help'] ?></small></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[sef]">
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['URL scheme label'] ?></label>
+				<div class="col-md-4">
+					<select id="fld<?php echo $forum_page['fld_count'] ?>" name="form[sef]" class="form-control">
 <?php
 
 		$url_schemes = get_scheme_packs();
@@ -825,11 +969,14 @@ if (!$section || $section == 'setup')
 		}
 
 ?>
-						</select></span>
-					</div>
+						</select>
+					<span class="help-block"><?php echo $lang_admin_settings['URL scheme help'] ?></span>
 				</div>
+			</div>
 <?php ($hook = get_hook('aop_setup_pre_url_scheme_fieldset_end')) ? eval($hook) : null; ?>
-			</fieldset>
+		</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_setup_url_scheme_fieldset_end')) ? eval($hook) : null;
@@ -838,31 +985,107 @@ if (!$section || $section == 'setup')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Setup links'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
-			<div class="ct-box">
-				<p class="warn"><?php echo $lang_admin_settings['Setup links info'] ?></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup links'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<div class="callout callout-info">
+<?php echo $lang_admin_settings['Setup links info'] ?>
+		</div>
 <?php ($hook = get_hook('aop_setup_pre_links_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Setup links legend'] ?></strong></legend>
+		<fieldset>
+			<legend>
+<?php echo $lang_admin_settings['Setup links legend'] ?>
+			</legend>
 <?php ($hook = get_hook('aop_setup_pre_additional_navlinks')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enter links label'] ?></span></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[additional_navlinks]" rows="3" cols="55"><?php echo forum_htmlencode($forum_config['o_additional_navlinks']) ?></textarea></span></div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enter links label'] ?></label>
+ 					 <div class="col-md-4">                     
+    					<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[additional_navlinks]" rows="3" cols="55"><?php echo forum_htmlencode($forum_config['o_additional_navlinks']) ?></textarea>
+  					</div>
+			</div>
+<?php ($hook = get_hook('aop_setup_pre_links_fieldset_end')) ? eval($hook) : null; ?>
+		</fieldset>
+	</div><!-- /.box-body -->
+	
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Setup footer'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+<?php ($hook = get_hook('aop_setup_pre_footer_fieldset')) ? eval($hook) : null; ?>
+		<fieldset>
+			<legend>
+<?php echo $lang_admin_settings['About us'] ?>
+			</legend>
+<?php ($hook = get_hook('aop_setup_pre_about_us_footer_menu')) ? eval($hook) : null; ?>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['About us'] ?></label>
+					<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[about_us]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_about_us']) ?>" class="form-control input-md">
 					</div>
 				</div>
-<?php ($hook = get_hook('aop_setup_pre_links_fieldset_end')) ? eval($hook) : null; ?>
-			</fieldset>
-<?php ($hook = get_hook('aop_setup_links_fieldset_end')) ? eval($hook) : null; ?>
-			<div id="buttons" class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" /></span>
+<?php ($hook = get_hook('aop_setup_pre_useful_links_footer_menu')) ? eval($hook) : null; ?>
+
+			<legend>
+<?php echo $lang_admin_settings['Useful links'] ?>
+			</legend>
+		<div class="callout callout-info">
+<?php echo $lang_admin_settings['Useful links help'] ?>
+		</div>
+<?php ($hook = get_hook('aop_setup_pre_additional_footer_menu')) ? eval($hook) : null; ?>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Useful links'] ?></label>
+ 					 <div class="col-md-4">                     
+    					<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[useful_links]" rows="3" cols="55"><?php echo forum_htmlencode($forum_config['o_useful_links']) ?></textarea>
+  					</div>
 			</div>
-		</form>
+			<hr>
+<?php ($hook = get_hook('aop_setup_pre_social_links_footer_menu')) ? eval($hook) : null; ?>
+			<legend>
+<?php echo $lang_admin_settings['Social links'] ?>
+			</legend>
+		<div class="callout callout-info">
+<?php echo $lang_admin_settings['Social links help'] ?>
+		</div>
+<?php ($hook = get_hook('aop_setup_pre_additional_footer_menu')) ? eval($hook) : null; ?>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+				<label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Social links'] ?></label>
+ 					 <div class="col-md-4">                     
+    					<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[social_links]" rows="3" cols="55"><?php echo forum_htmlencode($forum_config['o_social_links']) ?></textarea>
+  					</div>
+			</div>
+<?php ($hook = get_hook('aop_setup_pre_footer_fieldset_end')) ? eval($hook) : null; ?>
+		</fieldset>
+	</div><!-- /.box-body -->	
+
+
+	<div class="box-footer">
+		<div class="form-group">
+			<div id="buttons" class="col-md-4">
+				<input type="submit"  class="btn btn-primary" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" />
+			</div>
+		</div>
 	</div>
+		</form>
+</div>
 <?php
 
 }
@@ -875,7 +1098,7 @@ else if ($section == 'features')
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Settings'], forum_link('admin/settings.php?section=setup')),
 		array($lang_admin_common['Features'], forum_link('admin/settings.php?section=features'))
 	);
@@ -892,91 +1115,173 @@ else if ($section == 'features')
 	($hook = get_hook('aop_features_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content main-frm">
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=features') ?>">
+		<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=features') ?>">
 			<div class="hidden">
 				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=features')) ?>" />
 				<input type="hidden" name="form_sent" value="1" />
 			</div>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features general'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features general'] ?><small> <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_features_pre_general_fieldset')) ? eval($hook) : null; ?>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Features general legend'] ?></strong></legend>
+			<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
+				<legend><?php echo $lang_admin_settings['Features general legend'] ?></legend>
 <?php ($hook = get_hook('aop_features_pre_search_all_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[search_all_forums]" value="1"<?php if ($forum_config['o_search_all_forums']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Searching'] ?></span> <?php echo $lang_admin_settings['Search all label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[search_all_forums]" value="1"<?php if ($forum_config['o_search_all_forums']) echo ' checked="checked"' ?> />
+							<?php echo $lang_admin_settings['Searching'] ?>
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Search all label'] ?> 
+								<small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_ranks_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[ranks]" value="1"<?php if ($forum_config['o_ranks']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['User ranks'] ?></span> <?php echo $lang_admin_settings['User ranks label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+								<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[ranks]" value="1"<?php if ($forum_config['o_ranks']) echo ' checked="checked"' ?> />
+								<span><?php echo $lang_admin_settings['User ranks'] ?></span>
+								<div class="help-block">
+									<?php echo $lang_admin_settings['User ranks label'] ?>
+								</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_censoring_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[censoring]" value="1"<?php if ($forum_config['o_censoring']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Censor words'] ?></span> <?php echo $lang_admin_settings['Censor words label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[censoring]" value="1"<?php if ($forum_config['o_censoring']) echo ' checked="checked"' ?> /></span>
+							<span><?php echo $lang_admin_settings['Censor words'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Censor words label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_quickjump_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[quickjump]" value="1"<?php if ($forum_config['o_quickjump']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Quick jump'] ?></span> <?php echo $lang_admin_settings['Quick jump label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+								<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[quickjump]" value="1"<?php if ($forum_config['o_quickjump']) echo ' checked="checked"' ?> /></span>
+							<span><?php echo $lang_admin_settings['Quick jump'] ?></span>
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Quick jump label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_show_version_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_version]" value="1"<?php if ($forum_config['o_show_version']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Show version'] ?></span> <?php echo $lang_admin_settings['Show version label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_version]" value="1"<?php if ($forum_config['o_show_version']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Show version'] ?></span> 
+							<div class="help-block">
+							<?php echo $lang_admin_settings['Show version label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_users_online_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[users_online]" value="1"<?php if ($forum_config['o_users_online']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Online list'] ?></span> <?php echo $lang_admin_settings['Users online label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[users_online]" value="1"<?php if ($forum_config['o_users_online']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Online list'] ?></span>
+							<div class="help-block">
+								 <?php echo $lang_admin_settings['Users online label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_features_pre_today_users_online_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[online_today]" value="1"<?php if ($forum_config['o_online_today']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Today online list'] ?></span> <?php echo $lang_admin_settings['Today online label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[online_today]" value="1"<?php if ($forum_config['o_online_today']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Today online list'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Today online label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_features_pre_record_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[record]" value="1"<?php if ($forum_config['o_record']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Record list'] ?></span> <?php echo $lang_admin_settings['Record label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[record]" value="1"<?php if ($forum_config['o_record']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Record list'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Record label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_features_pre_stats_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[statistic]" value="1"<?php if ($forum_config['o_statistic']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Stats list'] ?></span> <?php echo $lang_admin_settings['Stats label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[statistic]" value="1"<?php if ($forum_config['o_statistic']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Stats list'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Stats label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_features_pre_online_ft_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[online_ft]" value="1"<?php if ($forum_config['o_online_ft']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Online ft list'] ?></span> <?php echo $lang_admin_settings['Online ft label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[online_ft]" value="1"<?php if ($forum_config['o_online_ft']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Online ft list'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Online ft label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_general_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+
+</div>
 <?php
 	($hook = get_hook('aop_features_general_fieldset_end')) ? eval($hook) : null;
 
@@ -984,85 +1289,155 @@ else if ($section == 'features')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features posting'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features posting'] ?><small><a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_features_pre_posting_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_settings['Features posting legend'] ?></span></legend>
+				<legend><?php echo $lang_admin_settings['Features posting legend'] ?></legend>
 <?php ($hook = get_hook('aop_features_pre_quickpost_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[quickpost]" value="1"<?php if ($forum_config['o_quickpost']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Quick post'] ?></span> <?php echo $lang_admin_settings['Quick post label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[quickpost]" value="1"<?php if ($forum_config['o_quickpost']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Quick post'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Quick post label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_subscriptions_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[subscriptions]" value="1"<?php if ($forum_config['o_subscriptions']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Subscriptions'] ?></span> <?php echo $lang_admin_settings['Subscriptions label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[subscriptions]" value="1"<?php if ($forum_config['o_subscriptions']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Subscriptions'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Subscriptions label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_force_guest_email_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[force_guest_email]" value="1"<?php if ($forum_config['p_force_guest_email']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Guest posting'] ?></span> <?php echo $lang_admin_settings['Guest posting label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[force_guest_email]" value="1"<?php if ($forum_config['p_force_guest_email']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Guest posting'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Guest posting label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_show_dot_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_dot]" value="1"<?php if ($forum_config['o_show_dot']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['User has posted'] ?></span> <?php echo $lang_admin_settings['User has posted label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_dot]" value="1"<?php if ($forum_config['o_show_dot']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['User has posted'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['User has posted label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_topic_views_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[topic_views]" value="1"<?php if ($forum_config['o_topic_views']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Topic views'] ?></span> <?php echo $lang_admin_settings['Topic views label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[topic_views]" value="1"<?php if ($forum_config['o_topic_views']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Topic views'] ?></span>
+							<div class="help-block">
+								 <?php echo $lang_admin_settings['Topic views label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_show_post_count_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_post_count]" value="1"<?php if ($forum_config['o_show_post_count']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['User post count'] ?></span> <?php echo $lang_admin_settings['User post count label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_post_count]" value="1"<?php if ($forum_config['o_show_post_count']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['User post count'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['User post count label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_show_user_info_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_user_info]" value="1"<?php if ($forum_config['o_show_user_info']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['User info'] ?></span> <?php echo $lang_admin_settings['User info label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small></label>
-					</div>
-				</div>
-<?php ($hook = get_hook('aop_fl_features_pre_merge_posts_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Merge info'] ?></span><small><?php echo $lang_admin_settings['Merge info label'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[merge_timeout]" size="5" maxlength="5" value="<?php echo $forum_config['o_merge_timeout'] ?>" /></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[show_user_info]" value="1"<?php if ($forum_config['o_show_user_info']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['User info'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['User info label'] ?> <small><?php echo $lang_admin_settings['Load server'] ?></small>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_features_pre_enable_bb_panel_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[enable_bb_panel]" value="1"<?php if ($forum_config['p_enable_bb_panel']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable bb panel'] ?></span> <?php echo $lang_admin_settings['Enable bb panel label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[enable_bb_panel]" value="1"<?php if ($forum_config['p_enable_bb_panel']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Enable bb panel'] ?></span> 
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Enable bb panel label'] ?>
+							</div>
+							</label>
+						</div>
 					</div>
 				</div>
+<?php ($hook = get_hook('aop_fl_features_pre_merge_posts_checkbox')) ? eval($hook) : null; ?>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Merge info'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[merge_timeout]" size="5" maxlength="5" value="<?php echo $forum_config['o_merge_timeout'] ?>"  class="form-control input-md">
+  					<span class="help-block"><?php echo $lang_admin_settings['Merge info label'] ?></span>  
+  				</div>
+			</div>	
 <?php ($hook = get_hook('aop_fl_features_pre_bb_panel_smilies_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['BB panel smilies'] ?></span><small><?php echo $lang_admin_settings['BB panel smilies label'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[bb_panel_smilies]" size="3" maxlength="3" value="<?php echo $forum_config['p_bb_panel_smilies'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['BB panel smilies'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[bb_panel_smilies]" size="3" maxlength="3" value="<?php echo $forum_config['p_bb_panel_smilies'] ?>" class="form-control input-md">
+  					<span class="help-block"><?php echo $lang_admin_settings['BB panel smilies label'] ?></span>  
+  				</div>
+			</div>	
 <?php ($hook = get_hook('aop_features_pre_posting_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+
+</div>
 <?php
 
 	($hook = get_hook('aop_features_posting_fieldset_end')) ? eval($hook) : null;
@@ -1071,75 +1446,122 @@ else if ($section == 'features')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features posts'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features posts'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_features_pre_message_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_settings['Features posts legend'] ?></span></legend>
+				<legend><?php echo $lang_admin_settings['Features posts legend'] ?></legend>
 <?php ($hook = get_hook('aop_features_pre_message_content_fieldset')) ? eval($hook) : null; ?>
-				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_admin_settings['Post content group'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[message_bbcode]" value="1"<?php if ($forum_config['p_message_bbcode']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow BBCode label'] ?></label>
+				<fieldset class="ic<?php echo ++$forum_page['item_count'] ?>">
+					<legend><?php echo $lang_admin_settings['Post content group'] ?></legend>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[message_bbcode]" value="1"<?php if ($forum_config['p_message_bbcode']) echo ' checked="checked"' ?> />
+							<?php echo $lang_admin_settings['Allow BBCode label'] ?>
+							</label>
 						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[message_img_tag]" value="1"<?php if ($forum_config['p_message_img_tag']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow img label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[smilies]" value="1"<?php if ($forum_config['o_smilies']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Smilies in posts label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[make_links]" value="1"<?php if ($forum_config['o_make_links']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Make clickable links label'] ?></label>
-						</div>
-<?php ($hook = get_hook('aop_features_new_message_content_option')) ? eval($hook) : null; ?>
-					</div>
-<?php ($hook = get_hook('aop_features_pre_message_content_fieldset_end')) ? eval($hook) : null; ?>
-				</fieldset>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Post period label'] ?></span><small><?php echo $lang_admin_settings['Post period help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[post_edit]" size="3" maxlength="3" value="<?php echo $forum_config['o_post_edit'] ?>" /></span>
 					</div>
 				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[message_img_tag]" value="1"<?php if ($forum_config['p_message_img_tag']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['Allow img label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[smilies]" value="1"<?php if ($forum_config['o_smilies']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['Smilies in posts label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[make_links]" value="1"<?php if ($forum_config['o_make_links']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['Make clickable links label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+<?php ($hook = get_hook('aop_features_new_message_content_option')) ? eval($hook) : null; ?>
+<?php ($hook = get_hook('aop_features_pre_message_content_fieldset_end')) ? eval($hook) : null; ?>
+				</fieldset>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Post period label'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[post_edit]" size="3" maxlength="3" value="<?php echo $forum_config['o_post_edit'] ?>"  class="form-control input-md">
+  					<span class="help-block"><?php echo $lang_admin_settings['Post period help'] ?></span>  
+  				</div>
+			</div>	
 <?php ($hook = get_hook('aop_features_message_content_fieldset_end')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_admin_settings['Allow capitals group'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[message_all_caps]" value="1"<?php if ($forum_config['p_message_all_caps']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['All caps message label'] ?></label>
+					<legend><?php echo $lang_admin_settings['Allow capitals group'] ?></legend>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[message_all_caps]" value="1"<?php if ($forum_config['p_message_all_caps']) echo ' checked="checked"' ?> />
+							<?php echo $lang_admin_settings['All caps message label'] ?>
+							</label>
 						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[subject_all_caps]" value="1"<?php if ($forum_config['p_subject_all_caps']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['All caps subject label'] ?></label>
-						</div>
-<?php ($hook = get_hook('aop_features_new_message_caps_option')) ? eval($hook) : null; ?>
 					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[subject_all_caps]" value="1"<?php if ($forum_config['p_subject_all_caps']) echo ' checked="checked"' ?> />
+							<?php echo $lang_admin_settings['All caps subject label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+<?php ($hook = get_hook('aop_features_new_message_caps_option')) ? eval($hook) : null; ?>
+			
 <?php ($hook = get_hook('aop_features_pre_message_caps_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
 <?php ($hook = get_hook('aop_features_message_caps_fieldset_end')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Indent size label'] ?></span><small><?php echo $lang_admin_settings['Indent size help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[indent_num_spaces]" size="3" maxlength="3" value="<?php echo $forum_config['o_indent_num_spaces'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Indent size label'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[indent_num_spaces]" size="3" maxlength="3" value="<?php echo $forum_config['o_indent_num_spaces'] ?>"  class="form-control input-md">
+  					<span class="help-block"><?php echo $lang_admin_settings['Indent size help'] ?></span>  
+  				</div>
+			</div>	
 <?php ($hook = get_hook('aop_features_pre_quote_depth')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Quote depth label'] ?></span><small><?php echo $lang_admin_settings['Quote depth help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[quote_depth]" size="3" maxlength="3" value="<?php echo $forum_config['o_quote_depth'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Quote depth label'] ?></label>  
+  				<div class="col-md-4">
+  					<input ype="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[quote_depth]" size="3" maxlength="3" value="<?php echo $forum_config['o_quote_depth'] ?>"   class="form-control input-md">
+  					<span class="help-block"><?php echo $lang_admin_settings['Quote depth help'] ?></span>  
+  				</div>
+			</div>	
 <?php ($hook = get_hook('aop_features_pre_message_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_features_message_fieldset_end')) ? eval($hook) : null;
@@ -1148,60 +1570,100 @@ else if ($section == 'features')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features sigs'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features sigs'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_features_pre_sig_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_settings['Features sigs legend'] ?></span></legend>
+				<legend><?php echo $lang_admin_settings['Features sigs legend'] ?></legend>
 <?php ($hook = get_hook('aop_features_pre_signature_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[signatures]" value="1"<?php if ($forum_config['o_signatures']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Allow signatures'] ?></span> <?php echo $lang_admin_settings['Allow signatures label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[signatures]" value="1"<?php if ($forum_config['o_signatures']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Allow signatures'] ?></span> 
+							</label>
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Allow signatures label'] ?>
+							</div>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_sig_content_fieldset')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_admin_settings['Signature content group'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[sig_bbcode]" value="1"<?php if ($forum_config['p_sig_bbcode']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['BBCode in sigs label'] ?></label>
+					<legend><?php echo $lang_admin_settings['Signature content group'] ?></legend>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[sig_bbcode]" value="1"<?php if ($forum_config['p_sig_bbcode']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['BBCode in sigs label'] ?>
+							</label>
 						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[sig_img_tag]" value="1"<?php if ($forum_config['p_sig_img_tag']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Img in sigs label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[smilies_sig]" value="1"<?php if ($forum_config['o_smilies_sig']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Smilies in sigs label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[sig_all_caps]" value="1"<?php if ($forum_config['p_sig_all_caps']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['All caps sigs label'] ?></label>
-						</div>
-<?php ($hook = get_hook('aop_features_new_sig_content_option')) ? eval($hook) : null; ?>
 					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[sig_img_tag]" value="1"<?php if ($forum_config['p_sig_img_tag']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['Img in sigs label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[smilies_sig]" value="1"<?php if ($forum_config['o_smilies_sig']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['Smilies in sigs label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[sig_all_caps]" value="1"<?php if ($forum_config['p_sig_all_caps']) echo ' checked="checked"' ?> /></span>
+							<?php echo $lang_admin_settings['All caps sigs label'] ?>
+							</label>
+						</div>
+					</div>
+				</div>
+<?php ($hook = get_hook('aop_features_new_sig_content_option')) ? eval($hook) : null; ?>
 <?php ($hook = get_hook('aop_features_pre_sig_content_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
 <?php ($hook = get_hook('aop_features_sig_content_fieldset_end')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Max sig length label'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[sig_length]" size="5" maxlength="5" value="<?php echo $forum_config['p_sig_length'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Max sig length label'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[sig_length]" size="5" maxlength="5" value="<?php echo $forum_config['p_sig_length'] ?>" class="form-control input-md">
+  				</div>
+			</div>
 <?php ($hook = get_hook('aop_features_pre_max_sig_lines')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Max sig lines label'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[sig_lines]" size="5" maxlength="3" value="<?php echo $forum_config['p_sig_lines'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Max sig lines label'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[sig_lines]" size="5" maxlength="3" value="<?php echo $forum_config['p_sig_lines'] ?>" class="form-control input-md">
+  				</div>
+			</div>
 <?php ($hook = get_hook('aop_features_pre_sig_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_features_sig_fieldset_end')) ? eval($hook) : null;
@@ -1210,70 +1672,109 @@ else if ($section == 'features')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features Avatars'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features Avatars'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_features_pre_avatars_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_settings['Features Avatars legend'] ?></span></legend>
+				<legend class="group-legend"><?php echo $lang_admin_settings['Features Avatars legend'] ?></legend>
 <?php ($hook = get_hook('aop_features_pre_avatar_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[avatars]" value="1"<?php if ($forum_config['o_avatars']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Allow avatars'] ?></span> <?php echo $lang_admin_settings['Allow avatars label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[avatars]" value="1"<?php if ($forum_config['o_avatars']) echo ' checked="checked"' ?> /></span>
+						<span><?php echo $lang_admin_settings['Allow avatars'] ?></span>
+							</label>
+							<div class="help-block">
+								 <?php echo $lang_admin_settings['Allow avatars label'] ?>
+							</div>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_avatar_max_width')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Avatar Max width label'] ?></span><small><?php echo $lang_admin_settings['Avatar Max width help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[avatars_width]" size="6" maxlength="5" value="<?php echo $forum_config['o_avatars_width'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Avatar Max width label'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[avatars_width]" size="6" maxlength="5" value="<?php echo $forum_config['o_avatars_width'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Avatar Max width help'] ?>
+  					</div>
+  				</div>
+			</div>
 <?php ($hook = get_hook('aop_features_pre_avatar_max_height')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Avatar Max height label'] ?></span><small><?php echo $lang_admin_settings['Avatar Max height help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[avatars_height]" size="6" maxlength="5" value="<?php echo $forum_config['o_avatars_height'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Avatar Max height label'] ?></label>  
+  				<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[avatars_height]" size="6" maxlength="5" value="<?php echo $forum_config['o_avatars_height'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Avatar Max height help'] ?>
+  					</div>
+  				</div>
+			</div>
 <?php ($hook = get_hook('aop_features_pre_avatar_max_size')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Avatar Max size label'] ?></span><small><?php echo $lang_admin_settings['Avatar Max size help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[avatars_size]" size="6" maxlength="6" value="<?php echo $forum_config['o_avatars_size'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Avatar Max size label'] ?></label>  
+  				<div class="col-md-4">
+						<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[avatars_size]" size="6" maxlength="6" value="<?php echo $forum_config['o_avatars_size'] ?>" lass="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Avatar Max size help'] ?>
+  					</div>
+  				</div>
+			</div>
 <?php ($hook = get_hook('aop_features_pre_gravatar')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<legend><span><?php echo $lang_admin_settings['Allow gravatar'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="0"<?php if ($forum_config['o_gravatar'] == '0') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Gravatar disabled label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="G"<?php if ($forum_config['o_gravatar'] == 'G') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Gravatar G label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="PG"<?php if ($forum_config['o_gravatar'] == 'PG') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Gravatar PG label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="R"<?php if ($forum_config['o_gravatar'] == 'R') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Gravatar R label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="X"<?php if ($forum_config['o_gravatar'] == 'X') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Gravatar X label'] ?></label>
-						</div>
+					<legend><?php echo $lang_admin_settings['Allow gravatar'] ?></legend>
+					
+					<div class="form-group col-md-12">
+                      <div class="radio">
+                        <label for="fld<?php echo $forum_page['fld_count'] ?>">
+                          <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="0"<?php if ($forum_config['o_gravatar'] == '0') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Gravatar disabled label'] ?>
+                        </label>
+                      </div>
+                      <div class="radio">
+                         <label for="fld<?php echo $forum_page['fld_count'] ?>">
+                          <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="G"<?php if ($forum_config['o_gravatar'] == 'G') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Gravatar G label'] ?>
+                        </label>
+                      </div>
+                      <div class="radio">
+                         <label for="fld<?php echo $forum_page['fld_count'] ?>">
+                         <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="PG"<?php if ($forum_config['o_gravatar'] == 'PG') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Gravatar PG label'] ?>
+                        </label>
+                      </div>
+                      <div class="radio">
+                         <label for="fld<?php echo $forum_page['fld_count'] ?>">
+                          <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="R"<?php if ($forum_config['o_gravatar'] == 'R') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Gravatar R label'] ?>
+                        </label>
+                      </div>
+                      <div class="radio">
+                        <label for="fld<?php echo $forum_page['fld_count'] ?>">
+                         <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gravatar]" value="X"<?php if ($forum_config['o_gravatar'] == 'X') echo ' checked="checked"' ?> />
+                          <?php echo $lang_admin_settings['Gravatar X label'] ?>
+                        </label>
+                      </div>
+                    
 <?php ($hook = get_hook('aop_setup_new_reporting_method')) ? eval($hook) : null; ?>
-					</div>
+ 					</div>
 				</fieldset>
 <?php ($hook = get_hook('aop_features_pre_avatars_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	($hook = get_hook('aop_features_avatars_fieldset_end')) ? eval($hook) : null;
@@ -1282,113 +1783,190 @@ else if ($section == 'features')
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Settings for polls'] ?></span></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Settings for polls'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+			<fieldset>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input id="fld<?php echo ++$forum_page['fld_count'] ?>" type="checkbox" name="form[poll_enable_revote]" value="1"<?php if ($forum_config['p_poll_enable_revote']) echo ' checked="checked"' ?>/>
+						<span><?php echo $lang_admin_settings['Disable revoting'] ?></span>
+							</label>
+							<div class="help-block">
+								 <?php echo $lang_admin_settings['Disable revoting info'] ?>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input id="fld<?php echo ++$forum_page['fld_count'] ?>" type="checkbox" name="form[poll_enable_read]" value="1"<?php if ($forum_config['p_poll_enable_read']) echo ' checked="checked"' ?>/>
+						<span><?php echo $lang_admin_settings['Disable see results'] ?></span>
+							</label>
+							<div class="help-block">
+								 <?php echo $lang_admin_settings['Disable see results info'] ?>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Maximum answers'] ?></label>  
+  				<div class="col-md-4">
+  					<input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="form[poll_max_answers]" size="6" maxlength="6" value="<?php echo $forum_config['p_poll_max_answers'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Maximum answers info'] ?>
+  					</div>
+  				</div>
 			</div>
-			<fieldset class="frm-group group1">
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input id="fld<?php echo ++$forum_page['fld_count'] ?>" type="checkbox" name="form[poll_enable_revote]" value="1"<?php if ($forum_config['p_poll_enable_revote']) echo ' checked="checked"' ?>/></span>
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Disable revoting'] ?></span><?php echo $lang_admin_settings['Disable revoting info'] ?></label>
-					</div>
-				</div>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input id="fld<?php echo ++$forum_page['fld_count'] ?>" type="checkbox" name="form[poll_enable_read]" value="1"<?php if ($forum_config['p_poll_enable_read']) echo ' checked="checked"' ?>/></span>
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Disable see results'] ?></span><?php echo $lang_admin_settings['Disable see results info'] ?></label></span>
-					</div>
-				</div>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Maximum answers'] ?></span><small><?php echo $lang_admin_settings['Maximum answers info'] ?></small></label>
-						<span class="fld-input"><input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="form[poll_max_answers]" size="6" maxlength="6" value="<?php echo $forum_config['p_poll_max_answers'] ?>" /></span>
-					</div>
-				</div>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Poll min posts'] ?></span><small><?php echo $lang_admin_settings['Poll min posts info'] ?></small></label>
-						<span class="fld-input"><input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="form[poll_min_posts]" size="6" maxlength="6" value="<?php echo $forum_config['p_poll_min_posts'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Poll min posts'] ?></label>  
+  				<div class="col-md-4">
+  					<input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="form[poll_min_posts]" size="6" maxlength="6" value="<?php echo $forum_config['p_poll_min_posts'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Poll min posts info'] ?>
+  					</div>
+  				</div>
+			</div>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 	// Reset counter
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features reputation'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features reputation'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_fl_features_pre_per_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_settings['Features reputation legend'] ?></span></legend>
+				<legend><?php echo $lang_admin_settings['Features reputation legend'] ?></legend>
 <?php ($hook = get_hook('aop_fl_features_pre_rep_enabled')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[rep_enabled]" value="1"<?php if ($forum_config['o_rep_enabled']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Allow reputation'] ?></span> <?php echo $lang_admin_settings['Allow reputation label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+						<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[rep_enabled]" value="1"<?php if ($forum_config['o_rep_enabled']) echo ' checked="checked"' ?> />
+						<span><?php echo $lang_admin_settings['Allow reputation'] ?></span>
+							</label>
+							<div class="help-block">
+								 <?php echo $lang_admin_settings['Allow reputation label'] ?>
+							</div>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_fl_features_pre_reputation_timeout')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Reputation timeout'] ?></span><small><?php echo $lang_admin_settings['Reputation timeout help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[rep_timeout]" size="5" maxlength="5" value="<?php echo $forum_config['o_rep_timeout'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Reputation timeout'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[rep_timeout]" size="5" maxlength="5" value="<?php echo $forum_config['o_rep_timeout'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Reputation timeout help'] ?>
+  					</div>
+  				</div>
+			</div>
 <?php ($hook = get_hook('aop_fl_features_pre_sigs_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div>	
+</div>
 <?php
 
 	// Reset counter
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features title'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features title'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+			<fieldset class="gc<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Features title'] ?></strong></legend>
 <?php ($hook = get_hook('aop_fl_features_pre_pm_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld32"><span><?php echo $lang_admin_settings['Inbox limit'] ?></span><small><?php echo $lang_admin_settings['Inbox limit info'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_inbox_size]" size="6" maxlength="5" value="<?php echo $forum_config['o_pm_inbox_size'] ?>" /></span>
-					</div>
-				</div>
-<?php ($hook = get_hook('aop_fl_features_pre_outbox_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld32"><span><?php echo $lang_admin_settings['Outbox limit'] ?></span><small><?php echo $lang_admin_settings['Outbox limit info'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_outbox_size]" size="6" maxlength="5" value="<?php echo $forum_config['o_pm_outbox_size'] ?>" /></span>
-					</div>
-				</div>
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Inbox limit'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_inbox_size]" size="6" maxlength="5" value="<?php echo $forum_config['o_pm_inbox_size'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Inbox limit info'] ?>
+  					</div>
+  				</div>
+			</div>
+<?php ($hook = get_hook('aop_fl_features_pre_outbox_checkbox')) ? eval($hook) : null; ?>			
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Outbox limit'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_outbox_size]" size="6" maxlength="5" value="<?php echo $forum_config['o_pm_outbox_size'] ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Outbox limit info'] ?>
+  				</div>
+  			</div>
+	</div>
 <?php ($hook = get_hook('aop_fl_features_pre_navigation_checkbox')) ? eval($hook) : null; ?>
-				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
+				<fieldset class="ic<?php echo ++$forum_page['item_count'] ?>">
 					<legend><span><?php echo $lang_admin_settings['Navigation links'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_show_new_count]" value="1"<?php if ($forum_config['o_pm_show_new_count']) echo ' checked="checked"' ?> /></span>
-							<label for="fld24"><?php echo $lang_admin_settings['Snow new count'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_show_global_link]" value="1"<?php if ($forum_config['o_pm_show_global_link']) echo ' checked="checked"' ?> /></span>
-							<label for="fld23"><?php echo $lang_admin_settings['Show global link'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[pm_show_new_count]" value="1"<?php if ($forum_config['o_pm_show_new_count']) echo ' checked="checked"' ?> />
+								<?php echo $lang_admin_settings['Snow new count'] ?>
+							</label>
 						</div>
 					</div>
+				</div>
 				</fieldset>
 <?php ($hook = get_hook('aop_fl_features_pre_pm_fieldset_end')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input id="fld<?php echo ++$forum_page['fld_count'] ?>" type="checkbox" name="form[pm_get_mail]" value="1"<?php if ($forum_config['o_pm_get_mail']) echo ' checked="checked"' ?>/></span>
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Disable pm get mail'] ?></span><?php echo $lang_admin_settings['Disable pm get mail info'] ?></label></span>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input id="fld<?php echo ++$forum_page['fld_count'] ?>" type="checkbox" name="form[pm_get_mail]" value="1"<?php if ($forum_config['o_pm_get_mail']) echo ' checked="checked"' ?>/>
+								<?php echo $lang_admin_settings['Disable pm get mail'] ?>
+							</label>
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Disable pm get mail info'] ?>
+							</div>
+						</div>
 					</div>
 				</div>
 			</fieldset>
+	</div>
+</div>
 <?php
 
 ($hook = get_hook('aop_fl_features_pm_fieldset_end')) ? eval($hook) : null;
@@ -1396,25 +1974,36 @@ else if ($section == 'features')
 $forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Google Analytics'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Google Analytics'] ?></strong></legend>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Google Analytics'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+		<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 <?php ($hook = get_hook('aop_fl_features_pre_google_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>">
-							<span><?php echo $lang_admin_settings['Tracker'] ?></span>
-							<small><?php echo $lang_admin_settings['Tracker help'] ?></small>
-						</label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[google_analytics]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_google_analytics']) ?>"  /></span>
-					</div>
-				</div>
-			</fieldset>
+			
+			<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  				<label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Tracker'] ?></label>  
+  				<div class="col-md-4">
+  					<input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[google_analytics]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_google_analytics']) ?>" class="form-control input-md">
+  					<div class="help-block">
+  						<?php echo $lang_admin_settings['Tracker help'] ?>
+  					</div>
+  				</div>
+  			</div>
+		</fieldset>
+	</div>
+</div>
 <?php
-
+/*
 ($hook = get_hook('aop_fl_features_google_fieldset_end')) ? eval($hook) : null;
 
 $forum_page['group_count'] = $forum_page['item_count'] = 0;
@@ -1451,33 +2040,54 @@ endif;
 
 	// Reset counter
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
-
+*/
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Features gzip'] ?></span></h2>
-				<p class="content-options options"><a href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></p>
-			</div>
-			<div class="ct-box">
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Features gzip'] ?><small>  <a class="btn btn-default btn-xs" href="#buttons"><?php echo $lang_admin_common['Save changes'] ?></a></small></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
+			<div class="callout callout-info">
 				<p><?php echo $lang_admin_settings['Features gzip info'] ?></p>
 			</div>
 <?php ($hook = get_hook('aop_features_pre_gzip_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Features gzip legend'] ?></strong></legend>
+				<legend class="group-legend"><?php echo $lang_admin_settings['Features gzip legend'] ?></legend>
 <?php ($hook = get_hook('aop_features_pre_gzip_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gzip]" value="1"<?php if ($forum_config['o_gzip']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable gzip'] ?></span> <?php echo $lang_admin_settings['Enable gzip label'] ?></label>
+				<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+					<div class="checkbox">
+						<div class="col-md-8">
+							<label for="fld<?php echo $forum_page['fld_count'] ?>">
+							<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[gzip]" value="1"<?php if ($forum_config['o_gzip']) echo ' checked="checked"' ?>/>
+								<?php echo $lang_admin_settings['Enable gzip'] ?>
+							</label>
+							<div class="help-block">
+								<?php echo $lang_admin_settings['Enable gzip label'] ?>
+							</div>
+						</div>
 					</div>
 				</div>
 <?php ($hook = get_hook('aop_features_pre_gzip_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('aop_features_gzip_fieldset_end')) ? eval($hook) : null; ?>
-			<div id="buttons" class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" /></span>
-			</div>
-		</form>
 	</div>
+	<div class="box-footer">
+		<div class="form-group">
+			<div id="buttons" class="col-md-4">
+				<input type="submit"  class="btn btn-primary" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" />
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
 <?php
 
 }
@@ -1489,7 +2099,7 @@ else if ($section == 'announcements')
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Settings'], forum_link('admin/settings.php?section=setup')),
 		array($lang_admin_common['Announcements'], forum_link('admin/settings.php?section=announcements'))
 	);
@@ -1506,67 +2116,97 @@ else if ($section == 'announcements')
 	($hook = get_hook('aop_announcements_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content main-frm">
-		<div class="main-subhead">
-			<h2 class="hn"><span><?php echo $lang_admin_settings['Announcements head'] ?></span></h2>
-		</div>
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=announcements') ?>">
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=announcements') ?>">
 			<div class="hidden">
 				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=announcements')) ?>" />
 				<input type="hidden" name="form_sent" value="1" />
 			</div>
+<div class="box ic">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Announcements head'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+				<i class="fa fa-minus"></i>
+			</button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+				<i class="fa fa-times"></i>
+			</button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_announcements_pre_announcement_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Announcements legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_announcements_pre_enable_announcement_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[announcement]" value="1"<?php if ($forum_config['o_announcement']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable announcement'] ?></span> <?php echo $lang_admin_settings['Enable announcement label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable announcement'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="checkboxes-0">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[announcement]" value="1"<?php if ($forum_config['o_announcement']) echo ' checked="checked"' ?> />
+      <span class="help-block"><?php echo $lang_admin_settings['Enable announcement label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_announcements_pre_announcement_heading')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Announcement heading label'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[announcement_heading]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_announcement_heading']) ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Announcement heading label'] ?></label>  
+  <div class="col-md-4">
+  <input  class="form-control input-md" type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[announcement_heading]" size="50" maxlength="255" value="<?php echo forum_htmlencode($forum_config['o_announcement_heading']) ?>" />
+  </div>
+</div>
 <?php ($hook = get_hook('aop_announcements_pre_announcement_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Announcement message label'] ?></span><small><?php echo $lang_admin_settings['Announcement message help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[announcement_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_announcement_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Announcement message label'] ?></label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[announcement_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_announcement_message']) ?></textarea>
+    <span class="help-block"><?php echo $lang_admin_settings['Announcement message help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_announcements_pre_announcement_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_html_top_fieldset')) ? eval($hook) : null; 
 
 // Setup the form
 $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'] = 0;
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['HTML head'] ?></span></h2>
-			</div>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
+<div class="box">
+	<div class="box-header with-border">
+	<h3 class="box-title"><?php echo $lang_admin_settings['HTML head'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
+		<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
+			<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_fl_announcements_pre_enable_html_top_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[html_top]" value="1"<?php if ($forum_config['o_html_top']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable HTML top'] ?></span> <?php echo $lang_admin_settings['HTML label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable HTML top'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo ++$forum_page['fld_count'] ?>">
+		<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[html_top]" value="1"<?php if ($forum_config['o_html_top']) echo ' checked="checked"' ?> />
+		<span class="help-block"><?php echo $lang_admin_settings['HTML label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_html_top_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['HTML top part'] ?></span><small><?php echo $lang_admin_settings['HTML top help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[html_top_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_html_top_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['HTML top part'] ?></label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[html_top_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_html_top_message']) ?></textarea>
+    <span class="help-block"><?php echo $lang_admin_settings['HTML top help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_html_top_fieldset_end')) ? eval($hook) : null; ?>
-			</fieldset>
+		</fieldset>
+
 <?php
 
 ($hook = get_hook('aop_fl_announcements_pre_html_top_fieldset')) ? eval($hook) : null;
@@ -1576,23 +2216,30 @@ $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'
 
 ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_fl_announcements_pre_enable_html_bottom_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[html_bottom]" value="1"<?php if ($forum_config['o_html_bottom']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable HTML bottom'] ?></span> <?php echo $lang_admin_settings['HTML label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable HTML bottom'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo ++$forum_page['fld_count'] ?>">
+		<input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[html_bottom]" value="1"<?php if ($forum_config['o_html_bottom']) echo ' checked="checked"' ?> />
+		<span class="help-block"><?php echo $lang_admin_settings['HTML label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_html_bottom_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['HTML bottom part'] ?></span><small><?php echo $lang_admin_settings['HTML bottom help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[html_bottom_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_html_bottom_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['HTML bottom part'] ?></label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[html_bottom_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_html_bottom_message']) ?></textarea>
+    <span class="help-block"><?php echo $lang_admin_settings['HTML bottom help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_html_bottom_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
 
 ($hook = get_hook('aop_fl_announcements_pre_adbox_fieldset')) ? eval($hook) : null;
@@ -1601,25 +2248,38 @@ $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'
 $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Ad head'] ?></span></h2>
-			</div>
+
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Ad head'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+ 			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_fl_announcements_pre_enable_adbox_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[adbox]" value="1"<?php if ($forum_config['o_adbox']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable Adbox'] ?></span> <?php echo $lang_admin_settings['Adbox label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable Adbox'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[adbox]" value="1"<?php if ($forum_config['o_adbox']) echo ' checked="checked"' ?>>
+      <span class="help-block"><?php echo $lang_admin_settings['Adbox label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_adbox_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Adbox part'] ?></span><small><?php echo $lang_admin_settings['Adbox help'].$lang_admin_settings['HTML help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[adbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_adbox_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Adbox part'] ?></label>
+  <div class="col-md-4">                     
+	<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[adbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_adbox_message']) ?></textarea>
+	<span class="help-block"><?php echo $lang_admin_settings['Adbox help'].$lang_admin_settings['HTML help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_html_adbox_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('aop_fl_announcements_pre_guestbox_fieldset')) ? eval($hook) : null; 
@@ -1628,21 +2288,27 @@ $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'
 $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'] = 0;
 ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
+				
 <?php ($hook = get_hook('aop_fl_announcements_pre_enable_guestbox_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[guestbox]" value="1"<?php if ($forum_config['o_guestbox']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable Guestbox'] ?></span> <?php echo $lang_admin_settings['Adbox label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable Guestbox'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[guestbox]" value="1"<?php if ($forum_config['o_guestbox']) echo ' checked="checked"' ?>>
+      <span class="help-block"><?php echo $lang_admin_settings['Adbox label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_guestbox_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Adbox part'] ?></span><small><?php echo $lang_admin_settings['Guestbox help'].$lang_admin_settings['HTML help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[guestbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_guestbox_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Adbox part'] ?></label>
+  <div class="col-md-4">                     
+	<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[guestbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_guestbox_message']) ?></textarea>
+	<span class="help-block"><?php echo $lang_admin_settings['Guestbox help'].$lang_admin_settings['HTML help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_html_guestbox_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php 
@@ -1654,21 +2320,23 @@ $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'
 
 ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
+				
 <?php ($hook = get_hook('aop_fl_announcements_pre_enable_topicbox_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable Topicbox'] ?></span><small><?php echo $lang_admin_settings['Topic legend'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld22" name="form[topicbox]" size="3" maxlength="3" value="<?php echo $forum_config['o_topicbox'] ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable Topicbox'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[topicbox]" size="3" maxlength="3" value="<?php echo $forum_config['o_topicbox'] ?>" class="form-control input-md">
+  <span class="help-block"><?php echo $lang_admin_settings['Topic legend'] ?></span>  
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_topicbox_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Adbox part'] ?></span><small><?php echo $lang_admin_settings['Topicbox help'].$lang_admin_settings['HTML help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[topicbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_topicbox_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Adbox part'] ?></label>
+  <div class="col-md-4">                     
+	<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[topicbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_topicbox_message']) ?></textarea>
+	<span class="help-block"><?php echo $lang_admin_settings['Topicbox help'].$lang_admin_settings['HTML help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_html_topicbox_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php 
@@ -1680,28 +2348,41 @@ $forum_page['group_count'] = $forum_page['item_count'] = $forum_page['fld_count'
 
 ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><strong><?php echo $lang_admin_settings['HTML legend'] ?></strong></legend>
+				
 <?php ($hook = get_hook('aop_fl_announcements_pre_enable_externbox_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[externbox]" value="1"<?php if ($forum_config['o_externbox']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Enable Externbox'] ?></span> <?php echo $lang_admin_settings['Adbox label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Enable Externbox'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[externbox]" value="1"<?php if ($forum_config['o_externbox']) echo ' checked="checked"' ?>>
+      <span class="help-block"><?php echo $lang_admin_settings['Adbox label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_pre_externbox_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Adbox part'] ?></span><small><?php echo $lang_admin_settings['Externbox help'].$lang_admin_settings['HTML help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[externbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_externbox_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Adbox part'] ?></label>
+  <div class="col-md-4">                     
+	<textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[externbox_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_externbox_message']) ?></textarea>
+	<span class="help-block"><?php echo $lang_admin_settings['Externbox help'].$lang_admin_settings['HTML help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_announcements_html_externbox_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" /></span>
-			</div>
-		</form>
+
+	</div><!-- /.box-body -->
+<div class="box-footer">
+	<div class="form-group">
+		<div id="buttons" class="col-md-4">
+			<input type="submit" class="btn btn-primary" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>">
+		</div>
 	</div>
+</div><!-- /.box-footer-->
+</div>
+		</form>
+
 <?php
 
 }
@@ -1713,7 +2394,7 @@ else if ($section == 'registration')
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Settings'], forum_link('admin/settings.php?section=setup')),
 		array($lang_admin_common['Registration'], forum_link('admin/settings.php?section=registration'))
 	);
@@ -1736,103 +2417,151 @@ else if ($section == 'registration')
 	}
 
 	($hook = get_hook('aop_registration_pre_header_load')) ? eval($hook) : null;
-
+        $forum_js->file(array('admin_wysihtml5'));
+        $forum_js->code('
+            $(\'.textarea\').wysihtml5({
+                "font-styles": true, //Font styling, e.g. h1, h2, etc. Default true
+                "emphasis": true, //Italics, bold, etc. Default true
+                "lists": true, //(Un)ordered lists, e.g. Bullets, Numbers. Default true
+                "html": true, //Button which allows you to edit the generated HTML. Default false
+                "link": true, //Button to insert a link. Default true
+                "image": false, //Button to insert an image. Default true,
+                "color": true //Button to change color of font  
+            });
+'
+          );
+        //$forum_css->file(array('admin_wysihtml5'));
 	define('FORUM_PAGE_SECTION', 'settings');
 	define('FORUM_PAGE', 'admin-settings-registration');
 	require FORUM_ROOT.'header.php';
-
 	// START SUBST - <forum_main>
 	ob_start();
-
 	($hook = get_hook('aop_registration_output_start')) ? eval($hook) : null;
-
 ?>
-	<div class="main-content main-frm">
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=registration') ?>">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=registration')) ?>" />
-				<input type="hidden" name="form_sent" value="1" />
-			</div>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Registration new'] ?></span></h2>
-			</div>
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=registration') ?>">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=registration')) ?>" />
+		<input type="hidden" name="form_sent" value="1" />
+	</div>
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Registration new'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_registration_pre_new_regs_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><span><?php echo $lang_admin_settings['Registration new legend'] ?></span></legend>
-				<div class="ct-box set<?php echo ++$forum_page['item_count'] ?>">
-					<p><?php echo $lang_admin_settings['New reg info'] ?></p>
-				</div>
+<div class="alert alert-info alert-dismissable">
+	<h4><i class="icon fa fa-info"></i>Info</h4>
+    <?php echo $lang_admin_settings['New reg info'] ?>
+</div>
 <?php ($hook = get_hook('aop_registration_pre_allow_new_regs_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[regs_allow]" value="1"<?php if ($forum_config['o_regs_allow']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Allow new reg'] ?></span> <?php echo $lang_admin_settings['Allow new reg label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow new reg'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[regs_allow]" value="1"<?php if ($forum_config['o_regs_allow']) echo ' checked="checked"' ?>>
+     <span class="help-block"><?php echo $lang_admin_settings['Allow new reg label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_registration_pre_verify_regs_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[regs_verify]" value="1"<?php if ($forum_config['o_regs_verify']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Verify reg'] ?></span> <?php echo $lang_admin_settings['Verify reg label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Verify reg'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[regs_verify]" value="1"<?php if ($forum_config['o_regs_verify']) echo ' checked="checked"' ?>>
+      <span class="help-block"><?php echo $lang_admin_settings['Verify reg label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_registration_pre_email_fieldset')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
 					<legend><span><?php echo $lang_admin_settings['Reg e-mail group'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[allow_banned_email]" value="1"<?php if ($forum_config['p_allow_banned_email']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow banned label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[allow_dupe_email]" value="1"<?php if ($forum_config['p_allow_dupe_email']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow dupe label'] ?></label>
-						</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow banned label'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+     <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[allow_banned_email]" value="1"<?php if ($forum_config['p_allow_banned_email']) echo ' checked="checked"' ?>>
+    </label>
+	</div>
+  </div>
+</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow dupe label'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[allow_dupe_email]" value="1"<?php if ($forum_config['p_allow_dupe_email']) echo ' checked="checked"' ?> />
+    </label>
+	</div>
+  </div>
+</div>						
 <?php ($hook = get_hook('aop_registration_new_email_option')) ? eval($hook) : null; ?>
-					</div>
 <?php ($hook = get_hook('aop_registration_pre_email_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
 <?php ($hook = get_hook('aop_registration_email_fieldset_end')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[regs_report]" value="1"<?php if ($forum_config['o_regs_report']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Report new reg'] ?></span> <?php echo $lang_admin_settings['Report new reg label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Report new reg'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[regs_report]" value="1"<?php if ($forum_config['o_regs_report']) echo ' checked="checked"' ?> />
+     <span class="help-block"><?php echo $lang_admin_settings['Report new reg label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>		
 <?php ($hook = get_hook('aop_registration_pre_email_setting_fieldset')) ? eval($hook) : null; ?>
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
 					<legend><span><?php echo $lang_admin_settings['E-mail setting group'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_email_setting]" value="0"<?php if ($forum_config['o_default_email_setting'] == '0') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Display e-mail label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_email_setting]" value="1"<?php if ($forum_config['o_default_email_setting'] == '1') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Allow form e-mail label'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_email_setting]" value="2"<?php if ($forum_config['o_default_email_setting'] == '2') echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Disallow form e-mail label'] ?></label>
-						</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <div class="col-md-4">
+  <div class="radio">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+     <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_email_setting]" value="0"<?php if ($forum_config['o_default_email_setting'] == '0') echo ' checked="checked"' ?> />
+      <?php echo $lang_admin_settings['Display e-mail label'] ?>
+    </label>
+	</div>
+  <div class="radio">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_email_setting]" value="1"<?php if ($forum_config['o_default_email_setting'] == '1') echo ' checked="checked"' ?> />
+      <?php echo $lang_admin_settings['Allow form e-mail label'] ?>
+    </label>
+	</div>
+  <div class="radio">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="radio" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[default_email_setting]" value="2"<?php if ($forum_config['o_default_email_setting'] == '2') echo ' checked="checked"' ?> />
+      <?php echo $lang_admin_settings['Disallow form e-mail label'] ?>
+    </label>
+	</div>
+  </div>
 <?php ($hook = get_hook('aop_registration_new_email_setting_option')) ? eval($hook) : null; ?>
-					</div>
+</div>
 <?php ($hook = get_hook('aop_registration_pre_email_setting_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
 <?php ($hook = get_hook('aop_fl_registration_pre_register_timeout_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld11"><span><?php echo $lang_admin_settings['Registration timeout'] ?></span><small><?php echo $lang_admin_settings['Registration timeout help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[register_timeout]" size="5" maxlength="10" value="<?php echo forum_htmlencode($forum_config['o_register_timeout']) ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="textinput"><?php echo $lang_admin_settings['Registration timeout'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[register_timeout]" size="5" maxlength="10" value="<?php echo forum_htmlencode($forum_config['o_register_timeout']) ?>" class="form-control input-md">
+  <span class="help-block"><?php echo $lang_admin_settings['Registration timeout help'] ?></span>  
+  </div>
+</div>
 <?php ($hook = get_hook('aop_registration_email_setting_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php
-
 	// Reset counter
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
-
 ?>
 			<div class="ct-box">
 				<p><?php echo $lang_admin_settings['Spam check info'] ?></p>
@@ -1841,126 +2570,178 @@ else if ($section == 'registration')
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<fieldset class="mf-set set<?php echo ++$forum_page['item_count'] ?>">
 					<legend><span><?php echo $lang_admin_settings['Spam check legend'] ?></span></legend>
-					<div class="mf-box">
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[spam_ip]" value="1"<?php if ($forum_config['o_spam_ip']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Spam ip info'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[spam_email]" value="1"<?php if ($forum_config['o_spam_email']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Spam email info'] ?></label>
-						</div>
-						<div class="mf-item">
-							<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[spam_name]" value="1"<?php if ($forum_config['o_spam_username']) echo ' checked="checked"' ?> /></span>
-							<label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Spam name info'] ?></label>
-						</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Spam ip info'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+     <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[spam_ip]" value="1"<?php if ($forum_config['o_spam_ip']) echo ' checked="checked"' ?> >
+    </label>
+	</div>
+  </div>
+</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Spam email info'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+     <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[spam_email]" value="1"<?php if ($forum_config['o_spam_email']) echo ' checked="checked"' ?>>
+    </label>
+	</div>
+  </div>
+</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Spam name info'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+     <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[spam_username]" value="1"<?php if ($forum_config['o_spam_username']) echo ' checked="checked"' ?>>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_registration_spamforum_option')) ? eval($hook) : null; ?>
-					</div>
 <?php ($hook = get_hook('aop_fl_registration_pre_rules_fieldset_end')) ? eval($hook) : null; ?>
 				</fieldset>
 			</fieldset>
+	</div><!-- /.box-body -->
+</div>
 <?php
-
 	($hook = get_hook('aop_fl_registration_new_regs_fieldset_end')) ? eval($hook) : null;
-
 	// Reset counter
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
-
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Registration rules'] ?></span></h2>
-			</div>
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Registration rules'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_fl_registration_pre_rules_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><span><?php echo $lang_admin_settings['Registration rules legend'] ?></span></legend>
-				<div class="ct-box set<?php echo ++$forum_page['item_count'] ?>">
-					<p><?php echo $lang_admin_settings['Registration rules info'] ?></p>
-				</div>
+<div class="alert alert-info">
+	<h4><i class="icon fa fa-info"></i> Info</h4>
+	<?php echo $lang_admin_settings['Registration rules info'] ?>
+</div>
 <?php ($hook = get_hook('aop_fl_registration_pre_rules_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[rules]" value="1"<?php if ($forum_config['o_rules']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Require rules'] ?></span><?php echo $lang_admin_settings['Require rules label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Require rules'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+     <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[rules]" value="1"<?php if ($forum_config['o_rules']) echo ' checked="checked"' ?>>
+     <span class="help-block"><?php echo $lang_admin_settings['Require rules label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_registration_pre_rules_text')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Compose rules label'] ?></span><small><?php echo $lang_admin_settings['Compose rules help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[rules_message]" rows="10" cols="55"><?php echo forum_htmlencode($forum_config['o_rules_message']) ?></textarea></span></div>
-					</div>
-				</div>
+          <div class="box ic<?php echo ++$forum_page['item_count'] ?>">
+            <div class="box-header">
+              <h3 class="box-title"><?php echo $lang_admin_settings['Compose rules label'] ?>
+                <small><?php echo $lang_admin_settings['Compose rules label'] ?></small>
+              </h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body pad">
+<textarea class="form-control textarea" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[rules_message]" rows="10" cols="55"><?php echo forum_htmlencode($forum_config['o_rules_message']) ?></textarea>
+            </div>
+          </div> 
+
 <?php ($hook = get_hook('aop_fl_registration_pre_rules_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('aop_fl_registration_rules_fieldset_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" /></span>
+	</div><!-- /.box-body -->
+<div class="box-footer">
+		<div class="form-group">
+			<div id="buttons" class="col-md-4">
+				<input type="submit" class="btn btn-primary" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>">
 			</div>
-		</form>
+		</div>
+	</div>
+</div>
+</form>
 <?php
-
 	// Reset counter
 	$forum_page['group_count'] = $forum_page['item_count'] = 0;
-
 ?>
-		<form class="frm-form" id="frm-adduser" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=registration') ?>#adduser">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=registration')) ?>" />
-				<input type="hidden" name="add_user" value="1" />
-			</div>
-			<div class="main-subhead" id="adduser">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Add user'] ?></span></h2>
-			</div>
-			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
-				<legend class="group-legend"><span><?php echo $lang_admin_settings['Add user'] ?></span></legend>
-<?php ($hook = get_hook('aop_fl_register_pre_username')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><? echo $lang_admin_settings['Username'] ?></span> <small><?php echo $lang_admin_settings['Username help'] ?></small></label>
-						<span class="fld-input"><input type="text" id="add_user_username" name="req_username" size="35" value="<?php echo $username ?>" maxlength="25" /></span>
-					</div>
-				</div>
-<?php ($hook = get_hook('aop_fl_register_pre_email')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span>E-mail</span> <small><?php echo $lang_admin_settings['E-mail help'] ?></small></label>
-						<span class="fld-input"><input type="text" id="add_user_email" name="req_email" size="35" value="<?php echo $email ?>" maxlength="80" /></span>
-					</div>
-				</div>
-<?php ($hook = get_hook('aop_fl_register_pre_email_identity')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="add_user_edit_user_identity" name="edit_identity" value="1"<?php echo $edit_identity ? ' checked="checked"' : '' ?> /></span>
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Edit user'] ?></span> <?php echo $lang_admin_settings['Edit help'] ?></label>
-					</div>
-				</div>
-			</fieldset>
-<?php ($hook = get_hook('aop_fl_register_group_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="submit" value="<?php echo $lang_admin_settings['Add user'] ?>" /></span>
-			</div>
-		</form>
 <?php
-
 	if (!empty($errors_add_users))
 	{
 		$error_li = array();
 		for ($i = 0; $i < count($errors_add_users); $i++)
-			$error_li[] = '<li class="warn"><span>'.$errors_add_users[$i].'</span></li>';
-
+			$error_li[] = '<p>'.$errors_add_users[$i].'</p>';
 ?>
-		<div class="ct-box error-box">
-			<h2 class="hn"><span><?php echo $lang_admin_settings['There are some errors']?></span></h2>
-			<ul>
-				<?php echo implode("\n\t\t\t\t\t", $error_li)."\n" ?>
-			</ul>
-		</div>
+<div class="alert alert-danger alert-dismissable">
+	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	<h4><i class="icon fa fa-ban"></i> <?php echo $lang_admin_settings['There are some errors']?></h4>
+<?php echo implode("\n\t\t\t\t\t", $error_li)."\n" ?>
+</div>
 <?php
-
 	}
-
 ?>
+<form class="form-horizontal" id="frm-adduser" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=registration') ?>#adduser">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=registration')) ?>" />
+		<input type="hidden" name="add_user" value="1" />
 	</div>
+<div class="box" id="adduser">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Add user'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
+<?php ($hook = get_hook('aop_fl_register_group')) ? eval($hook) : null; ?>
+			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
+<?php ($hook = get_hook('aop_fl_register_pre_username')) ? eval($hook) : null; ?>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><? echo $lang_admin_settings['Username'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="add_user_username" name="req_username" size="35" value="<?php echo $username ?>" maxlength="25" class="form-control input-md">
+  <span class="help-block"><?php echo $lang_admin_settings['Username help'] ?></span>  
+  </div>
+</div>
+<?php ($hook = get_hook('aop_fl_register_pre_email')) ? eval($hook) : null; ?>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><? echo $lang_admin_settings['E-mail'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="add_user_email" name="req_email" size="35" value="<?php echo $email ?>" maxlength="80" class="form-control input-md">
+  <span class="help-block"><?php echo $lang_admin_settings['E-mail help'] ?></span>  
+  </div>
+</div>
+<?php ($hook = get_hook('aop_fl_register_pre_email_identity')) ? eval($hook) : null; ?>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Edit user'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="checkboxes-0">
+      <input type="checkbox" id="add_user_edit_user_identity" name="edit_identity" value="1"<?php echo $edit_identity ? ' checked="checked"' : '' ?>>
+     <span class="help-block"><?php echo $lang_admin_settings['Edit help'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
+			</fieldset>
+<?php ($hook = get_hook('aop_fl_register_group_end')) ? eval($hook) : null; ?>
+	</div><!-- /.box-body -->
+<div class="box-footer">
+		<div class="form-group">
+			<div id="buttons" class="col-md-4">
+				<input type="submit" class="btn btn-primary" name="submit" value="<?php echo $lang_admin_settings['Add user'] ?>">
+			</div>
+		</div>
+	</div>
+</div>
+</form>
+
+
 <?php
 
 }
@@ -1973,7 +2754,7 @@ else if ($section == 'maintenance')
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Management'], forum_link('admin/reports.php')),
 		array($lang_admin_common['Maintenance mode'], forum_link('admin/settings.php?section=maintenance'))
 	);
@@ -1990,44 +2771,64 @@ else if ($section == 'maintenance')
 	($hook = get_hook('aop_maintenance_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-subhead">
-		<h2 class="hn"><span><?php echo $lang_admin_settings['Maintenance head'] ?></span></h2>
+<div class="box">
+	<div class="box-header with-border">
+			<h3 class="box-title"><?php echo $lang_admin_settings['Maintenance head'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
 	</div>
-	<div class="main-content main-frm">
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=maintenance') ?>">
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=maintenance') ?>">
+	<div class="box-body">
 			<div class="hidden">
 				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=maintenance')) ?>" />
 				<input type="hidden" name="form_sent" value="1" />
 			</div>
-			<div class="ct-box warn-box">
-				<p class="important"><?php echo $lang_admin_settings['Maintenance mode info'] ?></p>
-				<p class="warn"><?php echo $lang_admin_settings['Maintenance mode warn'] ?></p>
+			<div class="callout callout-danger">
+				<?php echo $lang_admin_settings['Maintenance mode info'] ?>
+			</div>
+			<div class="callout callout-warning">
+				<?php echo $lang_admin_settings['Maintenance mode warn'] ?>
 			</div>
 <?php ($hook = get_hook('aop_maintenance_pre_maintenance_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['Maintenance legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_maintenance_pre_maintenance_checkbox')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[maintenance]" value="1"<?php if ($forum_config['o_maintenance']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Maintenance mode'] ?></span> <?php echo $lang_admin_settings['Maintenance mode label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="checkboxes"><?php echo $lang_admin_settings['Maintenance mode'] ?></label>
+  <div class="col-md-4">
+  	<div class="checkbox">
+    	<label for="fld<?php echo $forum_page['fld_count'] ?>">
+    	  <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[maintenance]" value="1" <?php if ($forum_config['o_maintenance']) echo ' checked="checked"' ?> >
+    	 <span class="help-block"><?php echo $lang_admin_settings['Maintenance mode label'] ?></span>
+   		</label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_maintenance_pre_maintenance_message')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Maintenance message label'] ?></span><small><?php echo $lang_admin_settings['Maintenance message help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[maintenance_message]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_maintenance_message']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Maintenance message label'] ?></label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[maintenance_message]" rows="5" cols="55">default text</textarea>
+    <span class="help-block"><?php echo $lang_admin_settings['Maintenance message help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_maintenance_pre_maintenance_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('aop_maintenance_maintenance_fieldset_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" /></span>
+
+		
+	</div> 
+		<div class="box-footer">
+			<div class="form-group">
+				<div id="buttons" class="col-md-4">
+					<input type="submit" class="btn btn-primary" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>">
+				</div>
 			</div>
-		</form>
-	</div>
+		</div>
+	</form> 
+</div>
 <?php
 
 }
@@ -2040,7 +2841,7 @@ else if ($section == 'email')
 	// Setup breadcrumbs
 	$forum_page['crumbs'] = array(
 		array($forum_config['o_board_title'], forum_link($forum_url['index'])),
-		array($lang_admin_common['Forum administration'], forum_link('admin/admin.php')),
+		array($lang_admin_common['Forum administration'], forum_link('admin/index.php')),
 		array($lang_admin_common['Settings'], forum_link('admin/settings.php?section=setup')),
 		array($lang_admin_common['E-mail'], forum_link('admin/settings.php?section=email'))
 	);
@@ -2126,6 +2927,19 @@ else if ($section == 'email')
 		$preview_message = nl2br(forum_htmlencode($_POST['req_mass_message']));
 
 ?>
+
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title">Title</h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
+              Start creating your amazing application!
+	</div><!-- /.box-body -->
+</div>
 	<div class="main-subhead">
 		<h2 class="hn"><span><?php echo $lang_admin_settings['Preview mail']; ?></span></h2>
 	</div>
@@ -2181,39 +2995,46 @@ else if ($section == 'email')
 	($hook = get_hook('aop_email_output_start')) ? eval($hook) : null;
 
 ?>
-	<div class="main-content frm parted">
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=email') ?>">
+		<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=email') ?>">
 			<div class="hidden">
 				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=email')) ?>" />
 				<input type="hidden" name="form_sent" value="1" />
 			</div>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['E-mail head'] ?></span></h2>
-			</div>
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['E-mail head'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_email_pre_addresses_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['E-mail addresses legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_email_pre_admin_email')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Admin e-mail'] ?></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[admin_email]" size="50" maxlength="80" value="<?php echo forum_htmlencode($forum_config['o_admin_email']) ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Admin e-mail'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[admin_email]" size="50" maxlength="80" value="<?php echo forum_htmlencode($forum_config['o_admin_email']) ?>" class="form-control input-md">
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_webmaster_email')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Webmaster e-mail label'] ?></span><small><?php echo $lang_admin_settings['Webmaster e-mail help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[webmaster_email]" size="50" maxlength="80" value="<?php echo forum_htmlencode($forum_config['o_webmaster_email']) ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Webmaster e-mail label'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[webmaster_email]" size="50" maxlength="80" value="<?php echo forum_htmlencode($forum_config['o_webmaster_email']) ?>" class="form-control input-md">
+  <span class="help-block"><?php echo $lang_admin_settings['Webmaster e-mail help'] ?></span>  
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_mailing_list')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Mailing list label'] ?></span><small><?php echo $lang_admin_settings['Mailing list help'] ?></small></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="form[mailing_list]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_mailing_list']) ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Mailing list label'] ?></label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[mailing_list]" rows="5" cols="55"><?php echo forum_htmlencode($forum_config['o_mailing_list']) ?></textarea>
+	<span class="help-block"><?php echo $lang_admin_settings['Mailing list help'] ?></span>  
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_addresses_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php
@@ -2224,9 +3045,18 @@ else if ($section == 'email')
 $forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['E-mail server'] ?></span></h2>
-			</div>
+	</div><!-- /.box-body -->
+</div>
+
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['E-mail server'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
 <?php ($hook = get_hook('aop_email_pre_smtp_fieldset')) ? eval($hook) : null; ?>
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['E-mail server legend'] ?></strong></legend>
@@ -2234,54 +3064,76 @@ $forum_page['group_count'] = $forum_page['item_count'] = 0;
 					<p><?php echo $lang_admin_settings['E-mail server info'] ?></p>
 				</div>
 <?php ($hook = get_hook('aop_email_pre_smtp_host')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['SMTP address label'] ?></span><small><?php echo $lang_admin_settings['SMTP address help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[smtp_host]" size="35" maxlength="100" value="<?php echo forum_htmlencode($forum_config['o_smtp_host']) ?>" /></span>
-					</div>
-				</div>
+
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['SMTP address label'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[smtp_host]" size="35" maxlength="100" value="<?php echo forum_htmlencode($forum_config['o_smtp_host']) ?>" class="form-control input-md">
+  <span><?php echo $lang_admin_settings['SMTP address help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_smtp_user')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['SMTP username label'] ?></span><small><?php echo $lang_admin_settings['SMTP help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[smtp_user]" size="35" maxlength="50" value="<?php echo forum_htmlencode($forum_config['o_smtp_user']) ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['SMTP username label'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[smtp_user]" size="35" maxlength="50" value="<?php echo forum_htmlencode($forum_config['o_smtp_user']) ?>" class="form-control input-md">
+  <span><?php echo $lang_admin_settings['SMTP help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_smtp_pass')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['SMTP password label'] ?></span><small><?php echo $lang_admin_settings['SMTP help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[smtp_pass]" size="35" maxlength="50" value="<?php echo forum_htmlencode($forum_config['o_smtp_pass']) ?>" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['SMTP password label'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="form[smtp_pass]" size="35" maxlength="50" value="<?php echo forum_htmlencode($forum_config['o_smtp_pass']) ?>" class="form-control input-md">
+  <span><?php echo $lang_admin_settings['SMTP help'] ?></span>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_smtp_ssl')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box checkbox">
-						<span class="fld-input"><input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[smtp_ssl]" value="1"<?php if ($forum_config['o_smtp_ssl']) echo ' checked="checked"' ?> /></span>
-						<label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['SMTP SSL'] ?></span> <?php echo $lang_admin_settings['SMTP SSL label'] ?></label>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['SMTP SSL'] ?></label>
+  <div class="col-md-4">
+  <div class="checkbox">
+    <label for="fld<?php echo $forum_page['fld_count'] ?>">
+      <input type="checkbox" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="form[smtp_ssl]" value="1"<?php if ($forum_config['o_smtp_ssl']) echo ' checked="checked"' ?> />
+      <span class="help-block"><?php echo $lang_admin_settings['SMTP SSL label'] ?></span>
+    </label>
+	</div>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_email_pre_smtp_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
 <?php ($hook = get_hook('aop_email_smtp_fieldset_end')) ? eval($hook) : null; ?>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>" /></span>
+	</div><!-- /.box-body -->
+	<div class="box-footer">
+		<div class="form-group">
+			<div id="buttons" class="col-md-4">
+				<input type="submit" class="btn btn-primary" name="save" value="<?php echo $lang_admin_common['Save changes'] ?>">
 			</div>
-		</form>
+		</div>
+	</div>
+</div>
+</form>
+
 <?php
 
 // Reset counter
 $forum_page['group_count'] = $forum_page['item_count'] = 0;
 
 ?>
-		<form class="frm-form" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=email') ?>">
-			<div class="hidden">
-				<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=email')) ?>" />
-				<input type="hidden" name="mass_mail" value="1" />
-			</div>
-			<div class="main-subhead">
-				<h2 class="hn"><span><?php echo $lang_admin_settings['Mass e-mail'] ?></span></h2>
-			</div>
+<form class="form-horizontal" method="post" accept-charset="utf-8" action="<?php echo forum_link('admin/settings.php?section=email') ?>">
+	<div class="hidden">
+		<input type="hidden" name="csrf_token" value="<?php echo generate_form_token(forum_link('admin/settings.php?section=email')) ?>" />
+		<input type="hidden" name="mass_mail" value="1" />
+	</div>
+<div class="box">
+	<div class="box-header with-border">
+		<h3 class="box-title"><?php echo $lang_admin_settings['Mass e-mail'] ?></h3>
+		<div class="box-tools pull-right">
+			<button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<div class="box-body">
 			<div id="req-msg" class="req-warn ct-box error-box">
 				<p class="important"><?php printf($lang_common['Required warn'], '<em>'.$lang_common['Required'].'</em>') ?></p>
 			</div>
@@ -2289,57 +3141,60 @@ $forum_page['group_count'] = $forum_page['item_count'] = 0;
 			<fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
 				<legend class="group-legend"><strong><?php echo $lang_admin_settings['E-mail addresses legend'] ?></strong></legend>
 <?php ($hook = get_hook('aop_fl_email_pre_massmail_subjetc')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box text required longtext">
-						<label for="fld1"><span><?php echo $lang_admin_settings['Mass subject label'] ?><em><?php echo $lang_common['Required'] ?></em></span></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_mass_subject" value="<?php echo(isset($_POST['req_subject']) ? forum_htmlencode($_POST['req_subject']) : '') ?>" size="75" maxlength="70" /></span>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Mass subject label'] ?><em><?php echo $lang_common['Required'] ?></em></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_mass_subject" value="<?php echo(isset($_POST['req_subject']) ? forum_htmlencode($_POST['req_subject']) : '') ?>" size="75" maxlength="70" class="form-control input-md">
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_email_pre_massmail_massage')) ? eval($hook) : null; ?>
-				<div class="txt-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="txt-box textarea required">
-						<label for="fld2"><span><?php echo $lang_admin_settings['Mass massage label'] ?>  <em><?php echo $lang_common['Required'] ?></em></span></label>
-						<div class="txt-input"><span class="fld-input"><textarea id="fld<?php echo $forum_page['fld_count'] ?>" name="req_mass_message" rows="10" cols="95"><?php echo(isset($_POST['req_message']) ? forum_htmlencode($_POST['req_message']) : '') ?></textarea></span></div>
-					</div>
-				</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Mass massage label'] ?>  <em><?php echo $lang_common['Required'] ?></em></label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="fld<?php echo $forum_page['fld_count'] ?>" name="req_mass_message" rows="10" cols="95"><?php echo(isset($_POST['req_message']) ? forum_htmlencode($_POST['req_message']) : '') ?>default text</textarea>
+  </div>
+</div>
 <?php ($hook = get_hook('aop_fl_email_pre_massmail_group')) ? eval($hook) : null; ?>
-				<div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
-					<div class="sf-box select">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Mass recipient label'] ?></span></label><br />
-						<span class="fld-input"><select id="fld<?php echo $forum_page['fld_count'] ?>" name="mass_group">
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Mass recipient label'] ?></label>
+  <div class="col-md-4">
+    <select id="fld<?php echo $forum_page['fld_count'] ?>" name="mass_group" class="form-control">
 						<option value="0"><?php echo $lang_admin_settings['All group'] ?></option>
 <?php
-
 	$query = array(
 		'SELECT'	=> 'g.g_id, g.g_title',
 		'FROM'		=> 'groups AS g',
 		'WHERE'		=> 'g.g_id!=2',
 		'ORDER BY'	=> 'g.g_id'
 	);
-
 	($hook = get_hook('aop_qr_get_group_select')) ? eval($hook) : null;
 	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
-
 	while ($groups = $forum_db->fetch_assoc($result))
 		echo "\t\t\t\t\t\t\t\t".'<option value="'.$groups['g_id'].'">'.$groups['g_title'].'</option>'."\n";;
-
 ?>
-						</select></span>
-					</div>
-				</div>
-				<div class="sf-set set3">
-					<div class="sf-box frm-short text">
-						<label for="fld<?php echo ++$forum_page['fld_count'] ?>"><span><?php echo $lang_admin_settings['Mass partition label'] ?></span><small><?php echo $lang_admin_settings['Mass partition help'] ?></small></label><br />
-						<span class="fld-input"><input type="text" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="per_page" size="5" maxlength="5" value="<?php echo(isset($_POST['per_page']) ? forum_htmlencode($_POST['per_page']) : '0') ?>" /></span>
-					</div>
-				</div>
+    </select>
+  </div>
+</div>
+<div class="form-group ic<?php echo ++$forum_page['item_count'] ?>">
+  <label class="col-md-4 control-label" for="fld<?php echo ++$forum_page['fld_count'] ?>"><?php echo $lang_admin_settings['Mass partition label'] ?></label>  
+  <div class="col-md-4">
+  <input type="text" id="fld<?php echo ++$forum_page['fld_count'] ?>" name="per_page" size="5" maxlength="5" value="<?php echo(isset($_POST['per_page']) ? forum_htmlencode($_POST['per_page']) : '0') ?>" class="form-control input-md">
+  <span class="help-block"><?php echo $lang_admin_settings['Mass partition help'] ?></span>  
+  </div>
+</div>
+
 <?php ($hook = get_hook('aop_fl_email_pre_massmail_fieldset_end')) ? eval($hook) : null; ?>
 			</fieldset>
-			<div class="frm-buttons">
-				<span class="submit"><input type="submit" name="submit" value="<?php echo $lang_admin_settings['Preview'] ?>" /></span>
+	</div><!-- /.box-body -->
+	<div class="box-footer">
+		<div class="form-group">
+			<div id="buttons" class="col-md-4">
+				<input type="submit" class="btn btn-primary" name="submit" value="<?php echo $lang_admin_settings['Preview'] ?>">
 			</div>
-		</form>
+		</div>
 	</div>
+</div>
+</form>
 <?php
 
 	}
@@ -2356,4 +3211,4 @@ $tpl_main = str_replace('<forum_main>', $tpl_temp, $tpl_main);
 ob_end_clean();
 // END SUBST - <forum_main>
 
-require FORUM_ROOT.'footer.php';
+require FORUM_ROOT.'admin/footer_adm.php';

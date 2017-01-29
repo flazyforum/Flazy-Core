@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2008 Flazy.ru
+ * @modified Copyright (C) 2014-2017 Flazy.org
  * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
@@ -50,7 +50,7 @@ function generate_stat_user_cache($id = null, $username = null)
 	$load_info = '$forum_stat_user = array('."\n".
 		'\'total_users\'	=> \''.$stats['total_users'].'\','."\n".
 		'\'id\'				=> \''.$id.'\','."\n".
-		'\'username\'		=> \''.$username.'\','."\n".
+		'\'username\'		=> "'.$username.'",'."\n".
 		')';
 
 	$fh = @fopen(FORUM_CACHE_DIR.'cache_stat_user.php', 'wb');
