@@ -26,7 +26,11 @@ define('FORUM_SEARCH_MAX_WORD', 20);
 header('Content-Type: text/html; charset=utf-8');
 
 if (file_exists(FORUM_ROOT.'include/config.php'))
+<<<<<<< HEAD
 	die('File \'config.php\' already exists. This means that Flazy already installed. Go to the <a href="'.FORUM_ROOT.'index.php">main page</a>.');
+=======
+	die('The \'config.php\' already exists. That means the Flazy is already installed.Go to the  <a href="'.FORUM_ROOT.'index.php">main page</a>.');
+>>>>>>> origin/master
 
 // Make sure we are running at least MIN_PHP_VERSION
 if (!function_exists('version_compare') || version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))

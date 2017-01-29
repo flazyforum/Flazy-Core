@@ -2,7 +2,11 @@
 /**
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+<<<<<<< HEAD:resources/editor/post_bb.php
  * @modified Copyright (C) 2015 Flazy.us
+=======
+ * @modified Copyright (C) 2014-2017 Flazy.org
+>>>>>>> origin/master:bb.php
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */

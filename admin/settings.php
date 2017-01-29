@@ -4,8 +4,13 @@
  *
  * Allows administrators to control many of the settings used in the site.
  *
+<<<<<<< HEAD
  * @copyright Copyright (C) 2008-2015 PunBB, partially based on code copyright (C) 2008 FluxBB.org
  * @modified Copyright (C) 2013-2015 Flazy.us
+=======
+ * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
+ * @modified Copyright (C) 2014-2017 Flazy.org
+>>>>>>> origin/master
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
