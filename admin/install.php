@@ -1,8 +1,8 @@
 <?php
 /**
- * Установочный скрипт.
+ * The installation script
  *
- * Используется для установки Flazy
+ * It is used to set Flazy
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
  * @modified Copyright (C) 2014-2017 Flazy.org
@@ -34,7 +34,7 @@ if (file_exists(FORUM_ROOT.'include/config.php'))
 
 // Make sure we are running at least MIN_PHP_VERSION
 if (!function_exists('version_compare') || version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
-	die('Ваша версия PHP '.PHP_VERSION.'. Чтобы правильно работать, Flazy требуется  хотя бы PHP '.MIN_PHP_VERSION.'. Вам необходимо обновить PHP, и только тогда вы сможите прожолжить установку.');
+	die('Your PHP version is : '.PHP_VERSION.'. Flazy needs at least : '.MIN_PHP_VERSION.' to work properly.You will need to update your PHP version so Flazy can work properly.');
 
 // Disable error reporting for uninitialized variables
 error_reporting(E_ALL);

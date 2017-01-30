@@ -1,6 +1,6 @@
 <?php
 /**
- * Функции кеша.
+ * Cache
  *
  * Этот скрипт содержит все функции используемые для создания кеш-файлов.
  *
@@ -11,11 +11,11 @@
  */
 
 
-// Убедимся что никто не пытается запусть этот сценарий напрямую
+// Makes sure that no one is trying to run this script directly
 if (!defined('FORUM'))
 	die;
 
-// Создать кеш config
+// Creates the cache config
 function generate_config_cache()
 {
 	global $forum_db;
