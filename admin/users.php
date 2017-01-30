@@ -849,7 +849,7 @@ else if (isset($_POST['find_user']))
 	$registered_before = forum_trim($_POST['registered_before']);
 	$order_by = isset($_POST['order_by']) ? forum_trim($_POST['order_by']) : null;
 	$direction = isset($_POST['direction']) ? forum_trim($_POST['direction']) : null;
-	if ($order_by == null || $direction == null)
+	if ($order_by === null || $direction === null)
 		message($lang_common['Bad request']);
 	if (!in_array($order_by, array('username', 'email', 'num_posts', 'num_posts', 'registered')) || !in_array($direction, array('ASC', 'DESC')))
 		message($lang_common['Bad request']);
