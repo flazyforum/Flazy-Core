@@ -1295,8 +1295,8 @@ else
 
 	if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 	{
-		$schema['UNIQUE KEYS']['user_id_ident_idx'] = array('user_id', 'ident(25)');
-		$schema['INDEXES']['ident_idx'] = array('ident(25)');
+		$schema['UNIQUE KEYS']['user_id_ident_idx'] = array('user_id', 'ident(40)');
+		$schema['INDEXES']['ident_idx'] = array('ident(40)');
 	}
 
 	if ($db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
