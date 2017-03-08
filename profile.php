@@ -1,6 +1,6 @@
 <?php
 /**
- * Позволяет пользователям просматривать и редактировать информацию о себе.
+ * This page allows people to view and edit personal information.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
  * @modified Copyright (C) 2014-2017 Flazy.org

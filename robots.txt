@@ -2,7 +2,8 @@ User-agent: *
 Disallow: /admin/
 Disallow: /cache/
 Disallow: /extensions/
-Disallow: /img/
 Disallow: /include/
 Disallow: /lang/
+Disallow: /resources/admin
+Disallow: /resources/editor
 Disallow: /style/
