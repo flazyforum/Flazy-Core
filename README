@@ -26,35 +26,6 @@ Installation
 3. Open the file install.php with your browser (example:http://example.com/flazy/install.php)
 4. Follow the instructions about the installation.
 
-
-Features
---------
-Forum
-* Unlimited Forums 
-* Create topics or polls
-* Reply to topics, or quote previous posts
-* Post up and down ratings
-* Topic and forum subscription with email notifications
-
-Moderation
-* Still in the making
-
-Administration
-* Still in the making
-
-Security
-* Still in the making
-
-Miscellaneous
-* RSS feeds for each forum
-* Search through topics (Title and Post)
-* Report system for topics, posts and users
-* BBCode support using Decoda
-* Mark topics as read (Session)
-* Log created topics and posts (Session)
-
-
-
 Compatibility
 -------------
 * Web-server (Apache is recommended)
@@ -75,6 +46,11 @@ Frequently asked questions
 --------------------------
 
 Having problems with Flazy ? Check out the [FAQ](https://github.com/flazy-us/Flazy-Forum-Stable/wiki/FAQ) before reporting a bug or problem that may already be known.
+
+
+Contributing
+--------------------------
+Please report issues on the [Github issue](https://github.com/flazyforum/Flazy-Forum/issues) tracker. Personal email addresses are not appropriate for bug reports.
 
 License
 -------
