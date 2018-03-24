@@ -824,14 +824,14 @@ $text);
 		return $return;
 
 	// This thing takes a while! :)
-	$count = count($pattern);
-	for ($i = 0; $i < $count; $i++) {
-		$text = preg_replace_callback($pattern[$i], create_function('$matches', 'return "'.$replace[$i].'";'), $text);
+	foreach ($pattern as $key => $cur_pattern) {
+	 $text = preg_replace_callback($cur_pattern, create_function('$matches', 'return "'.$replace[$key].'";'), $text);
 	}
 	
-	$count = count($pattern_callback);
-	for ($i = 0; $i < $count; $i++) {
-		$text = preg_replace_callback($pattern_callback[$i], create_function('$matches', 'return '.$replace_callback[$i].';'), $text);
+	if (isset($pattern_callback)) {
+		foreach ($pattern_callback as $key => $cur_callback) {
+			$text = preg_replace_callback($cur_callback, create_function('$matches', 'return '.$replace_callback[$key].';'), $text);
+		}
 	}
 	$return = ($hook = get_hook('ps_do_bbcode_end')) ? eval($hook) : null;
 	if ($return != null)
