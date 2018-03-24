@@ -40,19 +40,30 @@ if (isset($_GET['install']) || isset($_GET['install_hotfix']))
 	($hook = get_hook('aex_install_selected')) ? eval($hook) : null;
 
 	// User pressed the cancel button
-	if (isset($_POST['install_cancel']))
-		redirect(forum_link('admin/extensions.php?section=install'), $lang_admin_common['Cancel redirect']);
+	if (!empty($errors)) {
+		foreach ($errors as $i => $cur_error) {
+			$errors[$i] = '<li class="warn"><span>' . $cur_error . '</span></li>';
+		}
+		$msg_errors =
+			'<div class="ct-box error-box"><h2 class="warn hn">'
+				. $lang_admin_ext['Install ext errors']
+				. '<ul class="error-list">'
+					. implode("\n", $errors)
+				. '</ul>'
+			. '</div>';
+		message(isset($_GET['install'])? $msg_errors : $lang_admin_ext['Hotfix download failed']);
+	}
 
 	$id = preg_replace('/[^0-9a-z_]/', '', isset($_GET['install']) ? $_GET['install'] : $_GET['install_hotfix']);
 
-	// Load manifest (either locally or from flazy.ru updates service)
+	// Load manifest (either locally or from flazy.mgknet.com updates service)
 	if (isset($_GET['install']))
 		$manifest = @file_get_contents(FORUM_ROOT.'extensions/'.$id.'/manifest.xml');
 	else
 	{
 		if (!defined('FORUM_FUNCTIONS_GET_REMOTE_FILE'))
 			require FORUM_ROOT.'include/functions/get_remote_file.php';
-		$manifest = @end(get_remote_file('http://flazy.ru/update/manifest/'.$id.'.xml', 16));
+		$manifest = @end(get_remote_file('http://flazy.mgknet.com/update/manifest/'.$id.'.xml', 16));
 	}
 
 	// Parse manifest.xml into an array and validate it
@@ -887,7 +898,17 @@ else if ($section == 'manage')
 		{
 			if (preg_match('/[^0-9a-z_]/', $entry))
 			{
-				$forum_page['ext_error'][] = '<div class="ext-error databox db'.++$forum_page['item_num'].'">'."\n\t\t\t\t".'<h3 class="legend"><span>'.sprintf($lang_admin_ext['Extension loading error'], forum_htmlencode($entry)).'</span></h3>'."\n\t\t\t\t".'<p>'.$lang_admin_ext['Illegal ID'].'</p>'."\n\t\t\t".'</div>';
+				foreach ($errors as $i => $cur_error) {
+					$errors[$i] = '<li class="warn"><span>' . $cur_error . '</span></li>';
+						}
+						$forum_page['ext_error'][] =
+							'<div class="ext-error databox db' . ++$forum_page['item_num'] . '">'
+								. "\n\t\t\t\t"
+								. '<h3 class="legend"><span>' . sprintf($lang_admin_ext['Extension loading error'], forum_htmlencode($entry)) . '</span></h3>'
+								. "\n\t\t\t\t"
+								. '<p><ul class="error-list">' . implode(' ', $errors) . '</ul></p>'
+								. "\n\t\t\t"
+							. '</div>';
 				++$num_failed;
 				continue;
 			}

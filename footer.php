@@ -16,7 +16,7 @@ ob_start();
 
 ($hook = get_hook('ft_about_output_start')) ? eval($hook) : null;
 
-$forum_page['copyright'] = sprintf($lang_common['Powered by'], '<a href="http://flazy.ru/">Flazy</a>' . ($forum_config['o_show_version'] ? ' ' . $forum_config['o_cur_version'] : ''));
+$forum_page['copyright'] = sprintf($lang_common['Powered by'], '<a href="http://flazy.mgknet.com/">Flazy</a>' . ($forum_config['o_show_version'] ? ' ' . $forum_config['o_cur_version'] : ''));
 
 
 ($hook     = get_hook('ft_about_pre_copyright')) ? eval($hook) : null;

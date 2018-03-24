@@ -235,10 +235,10 @@ function generate_updates_cache()
 	for ($i = 0; $i < $num_hotfixes; ++$i)
 		$hotfixes[] = urlencode($forum_db->result($result, $i));
 
-	// Contact the flazy.ru updates service
+	// Contact the flazy.mgknet.com updates service
 	if (!defined('FORUM_FUNCTIONS_GET_REMOTE_FILE'))
 		require FORUM_ROOT.'include/functions/get_remote_file.php';
-	$result = get_remote_file('https://flazy.eu/update/index.php?version='.str_replace(' ', '', $forum_config['o_cur_version']).'&hotfixes='.implode(',', $hotfixes), 8);
+	$result = get_remote_file('https://flazy.mgknet.com/update/index.php?version='.str_replace(' ', '', $forum_config['o_cur_version']).'&hotfixes='.implode(',', $hotfixes), 8);
 
 	// Make sure we got everything we need
 	if ($result != null && strpos($result['content'], '</updates>') !== false)

@@ -35,7 +35,7 @@ $lang_admin_index = array(
 'Updates failed'				=>	'The latest attempt at checking for updates against the updates.flazy.us updates service failed. This probably just means that the service is temporarily overloaded or out of order. However, if this alert does not disappear within a day or two, you should disable the automatic check for updates and check for updates manually in the future.',
 'Updates version n hf'			=>	'A newer version of Flazy, version %s, is available for download at <a href="https://flazy.us/">flazy.us</a>. Furthermore, one or more hotfixes are available for install on the <a href="%s">Manage hotfixes</a> tab of the admin interface.',
 /*RUS*/'Dev version'			=>	'Вы используете Dev-версию и не будите получать уведомления о критических исправлениях.',
-/*RUS*/'Updates version'		=>	'Более новая версия Flazy, версия %s, доступна для скачивания на сайте <a href="http://flazy.ru/webforum/download/">Flazy.ru</a>.',
+/*RUS*/'Updates version'		=>	'Более новая версия Flazy, версия %s, доступна для скачивания на сайте <a href="http://flazy.mgknet.com/webforum/download/">flazy.mgknet.com</a>.',
 /*RUS*/'Updates hf'				=>	'Один или несколько исправлений доступны для установки на вкладке <strong><a href="%s">Расширения » Исправления</a></strong> в админ-панеле.',
 /*RUS*/'Database mismatch'		=>	'Несоответствие версии базы данных:',
 /*RUS*/'Database mismatch alert'=>	'База данных Flazy будет использована в связке с новой версией кода Flazy. Их несоответствие может привести к неработоспособности форума. Рекомендуется обновить форум до самой новой версии.',

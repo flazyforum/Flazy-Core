@@ -7,7 +7,7 @@
          folder instead of downloading all of them to reduce the load. -->
              <link href="<?php echo $base_url ?>/resources/admin/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css"/>
     <link href="<?php echo $base_url  ?>/resources/admin/dist/css/skins/_all-skins.min.css" rel="stylesheet" type="text/css"/>
-<link rel="stylesheet" src="https://flazy.eu/resources/admin/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css"  type="text/css"/>
+<link rel="stylesheet" src="https://flazy.mgknet.com/resources/admin/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css"  type="text/css"/>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>

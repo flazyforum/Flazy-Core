@@ -251,7 +251,7 @@ if (count($topics_info) > 0) {
 
                     $forum_page['item_subject']['starter'] = '<span class="item-starter">' . sprintf($lang_forum['Topic starter'], '<cite><a href="' . forum_link($forum_url['user'], $cur_topic['poster_id']) . '">' . forum_htmlencode($cur_topic['poster']) . '</a></cite>') . '</span>';
 
-                    if ($cur_topic['moved_to'] != null) {
+                    if ($cur_topic['moved_to'] !== null) {
                         $forum_page['item_title_status']['moved'] = '<em class="moved">' . $lang_forum['Moved'] . '</em>';
                         $forum_page['item_status']['moved']       = 'moved';
 

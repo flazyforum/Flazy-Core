@@ -122,7 +122,7 @@ if (strpos($forum_config['o_cur_version'], 'dev') === false)
 		error('Ваша база данных не нуждается в обновлении.');
 
 	if (!version_compare($forum_config['o_cur_version'], PRE_VERSION, '>='))
-		error('Чтобы обновить Ваш форум до версии '.UPDATE_TO.' сначало его требуется обновить до предущей версии '.PRE_VERSION.' и только тогда вы сможете продолжить. Узнать какие версии вам нужны Вы можете <a href="http://flazy.ru/wiki/Скрипты_обновления">здесь</a>.');
+		error('Чтобы обновить Ваш форум до версии '.UPDATE_TO.' сначало его требуется обновить до предущей версии '.PRE_VERSION.' и только тогда вы сможете продолжить. Узнать какие версии вам нужны Вы можете <a href="http://flazy.mgknet.com/wiki/Скрипты_обновления">здесь</a>.');
 }
 
 // If $base_url isn't set, use o_base_url from config
