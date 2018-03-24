@@ -2078,9 +2078,9 @@ $type_image = 'circle';
                             <span class="fld-input"><input id="fld<?php echo $forum_page['fld_count'] ?>" type="text" name="form[magent]" value="<?php echo(isset($form['magent']) ? forum_htmlencode($form['magent']) : forum_htmlencode($user['magent'])) ?>" size="35" maxlength="30" class="magent inim" /></span>
                         </div>
                     </div>
-        <?php ($hook                     = get_hook('pf_change_details_identity_pre_contact_fieldset_end')) ? eval($hook) : null; ?>
+        <?php ($hook                     = get_hook('pf_change_details_identity_pre_messengers_fieldset_end')) ? eval($hook) : null; ?>
                 </fieldset>
-                    <?php ($hook                     = get_hook('pf_change_details_identity_contact_fieldset_end')) ? eval($hook) : null; ?>
+                    <?php ($hook                     = get_hook('pf_change_details_identity_messengers_fieldset_end')) ? eval($hook) : null; ?>
         <?php $forum_page['item_count'] = 0; ?>
                 <fieldset class="frm-group group<?php echo ++$forum_page['group_count'] ?>">
         <?php ($hook                     = get_hook('pf_fl_change_details_identity_pre_vkontakte')) ? eval($hook) : null; ?>
