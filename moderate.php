@@ -869,7 +869,7 @@ if (isset($_REQUEST['move_topics']) || isset($_POST['move_topics_to'])) {
                 <div class="sf-set set<?php echo ++$forum_page['item_count'] ?>">
                     <div class="sf-box checkbox">
                         <span class="fld-input"><input type="checkbox" id="fld<?php echo ( ++$forum_page['fld_count']) ?>" name="with_redirect" value="1"<?php if ($action == 'single') echo ' checked="checked"' ?> /></span>
-                        <label for="fld<?php echo $forum_page['fld_count'] ?>"><span><?php echo $lang_misc['Redirect topic'] ?></span> <?php echo ($action == 'single') ? $lang_misc['Leave redirect'] : $lang_misc['Leave redirects'] ?></label>
+                        <label for="fld<?php echo $forum_page['fld_count'] ?>"><?php echo $lang_misc['Leave merge redirects'] ?></label>
                     </div>
                 </div>
                 <?php ($hook     = get_hook('mr_move_topics_pre_fieldset_end')) ? eval($hook) : null; ?>
