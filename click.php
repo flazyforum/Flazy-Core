@@ -4,7 +4,7 @@
  * Скрипт перенаправления внешних ссылок.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2014-2017 Flazy.org
+ * @modified Copyright (C) 2014-2018 Flazy
  * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */
@@ -31,3 +31,4 @@ if (isset($_SERVER['QUERY_STRING'])) {
 }
 
 ($hook = get_hook('cl_fl_end')) ? eval($hook) : null;
+

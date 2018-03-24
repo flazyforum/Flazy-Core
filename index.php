@@ -3,7 +3,7 @@
  * Показывает список категорий/форумов, что участники могут видеть, вместе с некоторыми статистическими данными.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2014-2017 Flazy.org
+ * @modified Copyright (C) 2014-2018 Flazy
  * @license http://www.gnu.org/licenses/gpl.html GPL версии 2 или выше
  * @package Flazy
  */

@@ -5,7 +5,7 @@
  * Allows administrators and moderators to create, modify, and delete bans.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
- * @modified Copyright (C) 2014-2017 Flazy.org
+ * @modified Copyright (C) 2014-2018 Flazy
  * @license http://www.gnu.org/licenses/gpl.html GPL version 2 or higher
  * @package Flazy
  */
