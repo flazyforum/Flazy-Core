@@ -1,6 +1,6 @@
 <?php
 /**
- * Общие функции используемые на форуме.
+ * Loads common functions used throughout the site.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
  * @modified Copyright (C) 2014-2018 Flazy
@@ -13,10 +13,8 @@
 //
 
 /**
- * Преобразует специальные символы в мнемоники HTML, чтобы они были безопасны для вывода на страницу.
- * Кодировка используемая при преобразовании UTF-8, также преобразуются двойные и одиночные кавычки.
- * Обёртка PHP функции htmlspecialchars().
- * @param string Строка которую нужно конвертировать.
+ * Trim whitespace including non-breaking space
+ * @param string 
  * @return string.
  */
 function forum_htmlencode($str)
@@ -30,8 +28,7 @@ function forum_htmlencode($str)
 
 
 /**
- * Удаляет пробелы из начала и конца строки.
- * Обёртка для utf8_trim().
+ *  Convert \r\n and \r to \n
  * @param string Строка которую нужно обрезать.
  * @param string Символы которые нужно удалить (\t - символ табуляции, \n - символ перевода строки, \r - символ возврата каретки, \x0b - вертикальная табуляция, \xc2\xa0 - неразрывные пробелы).
  * @return string
@@ -780,7 +777,7 @@ function get_title($user)
 	}
 
 	// If not already loaded in a previous call, load the cached ranks
-	if ($forum_config['o_ranks'] && !defined('FORUM_RANKS_LOADED'))
+	if ($forum_config['o_ranks'] == '1' && !defined('FORUM_RANKS_LOADED'))
 	{
 		if (file_exists(FORUM_CACHE_DIR.'cache_ranks.php'))
 			include FORUM_CACHE_DIR.'cache_ranks.php';
@@ -797,7 +794,7 @@ function get_title($user)
 
 	// If the user has a custom title
 	if ($user['title'] != '')
-		$user_title = forum_htmlencode($forum_config['o_censoring'] ? censor_words($user['title']) : $user['title']);
+		$user_title = forum_htmlencode($forum_config['o_censoring'] == '1' ? censor_words($user['title']) : $user['title']);
 	// If the user is banned
 	else if (in_array(utf8_strtolower($user['username']), $ban_list))
 		$user_title = $lang_common['Banned'];
@@ -810,7 +807,7 @@ function get_title($user)
 	else
 	{
 		// Are there any ranks?
-		if ($forum_config['o_ranks'] && !empty($forum_ranks))
+		if ($forum_config['o_ranks'] == '1' && !empty($forum_ranks))
 			foreach ($forum_ranks as $cur_rank)
 				if (intval($user['num_posts']) >= $cur_rank['min_posts'])
 					$user_title = forum_htmlencode($cur_rank['rank']);
@@ -963,7 +960,7 @@ function get_current_url($max_length = 0)
 	if ($return != null)
 		return $return;
 
-	$protocol = (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off') ? 'http://' : 'https://';
+	$protocol = (!empty($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off') ? 'http://' : 'https://';
 	$port = (isset($_SERVER['SERVER_PORT']) && (($_SERVER['SERVER_PORT'] != '80' && $protocol == 'http://') || ($_SERVER['SERVER_PORT'] != '443' && $protocol == 'https://')) && strpos($_SERVER['HTTP_HOST'], ':') === false) ? ':'.$_SERVER['SERVER_PORT'] : '';
 
 	$url = urldecode($protocol.$_SERVER['HTTP_HOST'].$port.$_SERVER['REQUEST_URI']);
@@ -1108,8 +1105,7 @@ function generate_form_token($target_url)
 
 
 /**
- * Генерация хеша.
- * Используется SHA-1, если доступен, если нет, то SHA-1 через mhash(), если и это недоспупно, то возвращает через MD5.
+ * Generates a salted, SHA-1 hash of $str
  * @param string Строка которую необходимо кешировать, используется SHA-1.
  * @param string Случайно сгенерированый ключ (соль), который хранится в базе данных.
  * @return string хеш.
@@ -1131,7 +1127,7 @@ function forum_hash($str, $salt)
 
 
 /**
- * Удалякт все .php файлы из каталога кеша форума.
+ * Delete every .php file in the forum's cache directory.
  */
 function forum_clear_cache()
 {
@@ -1140,14 +1136,16 @@ function forum_clear_cache()
 		return;
 
 	$d = dir(FORUM_CACHE_DIR);
-	while (($entry = $d->read()) !== false)
+	if ($d)
 	{
-		if (substr($entry, strlen($entry)-4) == '.php')
-			@unlink(FORUM_CACHE_DIR.$entry);
+		while (($entry = $d->read()) !== false)
+		{
+			if (substr($entry, strlen($entry)-4) == '.php')
+				@unlink(FORUM_CACHE_DIR.$entry);
+		}
+		$d->close();
 	}
-	$d->close();
 }
-
 
 //
 // Главные функции форума
@@ -1214,7 +1212,7 @@ function cookie_login(&$forum_user)
 		return;
 
 	// If a cookie is set, we get the user_id and password hash from it
-	if (isset($_COOKIE[$cookie_name]))
+	if (!empty($_COOKIE[$cookie_name]))
 		@list($cookie['user_id'], $cookie['password_hash'], $cookie['expiration_time'], $cookie['expire_hash']) = @explode('|', base64_decode($_COOKIE[$cookie_name]));
 
 	($hook = get_hook('fn_cookie_login_fetch_cookie')) ? eval($hook) : null;
