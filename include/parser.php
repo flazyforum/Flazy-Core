@@ -584,7 +584,17 @@ function handle_url_tag($url, $link = '', $bbcode = false)
 	$return = ($hook = get_hook('ps_handle_url_tag_end')) ? eval($hook) : null;
 	if ($return != null)
 		return $return;
-
+		if (preg_match('%^#?\d+$%', $url)) // relative links [url=2] and [url=2#3]
+	{
+		if ($link == '')
+			$link = $url;
+ 		global  $ forum_url ;
+		$url = $url[0] == '#' ? forum_link($forum_url['post'], substr($url, 1)) : forum_link($forum_url['topic'], $url);
+ 		if ($bbcode)
+			return '[url='.$url.']'.$link.'[/url]';
+		else
+			return '<a href="'.$url.'">'.$link.'</a>';
+	}
 	if ($bbcode)
 	{
 		if ($full_url == $link)
