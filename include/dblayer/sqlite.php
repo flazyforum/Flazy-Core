@@ -60,6 +60,8 @@ class DBLayer
 		else
 			$this->link_id = @sqlite_open($db_name, 0666, $sqlite_error);
 
+			$this->link_id->busyTimeout(SQLITE_BUSY_TIMEOUT);
+
 		if (!$this->link_id)
 			error('Unable to open database \''.$db_name.'\'. SQLite reported: '.$sqlite_error, __FILE__, __LINE__);
 		else
