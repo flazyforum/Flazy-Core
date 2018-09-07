@@ -939,7 +939,16 @@ else if ($section == 'manage')
 			{
 				if (!array_key_exists($entry, $inst_exts) || version_compare($inst_exts[$entry]['version'], $ext_data['extension']['version'], '!='))
 				{
-					$forum_page['ext_item'][] = '<div class="box-body">'."\n\t\t\t".'<h3 class="ct-legend hn"><span>'.forum_htmlencode($ext_data['extension']['title']).'</span></h3>'."\n\t\t\t".'<ol>'."\n\t\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Extension by'], forum_htmlencode($ext_data['extension']['author'])).'</span></li>'."\n\t\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Version'], $ext_data['extension']['version']).'</span></li>'.(($ext_data['extension']['description'] != '') ? "\n\t\t\t\t".'<li><span>'.forum_htmlencode($ext_data['extension']['description']).'</span></li>' : '')."\n\t\t\t".'</ol>'."\n\t\t\t".'<a href="'.$base_url.'/admin/extensions.php?install='.urlencode($entry).'" class="btn btn-primary">'.(isset($inst_exts[$entry]['version']) ? $lang_admin_ext['Upgrade extension'] : $lang_admin_ext['Install extension']).'</a><hr>'."\n\t\t".'</div>';
+					$forum_page['ext_item'][] =
+						'<div class="ct-box info-box extension available">'."\n\t\t\t".'<h3 class="ct-legend hn">'.forum_htmlencode($ext_data['extension']['title']).' <em>'.$ext_data['extension']['version'].'</em></h3>'."\n\t\t\t"
+							. (!file_exists(FORUM_ROOT . 'extensions/' . $entry . '/icon.png')? "" :
+									('<img src="' . $base_url . "/extensions/" . $entry . "/icon.png" . '" style="width:100px;float:left;">'))
+							.'<ul class="data-list">'."\n\t\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Extension by'], forum_htmlencode($ext_data['extension']['author'])).'</span></li>'.(($ext_data['extension']['description'] != '') ? "\n\t\t\t\t".'<li><span>'.forum_htmlencode($ext_data['extension']['description']).'</span></li>' : '')."\n\t\t\t".'</ul>'
+							. "\n\t\t\t"
+							. '<div style="clear:both;"></div>'
+							. '<p class="options"><span class="first-item"><a href="'.$base_url.'/admin/extensions.php?install='.urlencode($entry).'">'.(isset($inst_exts[$entry]['version']) ? $lang_admin_ext['Upgrade extension'] : $lang_admin_ext['Install extension']).'</a></span></p>'
+							. "\n\t\t"
+						. '</div>';
 					++$num_exts;
 				}
 			}
@@ -1007,11 +1016,35 @@ else if ($section == 'manage')
 
 		($hook = get_hook('aex_section_manage_pre_ext_actions')) ? eval($hook) : null;
 
-		if ($ext['disabled'] == '1')
-			$forum_page['ext_item'][] = '<div class="ct-box info-box extension disabled">'."\n\t\t".'<h3 class="ct-legend hn"><span>'.forum_htmlencode($ext['title']).' ( <span>'.$lang_admin_ext['Extension disabled'].'</span> )</span></h3>'."\n\t\t".'<ul >'."\n\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Extension by'], forum_htmlencode($ext['author'])).'</span></li>'."\n\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Version'], $ext['version']).'</span></li>'."\n\t\t\t".(($ext['description'] != '') ? '<li><span>'.forum_htmlencode($ext['description']).'</span></li>' : '')."\n\t\t\t".'</ul>'."\n\t\t".'<p class="options">'.implode(' ', $forum_page['ext_actions']).'</p>'."\n\t".'</div>';
-		else
-			$forum_page['ext_item'][] = '<div class="">'."\n\t\t".'<h3 class="ct-legend hn"><span>'.forum_htmlencode($ext['title']).'</span></h3><hr>'."\n\t\t".'<ol>'."\n\t\t\t".'<dd><span>'.sprintf($lang_admin_ext['Extension by'], forum_htmlencode($ext['author'])).'</span></dd>'."\n\t\t\t".'<dd><span>'.sprintf($lang_admin_ext['Version'], $ext['version']).'</span></dd>'."\n\t\t\t".(($ext['description'] != '') ? '<dd><span>'.forum_htmlencode($ext['description']).'</span></dd>' : '')."\n\t\t".'</ol>'."\n\t\t".'<div class="box-footer">'.implode(' ', $forum_page['ext_actions']).'</div>'."\n\t".'</div>';
-
+		if ($ext['disabled'] == '1') {
+			$forum_page['ext_item'][] =
+				'<div class="ct-box info-box extension disabled">'
+					. "\n\t\t"
+					. '<h3 class="ct-legend hn">'.forum_htmlencode($ext['title']).' <em>'.$ext['version'].'</em> ('.$lang_admin_ext['Extension disabled'].')</h3>'
+					. "\n\t\t"
+					. (!file_exists(FORUM_ROOT . 'extensions/' . $id . '/icon.png')? "" :
+							('<img src="' . $base_url . "/extensions/" . $id . "/icon.png" . '" style="width:100px;float:left;">'))
+					. '<ul class="data-list">'."\n\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Extension by'], forum_htmlencode($ext['author'])).'</span></li>'."\n\t\t\t".(($ext['description'] != '') ? '<li><span>'.forum_htmlencode($ext['description']).'</span></li>' : '')."\n\t\t\t".'</ul>'."\n\t\t"
+					. '<div style="clear:both;"></div>'
+					. '<p class="options">'.implode(' ', $forum_page['ext_actions']).'</p>'
+					. "\n\t"
+				. '</div>';
+		}
+		else {
+			$forum_page['ext_item'][] =
+				'<div class="ct-box info-box extension enabled">'
+					. "\n\t\t"
+					. '<h3 class="ct-legend hn">'.forum_htmlencode($ext['title']).' <em>'.$ext['version'].'</em></h3>'
+					. "\n\t\t"
+					. (!file_exists(FORUM_ROOT . 'extensions/' . $id . '/icon.png')? "" :
+							('<img src="' . $base_url . "/extensions/" . $id . "/icon.png" . '" style="width:100px;float:left;">'))
+					. '<ul class="data-list">'."\n\t\t\t".'<li><span>'.sprintf($lang_admin_ext['Extension by'], forum_htmlencode($ext['author'])).'</span></li>'."\n\t\t\t".(($ext['description'] != '') ? '<li><span>'.forum_htmlencode($ext['description']).'</span></li>' : '')."\n\t\t".'</ul>'."\n\t\t"
+					. '<div style="clear:both;"></div>'
+					. '<p class="options">'.implode(' ', $forum_page['ext_actions']).'</p>'
+					. "\n\t"
+				. '</div>';
+		}
+		
 		$installed_count++;
 	}
 
