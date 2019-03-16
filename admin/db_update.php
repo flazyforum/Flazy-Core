@@ -526,6 +526,14 @@ switch ($stage)
 					<div class="box-footer">
 <?php
 	$current_url = get_current_url();
+	if (strpos($cur_version, '1.2') === 0 && $db_seems_utf8 && !isset($_GET['force']))
+{
+
+?>
+				<li class="important"><span><strong>IMPORTANT!</strong> Based on a random selection of 100 posts, topic subjects, usernames and forum names from the database, it appears as if text in the database is currently UTF-8 encoded. This is a good thing. Based on this, the update process will not attempt to do charset conversion. If you have reason to believe that the charset conversion is required nonetheless, you can <a href="<?php echo $current_url.((substr_count($current_url, '?') == 1) ? '&amp;' : '?').'force=1' ?>">force the conversion to run</a>.</span></li>
+<?php
+
+}
 ?>
 		<form class="frm-form" method="get" accept-charset="utf-8" action="<?php echo $current_url ?>">
 			<div class="hidden">
@@ -533,6 +541,16 @@ switch ($stage)
 			</div>
 			<div class="frm-buttons">
 				<input type="submit" name="start" class="btn btn-primary" value="Update" />
+				<?php
+
+		if (strpos($cur_version, '1.2') === 0 && (!$db_seems_utf8 || isset($_GET['force'])))
+		{
+
+?>
+			<div class="ct-box info-box">
+				<p class="important"><strong>Enable conversion:</strong> When enabled this update script will, after it has made the required structural changes to the database, convert all text in the database from the current character set to UTF-8. This conversion is required if you're upgrading from PunBB 1.2 and you are not currently using an UTF-8 language pack.</p>
+				<p class="important"><strong>Current character set:</strong> If the primary language in your forum is English, you can leave this at the default value. However, if your forum is non-English, you should enter the character set of the primary language pack used in the forum.</p>
+ 
 			</div>
 		</form>
 					</div><!-- /.box-footer-->
@@ -563,32 +581,259 @@ switch ($stage)
 
 	// Start by updating the database structure
 	case 'start':
+	// Put back dropped search tables
+		if (!$forum_db->table_exists('search_cache') && in_array($db_type, array('mysql', 'mysqli', 'mysql_innodb', 'mysqli_innodb')))
+		{
+			$schema = array(
+				'FIELDS'		=> array(
+					'id'			=> array(
+						'datatype'		=> 'INT(10) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'ident'			=> array(
+						'datatype'		=> 'VARCHAR(200)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'search_data'	=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					)
+				),
+				'PRIMARY KEY'	=> array('id'),
+				'INDEXES'		=> array(
+					'ident_idx'	=> array('ident(8)')
+				)
+			);
 
-		// Включение техобслуживания
-		$query = array(
-			'UPDATE'	=> 'config',
-			'SET'		=> 'conf_value=\'1\'',
-			'WHERE'		=> 'conf_name=\'o_maintenance\''
-		);
-		$forum_db->query_build($query) or error(__FILE__, __LINE__);
+			$forum_db->create_table('search_cache', $schema);
+
+
+			$schema = array(
+				'FIELDS'		=> array(
+					'post_id'		=> array(
+						'datatype'		=> 'INT(10) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'word_id'		=> array(
+						'datatype'		=> 'INT(10) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'subject_match'	=> array(
+						'datatype'		=> 'TINYINT(1)',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					)
+				),
+				'INDEXES'		=> array(
+					'word_id_idx'	=> array('word_id'),
+					'post_id_idx'	=> array('post_id')
+				)
+			);
+
+			$forum_db->create_table('search_matches', $schema);
+
+
+			$schema = array(
+				'FIELDS'		=> array(
+					'id'			=> array(
+						'datatype'		=> 'SERIAL',
+						'allow_null'	=> false
+					),
+					'word'			=> array(
+						'datatype'		=> 'VARCHAR(20)',
+						'allow_null'	=> false,
+						'default'		=> '\'\'',
+						'collation'		=> 'bin'
+					)
+				),
+				'PRIMARY KEY'	=> array('word'),
+				'INDEXES'		=> array(
+					'id_idx'	=> array('id')
+				)
+			);
+
+			$forum_db->create_table('search_words', $schema);
+		}
+
+		// Add the extensions table if it doesn't already exist
+		if (!$forum_db->table_exists('extensions'))
+		{
+			$schema = array(
+				'FIELDS'		=> array(
+					'id'				=> array(
+						'datatype'		=> 'VARCHAR(150)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'title'				=> array(
+						'datatype'		=> 'VARCHAR(255)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'version'			=> array(
+						'datatype'		=> 'VARCHAR(25)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'description'		=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'author'			=> array(
+						'datatype'		=> 'VARCHAR(50)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'uninstall'			=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'uninstall_note'	=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'disabled'			=> array(
+						'datatype'		=> 'TINYINT(1)',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'dependencies'		=> array(
+						'datatype'		=> 'VARCHAR(255)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					)
+				),
+				'PRIMARY KEY'	=> array('id')
+			);
+
+			$forum_db->create_table('extensions', $schema);
+		}
+
+		// Make sure the collation on "word" in the search_words table is utf8_bin
+		if (in_array($db_type, array('mysql', 'mysqli', 'mysql_innodb', 'mysqli_innodb')))
+		{
+			$result = $forum_db->query('SHOW FULL COLUMNS FROM '.$forum_db->prefix.'search_words') or error(__FILE__, __LINE__);
+			while ($cur_column = $forum_db->fetch_assoc($result))
+			{
+				if ($cur_column['Field'] === 'word')
+				{
+					if ($cur_column['Collation'] !== 'utf8_bin')
+						$forum_db->alter_field('search_words', 'word', 'VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_bin', false, '');
+// Add the extensions table if it doesn't already exist
+		if (!$forum_db->table_exists('extensions'))
+		{
+			$schema = array(
+				'FIELDS'		=> array(
+					'id'				=> array(
+						'datatype'		=> 'VARCHAR(150)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'title'				=> array(
+						'datatype'		=> 'VARCHAR(255)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'version'			=> array(
+						'datatype'		=> 'VARCHAR(25)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'description'		=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'author'			=> array(
+						'datatype'		=> 'VARCHAR(50)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'uninstall'			=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'uninstall_note'	=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'disabled'			=> array(
+						'datatype'		=> 'TINYINT(1)',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'dependencies'		=> array(
+						'datatype'		=> 'VARCHAR(255)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					)
+				),
+				'PRIMARY KEY'	=> array('id')
+			);
+
+			$forum_db->create_table('extensions', $schema);
+		}
+
+		// Make sure the collation on "word" in the search_words table is utf8_bin
+		if (in_array($db_type, array('mysql', 'mysqli', 'mysql_innodb', 'mysqli_innodb')))
+		{
+			$result = $forum_db->query('SHOW FULL COLUMNS FROM '.$forum_db->prefix.'search_words') or error(__FILE__, __LINE__);
+			while ($cur_column = $forum_db->fetch_assoc($result))
+			{
+				if ($cur_column['Field'] === 'word')
+				{
+					if ($cur_column['Collation'] !== 'utf8_bin')
+						$forum_db->alter_field('search_words', 'word', 'VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_bin', false, '');
+ 
 
 		require FORUM_ROOT.'lang/'.$forum_config['o_default_lang'].'/admin_settings.php';
 
-		$query = array(
-			'UPDATE'	=> 'config',
-			'SET'		=> 'conf_value=\''.$lang_admin_settings['Maintenance message default'].'\'',
-			'WHERE'		=> 'conf_name=\'o_maintenance_message\''
-		);
-		$forum_db->query_build($query) or error(__FILE__, __LINE__);
-
-		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-				require FORUM_ROOT.'include/cache.php';
-
-		generate_config_cache();
+		// Add uninstall_note field to extensions
+		$forum_db->add_field('extensions', 'uninstall_note', 'TEXT', true, null, 'uninstall');
+ 
+		// Drop uninstall_notes (plural) field
+		$forum_db->drop_field('extensions', 'uninstall_notes');
+		
+		// Add disabled field to extensions
+		$forum_db->add_field('extensions', 'disabled', 'TINYINT(1)', false, 0, 'uninstall_note');
 
 		function query_update($version, $cur_version)
 		{
-			global $forum_db, $db_type, $forum_config;
+			$schema = array(
+				'FIELDS'		=> array(
+					'id'			=> array(
+						'datatype'		=> 'VARCHAR(150)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'extension_id'	=> array(
+						'datatype'		=> 'VARCHAR(50)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'code'			=> array(
+						'datatype'		=> 'TEXT',
+						'allow_null'	=> true
+					),
+					'installed'		=> array(
+						'datatype'		=> 'INT(10) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'priority'		=> array(
+						'datatype'		=> 'TINYINT(1) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '5'
+					)
+				),
+				'PRIMARY KEY'	=> array('id', 'extension_id')
+			);
+
+			$forum_db->create_table('extension_hooks', $schema);
+		}
 
 			if ($version == '0.7.2' && version_compare($forum_config['o_cur_version'], $version, '<'))
 			{
