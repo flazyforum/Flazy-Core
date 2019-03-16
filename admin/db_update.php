@@ -24,7 +24,7 @@ define('MIN_MYSQL_VERSION', '4.1.2');
 
 header('Content-Type: text/html; charset=utf-8');
 
-// Make sure we are running at least PHP 4.3.0
+// Make sure we are running at least PHP 5
 if (!function_exists('version_compare') || version_compare(PHP_VERSION, MIN_PHP_VERSION, '<'))
 	die('Your version of PHP '.PHP_VERSION.'. To work properly, flazy requires at least PHP '.MIN_PHP_VERSION.'. You need to upgrade PHP version, and only then you will be able to install flazy.');
 
@@ -47,7 +47,7 @@ error_reporting(E_ALL);
 
 // Turn off magic_quotes_runtime
 if (get_magic_quotes_runtime())
-	set_magic_quotes_runtime(0);
+	@ini_set('magic_quotes_runtime', false);
 
 // Turn off PHP time limit
 @set_time_limit(0);
@@ -149,6 +149,294 @@ $maintenance_message = $forum_config['o_maintenance_message'];
 
 if(empty($style_url))
 	$style_url = $base_url;
+
+//
+// Determines whether $str is UTF-8 encoded or not
+//
+function seems_utf8($str)
+{
+	$str_len = strlen($str);
+	for ($i = 0; $i < $str_len; ++$i)
+	{
+		if (ord($str[$i]) < 0x80) continue; # 0bbbbbbb
+		else if ((ord($str[$i]) & 0xE0) == 0xC0) $n=1; # 110bbbbb
+		else if ((ord($str[$i]) & 0xF0) == 0xE0) $n=2; # 1110bbbb
+		else if ((ord($str[$i]) & 0xF8) == 0xF0) $n=3; # 11110bbb
+		else if ((ord($str[$i]) & 0xFC) == 0xF8) $n=4; # 111110bb
+		else if ((ord($str[$i]) & 0xFE) == 0xFC) $n=5; # 1111110b
+		else return false; # Does not match any model
+
+		for ($j = 0; $j < $n; ++$j) # n bytes matching 10bbbbbb follow ?
+		{
+			if ((++$i == strlen($str)) || ((ord($str[$i]) & 0xC0) != 0x80))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+
+//
+// Translates the number from an HTML numeric entity into an UTF-8 character
+//
+function dcr2utf8($src)
+{
+	$dest = '';
+	if ($src < 0)
+		return false;
+	else if ($src <= 0x007f)
+		$dest .= chr($src);
+	else if ($src <= 0x07ff)
+	{
+		$dest .= chr(0xc0 | ($src >> 6));
+		$dest .= chr(0x80 | ($src & 0x003f));
+	}
+	else if ($src == 0xFEFF)
+	{
+		// nop -- zap the BOM
+	}
+	else if ($src >= 0xD800 && $src <= 0xDFFF)
+	{
+		// found a surrogate
+		return false;
+	}
+	else if ($src <= 0xffff)
+	{
+		$dest .= chr(0xe0 | ($src >> 12));
+		$dest .= chr(0x80 | (($src >> 6) & 0x003f));
+		$dest .= chr(0x80 | ($src & 0x003f));
+	}
+	else if ($src <= 0x10ffff)
+	{
+		$dest .= chr(0xf0 | ($src >> 18));
+		$dest .= chr(0x80 | (($src >> 12) & 0x3f));
+		$dest .= chr(0x80 | (($src >> 6) & 0x3f));
+		$dest .= chr(0x80 | ($src & 0x3f));
+	}
+	else
+	{
+		// out of range
+		return false;
+	}
+
+	return $dest;
+}
+
+
+//
+// Attemts to convert $str from $old_charset to UTF-8. Also converts HTML entities (including numeric entities) to UTF-8 characters.
+//
+function convert_to_utf8(&$str, $old_charset)
+{
+	if ($str == '')
+		return false;
+
+	$save = $str;
+
+	// Replace literal entities (for non-UTF-8 compliant html_entity_encode)
+	if (version_compare(PHP_VERSION, '5.0.0', '<') && $old_charset == 'ISO-8859-1' || $old_charset == 'ISO-8859-15')
+		$str = html_entity_decode($str, ENT_QUOTES, $old_charset);
+
+	if (!seems_utf8($str))
+	{
+		if ($old_charset == 'ISO-8859-1')
+			$str = utf8_encode($str);
+		else if (function_exists('iconv'))
+			$str = iconv($old_charset, 'UTF-8', $str);
+		else if (function_exists('mb_convert_encoding'))
+			$str = mb_convert_encoding($str, 'UTF-8', $old_charset);
+	}
+
+	// Replace literal entities (for UTF-8 compliant html_entity_encode)
+	if (version_compare(PHP_VERSION, '5.0.0', '>='))
+		$str = html_entity_decode($str, ENT_QUOTES, 'UTF-8');
+
+	// Replace numeric entities
+	$str = preg_replace_callback('/&#([0-9]+);/', 'utf8_callback_1', $str);
+	$str = preg_replace_callback('/&#x([a-f0-9]+);/i', 'utf8_callback_2', $str);
+
+	return ($save != $str);
+}
+
+
+function utf8_callback_1($matches)
+{
+	return dcr2utf8($matches[1]);
+}
+
+
+function utf8_callback_2($matches)
+{
+	return dcr2utf8(hexdec($matches[1]));
+}
+
+
+//
+// Tries to determine whether post data in the database is UTF-8 encoded or not
+//
+function db_seems_utf8()
+{
+	global $db_type, $forum_db;
+
+	$seems_utf8 = true;
+
+	$query = array(
+		'SELECT'	=> 'MIN(id), MAX(id), COUNT(id)',
+		'FROM'		=> 'posts'
+	);
+
+	$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
+	list($min_id, $max_id, $count_id) = $forum_db->fetch_row($result);
+
+	if ($count_id == 0)
+		return false;
+
+	// Get a random soup of data and check if it appears to be UTF-8
+	for ($i = 0; $i < 100; ++$i)
+	{
+		$id = ($i == 0) ? $min_id : (($i == 1) ? $max_id : rand($min_id, $max_id));
+
+		$query = array(
+			'SELECT'	=> 'p.message, p.poster, t.subject, f.forum_name',
+			'FROM'		=> 'posts AS p',
+			'JOINS'		=> array(
+				array(
+					'INNER JOIN'	=> 'topics AS t',
+					'ON'		=> 't.id = p.topic_id'
+				),
+				array(
+					'INNER JOIN'	=> 'forums AS f',
+					'ON'		=> 'f.id = t.forum_id'
+				)
+			),
+			'WHERE'		=> 'p.id >= '.$id,
+			'LIMIT'		=> '1'
+		);
+		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
+		$random_row = $forum_db->fetch_row($result);
+
+		if (!seems_utf8($random_row[0].$random_row[1].$random_row[2].$random_row[3]))
+		{
+			$seems_utf8 = false;
+			break;
+		}
+	}
+
+	return $seems_utf8;
+}
+
+
+//
+// Safely converts text type columns into utf8 (MySQL only)
+// Function based on update_convert_table_utf8() from the Drupal project (http://drupal.org/)
+//
+function convert_table_utf8($table)
+{
+	global $forum_db;
+
+	$types = array(
+		'char'			=> 'binary',
+		'varchar'		=> 'varbinary',
+		'tinytext'		=> 'tinyblob',
+		'mediumtext'	=> 'mediumblob',
+		'text'			=> 'blob',
+		'longtext'		=> 'longblob'
+	);
+
+	// Set table default charset to utf8
+	$forum_db->query('ALTER TABLE `'.$table.'` CHARACTER SET utf8') or error(__FILE__, __LINE__);
+
+	// Find out which columns need converting and build SQL statements
+	$result = $forum_db->query('SHOW FULL COLUMNS FROM `'.$table.'`') or error(__FILE__, __LINE__);
+	while ($cur_column = $forum_db->fetch_assoc($result))
+	{
+		list($type) = explode('(', $cur_column['Type']);
+		if (isset($types[$type]) && strpos($cur_column['Collation'], 'utf8') === false)
+		{
+			$allow_null = ($cur_column['Null'] == 'YES');
+
+			$forum_db->alter_field($table, $cur_column['Field'], preg_replace('/'.$type.'/i', $types[$type], $cur_column['Type']), $allow_null, $cur_column['Default']);
+			$forum_db->alter_field($table, $cur_column['Field'], $cur_column['Type'].' CHARACTER SET utf8', $allow_null, $cur_column['Default']);
+		}
+	}
+}
+
+
+// Move avatars to DB
+function convert_avatars()
+{
+	global $forum_config, $forum_db;
+
+	$avatar_dir = FORUM_ROOT.'img/avatars/';
+	if (!is_dir($avatar_dir))
+	{
+		return false;
+	}
+
+	if ($handle = opendir($avatar_dir))
+	{
+		while (false !== ($avatar = readdir($handle)))
+		{
+			$avatar_file = $avatar_dir.$avatar;
+			if (!is_file($avatar_file))
+			{
+				continue;
+			}
+
+			//echo $avatar_file;
+
+			$avatar = basename($avatar_file);
+			if (preg_match('/^(\d+)\.(png|gif|jpg)/', $avatar, $matches))
+			{
+
+				$user_id = intval($matches[1], 10);
+				$avatar_ext = $matches[2];
+
+				$avatar_type = FORUM_AVATAR_NONE;
+				if ($avatar_ext == 'png')
+				{
+					$avatar_type = FORUM_AVATAR_PNG;
+				}
+				else if ($avatar_ext == 'gif')
+				{
+					$avatar_type = FORUM_AVATAR_GIF;
+				}
+				else if ($avatar_ext == 'jpg')
+				{
+					$avatar_type = FORUM_AVATAR_JPG;
+				}
+
+				// Check user and avatar type
+				if ($user_id < 2 || $avatar_type == FORUM_AVATAR_NONE)
+				{
+					continue;
+				}
+
+				// Now check the width/height
+				list($width, $height, $type,) = @/**/getimagesize($avatar_file);
+				if (empty($width) || empty($height) || $width > $forum_config['o_avatars_width'] || $height > $forum_config['o_avatars_height'])
+				{
+					@/**/unlink($avatar_file);
+				}
+				else
+				{
+					// Save to DB
+					$query = array(
+						'UPDATE'	=> 'users',
+						'SET'		=> 'avatar=\''.$avatar_type.'\', avatar_height=\''.$height.'\', avatar_width=\''.$width.'\'',
+						'WHERE'		=> 'id='.$user_id
+					);
+					$forum_db->query_build($query) or error(__FILE__, __LINE__);
+				}
+			}
+		}
+		closedir($handle);
+	}
+}
+
+
+header('Content-type: text/html; charset=utf-8');
 
 // Empty all output buffers and stop buffering
 while (@ob_end_clean());
