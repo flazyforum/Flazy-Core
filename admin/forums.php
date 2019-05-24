@@ -91,48 +91,81 @@ else if (isset($_GET['del_forum']))
 	{
 		@set_time_limit(0);
 
-		// Prune all posts and topics
-		prune($forum_to_delete, 1, -1);
+// Create a list of the users ID's in this forum
+      $query = array(
+         'SELECT'   => 'p.poster_id',
+         'FROM'      => 'posts AS p',
+         'JOINS'      => array(
+            array(
+               'INNER JOIN'   => 'topics AS t',
+               'ON'         => 't.id=p.topic_id'
+            ),
+            array(
+               'LEFT JOIN'      => 'forums AS f',
+               'ON'         => 'f.id=t.forum_id'
+            )
+         ),
+         'WHERE'      => 'f.id='.$forum_to_delete
+      );
 
-		delete_orphans();
+      ($hook = get_hook('afo_del_forum_qr_get_posters')) ? eval($hook) : null;
+      $result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
-		// Delete the forum and any forum specific group permissions
-		$query = array(
-			'DELETE'	=> 'forums',
-			'WHERE'		=> 'id='.$forum_to_delete
-		);
+      $count_posters_posts = array();
+      while ($row = $forum_db->fetch_assoc($result)) {
+         if (!isset($count_posters_posts[$row['poster_id']]))
+            $count_posters_posts[$row['poster_id']] = 1;
+         else
+            $count_posters_posts[$row['poster_id']] = $count_posters_posts[$row['poster_id']] + 1;
+      }
 
-		($hook = get_hook('afo_del_forum_qr_delete_forum')) ? eval($hook) : null;
-		$forum_db->query_build($query) or error(__FILE__, __LINE__);
+      // Prune all posts and topics
+      prune($forum_to_delete, 1, -1);
 
-		$query = array(
-			'DELETE'	=> 'forum_perms',
-			'WHERE'		=> 'forum_id='.$forum_to_delete
-		);
+      delete_orphans();
 
-		($hook = get_hook('afo_del_forum_qr_delete_forum_perms')) ? eval($hook) : null;
-		$forum_db->query_build($query) or error(__FILE__, __LINE__);
+      // Delete the forum and any forum specific group permissions
+      $query = array(
+         'DELETE'   => 'forums',
+         'WHERE'      => 'id='.$forum_to_delete
+      );
 
-		// Regenerate the quickjump cache
-		if (!defined('FORUM_CACHE_QUICKJUMP_LOADED'))
-			require FORUM_ROOT.'include/cache/quickjump.php';;
+      ($hook = get_hook('afo_del_forum_qr_delete_forum')) ? eval($hook) : null;
+      $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
-		generate_quickjump_cache();
+      $query = array(
+         'DELETE'   => 'forum_perms',
+         'WHERE'      => 'forum_id='.$forum_to_delete
+      );
 
-		($hook = get_hook('afo_del_forum_pre_redirect')) ? eval($hook) : null;
+      ($hook = get_hook('afo_del_forum_qr_delete_forum_perms')) ? eval($hook) : null;
+      $forum_db->query_build($query) or error(__FILE__, __LINE__);
 
-		redirect(forum_link('admin/forums.php'), $lang_admin_forums['Forum deleted'].' '.$lang_admin_common['Redirect']);
-	}
-	else	// If the user hasn't confirmed the delete
-	{
-		$query = array(
-			'SELECT'	=> 'f.forum_name',
-			'FROM'		=> 'forums AS f',
-			'WHERE'		=> 'f.id='.$forum_to_delete
-		);
+      // Delete forum subscriptions
+      $query = array(
+         'DELETE'   => 'forum_subscriptions',
+         'WHERE'      => 'forum_id='.$forum_to_delete
+      );
 
-		($hook = get_hook('afo_del_forum_qr_get_forum_name')) ? eval($hook) : null;
-		$result = $forum_db->query_build($query) or error(__FILE__, __LINE__);
+      ($hook = get_hook('afo_del_forum_qr_delete_forum_subscriptions')) ? eval($hook) : null;
+      $forum_db->query_build($query) or error(__FILE__, __LINE__);
+
+      //Update count posts of users
+      if (!empty($count_posters_posts))
+      {
+         foreach ($count_posters_posts as $poster_id => $count)
+         {
+            // Update users
+            $query = array(
+               'UPDATE'   => 'users',
+               'SET'      => 'num_posts=num_posts-'.$count,
+               'WHERE'      => 'id='.$poster_id
+            );
+
+            ($hook = get_hook('afo_del_forum_qr_update_users')) ? eval($hook) : null;
+            $forum_db->query_build($query) or error(__FILE__, __LINE__);
+         }
+      }
 		if (!$forum_db->num_rows($result))
 			message($lang_common['Bad request']);
 

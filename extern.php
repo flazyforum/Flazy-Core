@@ -12,34 +12,34 @@
  */
 /* * *********************************************************************
 
-  ИНСТРУКЦИЯ
+  INSTRUCTIONS
 
-  This script is used to include information about your board from
-  pages outside the forums and to syndicate news about recent
-  discussions via RSS/Atom/XML. The script can display a list of
-  recent discussions, a list of active users or a collection of
-  general board statistics. The script can be called directly via
-  an URL, from a PHP include command or through the use of Server
-  Side Includes (SSI).
+This script is used to include information about your board from
+pages outside the forums and to syndicate news about recent
+discussions via RSS/Atom/XML. The script can display a list of
+recent discussions, a list of active users or a collection of
+general board statistics. The script can be called directly via
+an URL, from a PHP include command or through the use of Server
+Side Includes (SSI).
 
-  The scripts behaviour is controlled via variables supplied in the
-  URL to the script. The different variables are: action (what to
-  do), show (how many items to display), fid (the ID or ID's of
-  the forum(s) to poll for topics), nfid (the ID or ID's of forums
-  that should be excluded), tid (the ID of the topic from which to
-  display posts) and type (output as HTML or RSS). The only
-  mandatory variable is action. Possible/default values are:
 
-  action: feed - показать последние темы/сообщения (HTML или RSS/Atom)
-  online - показать участников присутствующих на форуме (HTML)
-  online_full - тоже что и выше, но включает в себя полный
-  список участников (HTML)
-  stats - показать статистику форума (HTML)
+The scripts behaviour is controlled via variables supplied in the
+URL to the script. The different variables are: action (what to
+do), show (how many items to display), fid (the ID or ID's of
+the forum(s) to poll for topics), nfid (the ID or ID's of forums
+that should be excluded), tid (the ID of the topic from which to
+display posts) and type (output as HTML or RSS). The only
+mandatory variable is action. Possible/default values are:
 
-  type:   rss - результат в RSS 2.0
-  atom - результат в Atom 1.0
-  xml - результат в XML
-  html - результат в HTML (<li>'s)
+action: feed - show most recent topics/posts (HTML or RSS)
+    online - show users online (HTML)
+    online_full - as above, but includes a full list (HTML)
+    stats - show board statistics (HTML)
+
+type:   rss - output as RSS 2.0
+        atom - output as Atom 1.0
+        xml - output as XML
+        html - output as HTML (<li>'s)
 
   content: topics - показывать последние темы в указанных форумах
   posts - показать последние сообщения в указанных темах или форумам
@@ -69,13 +69,17 @@ require FORUM_ROOT . 'include/common.php';
 
 ($hook = get_hook('ex_start')) ? eval($hook) : null;
 
+// The length at which topic subjects will be truncated (for HTML output)
+if (!defined('FORUM_EXTERN_MAX_SUBJECT_LENGTH'))
+    define('FORUM_EXTERN_MAX_SUBJECT_LENGTH', 30);
+
 // If we're a guest and we've sent a username/pass, we can try to authenticate using those details
 if ($forum_user['is_guest'] && isset($_SERVER['PHP_AUTH_USER']))
     authenticate_user($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
 
-if (!$forum_user['g_read_board']) {
+if (!$forum_user['g_read_board'] == '0') {
     http_authenticate_user();
-    die($lang_common['No view']);
+    exit($lang_common['No view']);
 }
 
 $action = isset($_GET['action']) ? $_GET['action'] : 'feed';
@@ -101,29 +105,31 @@ function output_rss($feed) {
     header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
     header('Pragma: public');
 
-    echo '<?xml version="1.0" encoding="utf-8"?>' . "\n";
-    echo '<rss version="2.0">' . "\n";
-    echo "\t" . '<channel>' . "\n";
-    echo "\t\t" . '<title><![CDATA[' . escape_cdata($feed['title']) . ']]></title>' . "\n";
-    echo "\t\t" . '<link>' . $feed['link'] . '</link>' . "\n";
-    echo "\t\t" . '<description><![CDATA[' . escape_cdata($feed['description']) . ']]></description>' . "\n";
-    echo "\t\t" . '<lastBuildDate>' . gmdate('r', count($feed['items']) ? $feed['items'][0]['pubdate'] : time()) . '</lastBuildDate>' . "\n";
+    echo '<?xml version="1.0" encoding="utf-8"?>'."\n";
+    echo '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">'."\n";
+    echo "\t".'<channel>'."\n";
+    echo "\t\t".'<title><![CDATA['.escape_cdata($feed['title']).']]></title>'."\n";
+    echo "\t\t".'<link>'.$feed['link'].'</link>'."\n";
+    echo "\t\t".'<atom:link href="'.forum_htmlencode(get_current_url()).'" rel="self" type="application/rss+xml" />'."\n";
+    echo "\t\t".'<description><![CDATA['.escape_cdata($feed['description']).']]></description>'."\n";
+    echo "\t\t".'<lastBuildDate>'.gmdate('r', count($feed['items']) ? $feed['items'][0]['pubdate'] : time()).'</lastBuildDate>'."\n";
 
-    if ($forum_config['o_show_version'])
+    if ($forum_config['o_show_version'] == '1')
         echo "\t\t" . '<generator>Flazy ' . $forum_config['o_cur_version'] . '</generator>' . "\n";
     else
         echo "\t\t" . '<generator>Flazy</generator>' . "\n";
 
     ($hook = get_hook('ex_add_new_rss_info')) ? eval($hook) : null;
 
-    foreach ($feed['items'] as $item) {
-        echo "\t\t" . '<item>' . "\n";
-        echo "\t\t\t" . '<title><![CDATA[' . escape_cdata($item['title']) . ']]></title>' . "\n";
-        echo "\t\t\t" . '<link>' . $item['link'] . '</link>' . "\n";
-        echo "\t\t\t" . '<description><![CDATA[' . escape_cdata($item['description'] . ($forum_config['o_externbox'] && !defined('FORUM_DISABLE_HTML') ? $forum_config['o_externbox_message'] : '')) . ']]></description>' . "\n";
-        echo "\t\t\t" . '<author><![CDATA[' . (isset($item['author']['email']) ? escape_cdata($item['author']['email']) : 'example@example.com') . ' (' . escape_cdata($item['author']['name']) . ')]]></author>' . "\n";
-        echo "\t\t\t" . '<pubDate>' . gmdate('r', $item['pubdate']) . '</pubDate>' . "\n";
-        echo "\t\t\t" . '<guid>' . $item['link'] . '</guid>' . "\n";
+    foreach ($feed['items'] as $item)
+    {
+        echo "\t\t".'<item>'."\n";
+        echo "\t\t\t".'<title><![CDATA['.escape_cdata($item['title']).']]></title>'."\n";
+        echo "\t\t\t".'<link>'.$item['link'].'</link>'."\n";
+        echo "\t\t\t".'<description><![CDATA['.escape_cdata($item['description']).']]></description>'."\n";
+        echo "\t\t\t".'<author><![CDATA['.(isset($item['author']['email']) ? escape_cdata($item['author']['email']) : 'null@example.com').' ('.escape_cdata($item['author']['name']).')]]></author>'."\n";
+        echo "\t\t\t".'<pubDate>'.gmdate('r', $item['pubdate']).'</pubDate>'."\n";
+        echo "\t\t\t".'<guid>'.$item['link'].'</guid>'."\n";
 
         ($hook = get_hook('ex_add_new_rss_item_info')) ? eval($hook) : null;
 

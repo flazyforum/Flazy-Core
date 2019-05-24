@@ -1,6 +1,6 @@
 <?php
 /**
- * Загрузка данных (например: функции, база данных, конфигурационные данные, и т.д.), необходимые для работы форума.
+ * Loads the minimum amount of data (eg: functions, database connection, config data, etc) necessary to integrate the site.
  *
  * @copyright Copyright (C) 2008 PunBB, partially based on code copyright (C) 2008 FluxBB.org
  * @modified Copyright (C) 2014-2018 Flazy
@@ -43,7 +43,7 @@ if (file_exists($config))
 }
 
 if (!defined('FORUM'))
-	error('Файл \'config.php\' не существует или поврежден. Пожалуйста, запустите <a href="'.FORUM_ROOT.'admin/install.php">install.php</a>, чтобы установить Flazy.');
+	error('The file \'config.php\' doesn\'t exist or is corrupt.<br />Please run <a href="'.FORUM_ROOT.'admin/install.php">install.php</a> to install Flazy first.');
 
 // Загрузить скрипт с классами
 require FORUM_ROOT.'include/class/common.php';
@@ -64,21 +64,26 @@ if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
 // Record the start time (will be used to calculate the generation time for the page)
 $forum_start = get_microtime();
 
-// Make sure PHP reports all errors except E_NOTICE. Forum supports E_ALL, but a lot of scripts it may interact with, do not.
+// Make sure PHP reports all errors except E_NOTICE. Flazy supports E_ALL, but a lot of scripts it may interact with, do not.
 if (defined('FORUM_DEBUG'))
 	error_reporting(E_ALL);
 else
 	error_reporting(E_ALL ^ E_NOTICE);
 
-// Устанавливаем локаль для функций преобразования строк
+// Detect UTF-8 support in PCRE
+if ((version_compare(PHP_VERSION, '5.1.0', '>=') || (version_compare(PHP_VERSION, '5.0.0-dev', '<=') && version_compare(PHP_VERSION, '4.4.0', '>='))) && @/**/preg_match('/\p{L}/u', 'a') !== FALSE)
+	{
+		define('FORUM_SUPPORT_PCRE_UNICODE', 1);
+	}
+// Force POSIX locale (to prevent functions such as strtolower() from messing up UTF-8 strings)
 setlocale(LC_CTYPE, 'C');
 
 if(function_exists('date_default_timezone_set'))
 	date_default_timezone_set('UTC');
 
-// Construct REQUEST_URI if it isn't set (or if it's set improperly)
-if (!isset($_SERVER['REQUEST_URI']) || (!empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['REQUEST_URI'], '?') === false))
-	$_SERVER['REQUEST_URI'] = (isset($_SERVER['PHP_SELF']) ? str_replace(array('%26', '%3D', '%2F'), array('&', '=', '/'), rawurlencode($_SERVER['PHP_SELF'])) : '').(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '');
+// If the cache directory is not specified, we use the default setting
+if (!defined('FORUM_CACHE_DIR'))
+	define('FORUM_CACHE_DIR', FORUM_ROOT.'cache/');
 
 // Load DB abstraction layer and connect
 if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb' || $db_type == 'pgsql' ||  $db_type == 'sqlite')
@@ -142,10 +147,23 @@ if (!isset($base_url))
 	$base_url = $base_url_guess;
 }
 
-// For sqlite "show dot" options always disabled
-if ($db_type == 'sqlite')
-	$forum_config['o_show_dot'] = '0';
+// Verify that we are running the proper database schema revision
+if (defined('PUN') || !isset($forum_config['o_database_revision']) || $forum_config['o_database_revision'] < FORUM_DB_REVISION || version_compare($forum_config['o_cur_version'], FORUM_VERSION, '<'))
+	error('Your Flazy database is out-of-date and must be upgraded in order to continue.<br />Please run <a href="'.$base_url.'/admin/db_update.php">db_update.php</a> in order to complete the upgrade process.');
 
+
+// Load hooks
+if (file_exists(FORUM_CACHE_DIR.'cache_hooks.php'))
+	include FORUM_CACHE_DIR.'cache_hooks.php';
+
+if (!defined('FORUM_HOOKS_LOADED'))
+{
+	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+		require FORUM_ROOT.'include/cache.php';
+
+	generate_hooks_cache();
+	require FORUM_CACHE_DIR.'cache_hooks.php';
+}
 // Define a few commonly used constants
 define('FORUM_UNVERIFIED', 0);
 define('FORUM_ADMIN', 1);

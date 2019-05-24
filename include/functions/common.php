@@ -2107,8 +2107,11 @@ function redirect($destination_url, $message)
 	ob_start();
 
 	// Include stylesheets
+if (file_exists(FORUM_ROOT.'style/'.$forum_user['style'].'/'.$forum_user['style'].'.php'))
+   require FORUM_ROOT.'style/'.$forum_user['style'].'/'.$forum_user['style'].'.php';
+else
+   $forum_loader->add_css($base_url.'/style/print.css', array('type' => 'url', 'group' => FORUM_CSS_GROUP_SYSTEM, 'media' => 'screen'));
 	echo '<link rel="stylesheet" type="text/css" href="'.$base_url.'/style/base.css" />';
-	require FORUM_ROOT.'style/'.$forum_user['style'].'/'.$forum_user['style'].'.php';
 
 	$head_temp = forum_trim(ob_get_contents());
 	$num_temp = 0;
