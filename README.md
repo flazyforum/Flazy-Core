@@ -1,6 +1,6 @@
 ## Flazy  
 ======
-We are starting the project again. New design and everything. Just stay in touch.
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/flazy-us/localized.svg)](https://crowdin.com/project/flazy-us)
 
 Index
 -----
